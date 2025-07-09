@@ -2,6 +2,8 @@
 
 This project demonstrates the integration of Retrieval-Augmented Generation (RAG) and Agent-based reasoning for intelligent document and web-augmented question answering. It is designed for learning and experimenting with multi-step reasoning, tool selection, and dynamic answer generation.
 
+<img width="926" alt="Screenshot 2025-07-09 at 9 34 08 AM" src="https://github.com/user-attachments/assets/4ae291bd-0036-4cc7-9084-22ef285ed798" />
+
 ## Key Features
 - **Local Document RAG**: Parse, chunk, embed, and semantically retrieve information from local PDFs and other documents.
 - **Web-Augmented QA**: Optionally enhance answers with real-time web search (via Serper API and lightweight crawling).
