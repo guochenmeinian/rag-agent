@@ -2,8 +2,6 @@
 
 This project demonstrates the integration of Retrieval-Augmented Generation (RAG) and Agent-based reasoning for intelligent document and web-augmented question answering. It is designed for learning and experimenting with multi-step reasoning, tool selection, and dynamic answer generation.
 
-![image](https://github.com/user-attachments/assets/097b844f-9301-4fc2-9437-9c21b241a9bb)
-
 ## Key Features
 - **Local Document RAG**: Parse, chunk, embed, and semantically retrieve information from local PDFs and other documents.
 - **Web-Augmented QA**: Optionally enhance answers with real-time web search (via Serper API and lightweight crawling).
@@ -60,6 +58,10 @@ For local embedding models (e.g., bge-m3), see [FlagEmbedding](https://github.co
 - BeautifulSoup4, Requests, PyYAML, tqdm
 
 ## Reference
+- [llamacloud-demo](https://github.com/run-llama/llamacloud-demo)
+- [Milvus-BGE-M3](https://milvus.io/docs/embed-with-bgm-m3.md)
+- [DeepSeek-Access-API](https://platform.deepseek.com/api_keys)
+- [DeepSeek-R1](https://api-docs.deepseek.com/zh-cn/guides/reasoning_model)
 - Sample product documents (e.g., for ES9 EV) are included for RAG demos.
 - For detailed logic and workflow, see `rag-agent.ipynb` and `Agent+RAG实现检索.pdf`.
 
