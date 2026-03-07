@@ -5,10 +5,7 @@ from pymilvus import (
     CollectionSchema,
     DataType,
     Collection,
-    AnnSearchRequest,
-    WeightedRanker,
 )
-
 
 class MilvusVectorStore():
 
@@ -34,18 +31,18 @@ class MilvusVectorStore():
         ]
         return CollectionSchema(fields)
     
-    def _build_index(self):
+    def _build_index(self, col):
         sparse_index = {"index_type": "SPARSE_INVERTED_INDEX", "metric_type": "IP"}
-        self.col.create_index("sparse_vector", sparse_index)
+        col.create_index("sparse_vector", sparse_index)
         dense_index = {"index_type": "AUTOINDEX", "metric_type": "IP"}
-        self.col.create_index("dense_vector", dense_index)
+        col.create_index("dense_vector", dense_index)
     
     def _init_collection(self):
         if utility.has_collection(self.col_name):
             Collection(self.col_name).drop()
         
         col = Collection(self.col_name, self._build_schema(), consistency_level="Strong")
-        self._build_index()
+        self._build_index(col)
         col.load()
         return col
     
@@ -56,55 +53,29 @@ class MilvusVectorStore():
         
         if len(chunks) != len(chunk_embeddings["dense"]):
             raise ValueError("Length of chunks and chunk_embeddings must match.")
-        
+
+        sparse_embeddings = chunk_embeddings["sparse"]
+
         for i in range(0, len(chunks), 50):
+            end = min(i + 50, len(chunks))
+            # pymilvus has edge cases with scipy sparse array batches (e.g. coo_array),
+            # so convert to one sparse row object per entity.
+            sparse_batch = [self._sparse_row(sparse_embeddings, row_idx) for row_idx in range(i, end)]
             self.col.insert(
                 data = [
-                    chunks[i : i+50],
-                    chunk_embeddings["sparse"][i : i+50],
-                    chunk_embeddings["dense"][i : i+50],
+                    chunks[i:end],
+                    sparse_batch,
+                    chunk_embeddings["dense"][i:end],
                 ],
                 fields=["text", "sparse_vector", "dense_vector"]
             )
     
         self.col.flush()
-    
-    def dense_search(self, query_dense_embedding, limit=10):
-        search_params = {"metric_type": "IP", "params": {}}
-        res = self.col.search(
-            [query_dense_embedding],
-            anns_field="dense_vector",
-            limit=limit,
-            output_fields=["text"],
-            param=search_params,
-        )[0]
-        return [hit.get("text") for hit in res]
 
-    def sparse_search(self, query_sparse_embedding, limit=10):
-        search_params = {
-            "metric_type": "IP",
-            "params": {},
-        }
-        res = self.col.search(
-            [query_sparse_embedding],
-            anns_field="sparse_vector",
-            limit=limit,
-            output_fields=["text"],
-            param=search_params,
-        )[0]
-        return [hit.get("text") for hit in res]
-
-    def hybrid_search(self, query_dense_embedding, query_sparse_embedding, sparse_weight=1.0, dense_weight=1.0, limit=10):
-        dense_search_params = {"metric_type": "IP", "params": {}}
-        dense_req = AnnSearchRequest(
-            [query_dense_embedding], "dense_vector", dense_search_params, limit=limit
-        )
-        sparse_search_params = {"metric_type": "IP", "params": {}}
-        sparse_req = AnnSearchRequest(
-            [query_sparse_embedding], "sparse_vector", sparse_search_params, limit=limit
-        )
-        rerank = WeightedRanker(sparse_weight, dense_weight)
-        res = self.col.hybrid_search(
-            [sparse_req, dense_req], rerank=rerank, limit=limit, output_fields=["text"]
-        )[0]
-        return [hit.get("text") for hit in res]
+    @staticmethod
+    def _sparse_row(sparse_matrix, idx):
+        if hasattr(sparse_matrix, "getrow"):
+            return sparse_matrix.getrow(idx)
+        if hasattr(sparse_matrix, "_getrow"):
+            return sparse_matrix._getrow(idx)
+        return sparse_matrix[idx]
