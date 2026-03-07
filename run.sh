@@ -10,12 +10,19 @@ usage() {
   cat <<'EOF'
 Usage:
   ./run.sh setup   # create .venv and install pinned deps
-  ./run.sh test    # run src/tests/test_milvus.py
+  ./run.sh test    # run src/tests/test_generator.py (full RAG E2E)
+  ./run.sh test-milvus  # run src/tests/test_milvus.py
+  ./run.sh doctor  # re-sign binary libs on macOS
   ./run.sh all     # setup + test
 
 Environment variables:
   LLAMA_CLOUD_API_KEY   required for LlamaParse
+  OPENAI_API_KEY        required for OpenAI answer generation
   RAG_MODEL_CACHE       optional, default: <repo>/.cache/modelscope
+  RAG_TEST_QUERY        optional, default: 介绍一下技术规格
+  RAG_DATA_DIR          optional, default: data
+  RAG_OPENAI_MODEL      optional, default: gpt-4o-mini
+  RAG_TOPK              optional, default: 5
   VENV_DIR              optional, default: <repo>/.venv
 EOF
 }
@@ -47,7 +54,7 @@ print(sysconfig.get_paths()["purelib"])
 PY
 )"
 
-  for pkg in PIL numpy; do
+  for pkg in PIL numpy pandas scipy; do
     local pkg_dir="$py_site/$pkg"
     if [[ -d "$pkg_dir" ]]; then
       find "$pkg_dir" -type f \( -name "*.so" -o -name "*.dylib" \) -print0 \
@@ -56,19 +63,40 @@ PY
   done
 }
 
-run_test() {
+validate_api_key() {
+  local name="$1"
+  local value="${!name:-}"
+  if [[ -z "$value" ]]; then
+    echo "ERROR: $name is not set."
+    exit 1
+  fi
+  case "$value" in
+    "你的key"|"your_key"|"YOUR_KEY")
+      echo "ERROR: $name is placeholder text. Please set a real key."
+      exit 1
+      ;;
+  esac
+}
+
+set_common_env() {
   ensure_venv
   export PYTHONPATH="$ROOT_DIR/src"
   export RAG_MODEL_CACHE="${RAG_MODEL_CACHE:-$ROOT_DIR/.cache/modelscope}"
   export TOKENIZERS_PARALLELISM="${TOKENIZERS_PARALLELISM:-false}"
-
-  if [[ -z "${LLAMA_CLOUD_API_KEY:-}" ]]; then
-    echo "ERROR: LLAMA_CLOUD_API_KEY is not set."
-    echo "Example: export LLAMA_CLOUD_API_KEY='your_real_key'"
-    exit 1
-  fi
-
   mkdir -p "$RAG_MODEL_CACHE"
+}
+
+run_test_e2e() {
+  set_common_env
+  validate_api_key "LLAMA_CLOUD_API_KEY"
+  validate_api_key "OPENAI_API_KEY"
+
+  "$PYTHON_BIN" "$ROOT_DIR/src/tests/test_generator.py"
+}
+
+run_test_milvus() {
+  set_common_env
+  validate_api_key "LLAMA_CLOUD_API_KEY"
   "$PYTHON_BIN" "$ROOT_DIR/src/tests/test_milvus.py"
 }
 
@@ -80,12 +108,19 @@ main() {
       fix_macos_signatures
       ;;
     test)
-      run_test
+      run_test_e2e
+      ;;
+    test-milvus)
+      run_test_milvus
+      ;;
+    doctor)
+      ensure_venv
+      fix_macos_signatures
       ;;
     all)
       install_deps
       fix_macos_signatures
-      run_test
+      run_test_e2e
       ;;
     *)
       usage
