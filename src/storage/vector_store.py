@@ -39,8 +39,14 @@ class MilvusVectorStore():
     
     def _init_collection(self):
         if utility.has_collection(self.col_name):
-            Collection(self.col_name).drop()
-        
+            col = Collection(self.col_name)
+            col.load()
+            if col.num_entities > 0:
+                self.already_exists = True
+                return col
+            col.drop()
+
+        self.already_exists = False
         col = Collection(self.col_name, self._build_schema(), consistency_level="Strong")
         self._build_index(col)
         col.load()

@@ -1,0 +1,222 @@
+{
+  "version": "1.0",
+  "description": "蔚来汽车智能助手 — Golden QA 评估数据集",
+  "categories": {
+    "single_car_param": "单车型参数查询",
+    "multi_car_compare": "多车型横向对比",
+    "web_search": "需要联网查询的问题",
+    "no_tool": "无需工具的通用问题",
+    "multi_turn_context": "多轮上下文依赖问题（需结合 context 字段模拟记忆）",
+    "edge_case": "边界/异常情况"
+  },
+  "cases": [
+    {
+      "id": "q001",
+      "category": "single_car_param",
+      "input": "ET5 的电池容量有哪些版本？",
+      "context": null,
+      "expected_tools": [{"name": "rag_search", "car_model": "ET5", "query_keywords": ["电池容量", "kWh"]}],
+      "expected_answer_keywords": ["kWh", "ET5"],
+      "must_not_contain": [],
+      "notes": "基础单车型参数，应触发 rag_search(ET5)"
+    },
+    {
+      "id": "q002",
+      "category": "single_car_param",
+      "input": "ET7 的轴距是多少毫米？",
+      "context": null,
+      "expected_tools": [{"name": "rag_search", "car_model": "ET7", "query_keywords": ["轴距"]}],
+      "expected_answer_keywords": ["mm", "毫米", "ET7"],
+      "must_not_contain": [],
+      "notes": "精确参数查询，答案应引用具体数值"
+    },
+    {
+      "id": "q003",
+      "category": "single_car_param",
+      "input": "ES8 支持几座？",
+      "context": null,
+      "expected_tools": [{"name": "rag_search", "car_model": "ES8", "query_keywords": ["座位", "座"]}],
+      "expected_answer_keywords": ["座", "ES8"],
+      "must_not_contain": [],
+      "notes": "配置查询"
+    },
+    {
+      "id": "q004",
+      "category": "multi_car_compare",
+      "input": "EC6 和 ET5 的 CLTC 续航里程分别是多少？",
+      "context": null,
+      "expected_tools": [
+        {"name": "rag_search", "car_model": "EC6", "query_keywords": ["续航", "CLTC"]},
+        {"name": "rag_search", "car_model": "ET5", "query_keywords": ["续航", "CLTC"]}
+      ],
+      "expected_parallel": true,
+      "expected_answer_keywords": ["EC6", "ET5", "km"],
+      "must_not_contain": [],
+      "notes": "并行双 rag_search，验证 parallel_tool_calls"
+    },
+    {
+      "id": "q005",
+      "category": "multi_car_compare",
+      "input": "ET5、ET7 和 ES8 谁的轴距最长？",
+      "context": null,
+      "expected_tools": [
+        {"name": "rag_search", "car_model": "ET5", "query_keywords": ["轴距"]},
+        {"name": "rag_search", "car_model": "ET7", "query_keywords": ["轴距"]},
+        {"name": "rag_search", "car_model": "ES8", "query_keywords": ["轴距"]}
+      ],
+      "expected_parallel": true,
+      "expected_answer_keywords": ["轴距", "mm"],
+      "must_not_contain": [],
+      "notes": "三车型并行，验证3个并行 tool call"
+    },
+    {
+      "id": "q006",
+      "category": "multi_car_compare",
+      "input": "ET5 和 ET5T 有什么区别？",
+      "context": null,
+      "expected_tools": [
+        {"name": "rag_search", "car_model": "ET5", "query_keywords": []},
+        {"name": "rag_search", "car_model": "ET5T", "query_keywords": []}
+      ],
+      "expected_parallel": true,
+      "expected_answer_keywords": ["ET5", "ET5T"],
+      "must_not_contain": [],
+      "notes": "近似车型对比，考察模型是否能区分两款"
+    },
+    {
+      "id": "q007",
+      "category": "web_search",
+      "input": "特斯拉 Model Y 最近降价了吗？",
+      "context": null,
+      "expected_tools": [{"name": "web_search", "query_keywords": ["特斯拉", "Model Y", "价格"]}],
+      "expected_answer_keywords": [],
+      "must_not_contain": ["rag_search"],
+      "notes": "竞品实时资讯，应触发 web_search 而非 rag_search"
+    },
+    {
+      "id": "q008",
+      "category": "web_search",
+      "input": "ET5 和 Model 3 续航对比",
+      "context": null,
+      "expected_tools": [
+        {"name": "rag_search", "car_model": "ET5", "query_keywords": ["续航"]},
+        {"name": "web_search", "query_keywords": ["Model 3", "续航"]}
+      ],
+      "expected_parallel": true,
+      "expected_answer_keywords": ["ET5", "Model 3"],
+      "must_not_contain": [],
+      "notes": "混合查询：rag + web 并行"
+    },
+    {
+      "id": "q009",
+      "category": "no_tool",
+      "input": "蔚来的换电模式是怎么运作的？",
+      "context": null,
+      "expected_tools": [],
+      "expected_answer_keywords": ["换电", "电池"],
+      "must_not_contain": [],
+      "notes": "通用行业知识，不应调用任何工具"
+    },
+    {
+      "id": "q010",
+      "category": "no_tool",
+      "input": "你好，我想了解蔚来的车",
+      "context": null,
+      "expected_tools": [],
+      "expected_answer_keywords": [],
+      "must_not_contain": [],
+      "notes": "开场闲聊，不应调用工具，应引导用户说明需求"
+    },
+    {
+      "id": "q011",
+      "category": "multi_turn_context",
+      "input": "那个续航更长的快充要多久？",
+      "context": {
+        "summary": "[关注车型] ET5, EC6\n[用户需求] 预算35万，城市通勤\n[已确认数据] ET5 100kWh: CLTC 580km; EC6 75kWh: CLTC 490km\n[对话脉络] 询问ET5和EC6续航对比，ET5续航更长",
+        "recent_messages": [
+          {"role": "user", "content": "ET5 和 EC6 续航哪个长？"},
+          {"role": "assistant", "content": "ET5 100kWh版 CLTC约580km，EC6 75kWh版约490km，ET5续航更长。"}
+        ]
+      },
+      "expected_rewrite_contains": ["ET5", "快充"],
+      "expected_tools": [{"name": "rag_search", "car_model": "ET5", "query_keywords": ["快充"]}],
+      "expected_answer_keywords": ["ET5", "快充"],
+      "must_not_contain": [],
+      "notes": "代词消解：'那个续航更长的' = ET5（来自已确认数据）"
+    },
+    {
+      "id": "q012",
+      "category": "multi_turn_context",
+      "input": "那充电呢",
+      "context": {
+        "summary": "[关注车型] EC6, ET5\n[用户需求] 预算35万，城市通勤\n[已确认数据] EC6: CLTC 490km; ET5: CLTC 580km\n[对话脉络] 先比较续航 → 当前询问充电",
+        "recent_messages": [
+          {"role": "user", "content": "EC6 和 ET5 的续航对比"},
+          {"role": "assistant", "content": "EC6约490km，ET5约580km。"},
+          {"role": "user", "content": "那充电呢"}
+        ]
+      },
+      "expected_rewrite_contains": ["EC6", "ET5", "充电"],
+      "expected_tools": [
+        {"name": "rag_search", "car_model": "EC6", "query_keywords": ["充电", "快充"]},
+        {"name": "rag_search", "car_model": "ET5", "query_keywords": ["充电", "快充"]}
+      ],
+      "expected_parallel": true,
+      "expected_answer_keywords": ["EC6", "ET5"],
+      "must_not_contain": [],
+      "notes": "跨轮对比追踪：保持 EC6 vs ET5 框架，'那充电呢' → 两款车充电对比"
+    },
+    {
+      "id": "q013",
+      "category": "multi_turn_context",
+      "input": "有没有便宜一点的选择",
+      "context": {
+        "summary": "[关注车型] ES8\n[用户需求] 预算45万，两孩家庭，需要7座\n[已确认数据] ES8起售价46.8万（超预算）\n[对话脉络] 询问ES8价格 → 发现超预算 → 寻求替代",
+        "recent_messages": [
+          {"role": "user", "content": "ES8 多少钱？"},
+          {"role": "assistant", "content": "ES8 起售价约46.8万，超出您45万预算。"},
+          {"role": "user", "content": "有没有便宜一点的选择"}
+        ]
+      },
+      "expected_rewrite_contains": ["45万", "7座"],
+      "expected_tools": [{"name": "web_search"}],
+      "expected_answer_keywords": [],
+      "must_not_contain": [],
+      "notes": "意图显化 + 用户背景融合：'便宜' = 低于45万，需保留7座约束"
+    },
+    {
+      "id": "q014",
+      "category": "edge_case",
+      "input": "ET5 的量子纠缠加速模式开启方法",
+      "context": null,
+      "expected_tools": [{"name": "rag_search", "car_model": "ET5", "query_keywords": []}],
+      "expected_answer_keywords": ["未找到", "未检索", "没有"],
+      "must_not_contain": [],
+      "notes": "不存在的参数：模型应明确表示未找到，不能编造"
+    },
+    {
+      "id": "q015",
+      "category": "edge_case",
+      "input": "ET5 的价格",
+      "context": null,
+      "expected_tools": [{"name": "rag_search", "car_model": "ET5", "query_keywords": ["价格", "起售价"]}],
+      "expected_answer_keywords": ["ET5"],
+      "must_not_contain": [],
+      "notes": "简短模糊查询，测试 query 展开能力"
+    },
+    {
+      "id": "q016",
+      "category": "edge_case",
+      "input": "EL6 和 ES6 的后备厢容积哪个大？",
+      "context": null,
+      "expected_tools": [
+        {"name": "rag_search", "car_model": "EL6", "query_keywords": ["后备厢", "容积"]},
+        {"name": "rag_search", "car_model": "ES6", "query_keywords": ["后备厢", "容积"]}
+      ],
+      "expected_parallel": true,
+      "expected_answer_keywords": [],
+      "must_not_contain": [],
+      "notes": "较冷门车型对比，测试知识库覆盖度"
+    }
+  ]
+}

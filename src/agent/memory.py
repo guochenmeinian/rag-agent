@@ -1,69 +1,122 @@
+import json
 import os
 from collections import deque
-from .qwen_client import get_qwen_client
 
-SMALL_MODEL = os.getenv("QWEN_MODEL", "qwen3.5-instruct")
-SUMMARY_INTERVAL = int(os.getenv("SUMMARY_INTERVAL", "6"))
-MAX_RECENT = int(os.getenv("MAX_RECENT_MESSAGES", "5"))
+import config
+from prompts.memory import SUMMARY_SYSTEM, EMPTY_SUMMARY
+from .qwen_client import get_qwen_client
 
 
 class ConversationMemory:
-    """Manages conversation context with proactive rolling summarization.
+    """三层对话记忆：
 
-    Context structure (mirrors the flowchart):
-        user_profile      - static user info
-        context_summary   - compressed summary of older turns (updated every SUMMARY_INTERVAL msgs)
-        recent_messages   - last MAX_RECENT raw messages (sliding window)
+    Layer 1 — system_prompt + user_profile  (静态，启动时设定)
+    Layer 2 — context_summary               (结构化滚动摘要，recent 满时更新)
+    Layer 3 — recent_messages               (最近 MAX_RECENT 条原文，滑动窗口)
+
+    摘要格式（4个 slot）：
+        [关注车型]   用户关注或比较过的车型
+        [用户需求]   预算、用途、偏好
+        [已确认数据] RAG检索到的具体参数
+        [对话脉络]   最近话题转折
     """
 
-    def __init__(self, user_profile: str = ""):
+    def __init__(self, system_prompt: str = "", user_profile: str = ""):
+        self.system_prompt = system_prompt
         self.user_profile = user_profile
-        self.context_summary = ""
-        self.recent_messages: deque[dict] = deque(maxlen=MAX_RECENT)
-        self._pending: list[dict] = []  # buffer waiting to be summarized
-
+        self.context_summary: str = EMPTY_SUMMARY
+        self.recent_messages: deque[dict] = deque(maxlen=config.MAX_RECENT_MESSAGES)
         self._client = get_qwen_client()
 
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
     def add_message(self, role: str, content: str):
-        msg = {"role": role, "content": content}
-        self.recent_messages.append(msg)
-        self._pending.append(msg)
-
-        if len(self._pending) >= SUMMARY_INTERVAL:
-            self._update_summary()
-
-    def _update_summary(self):
-        if not self._pending:
-            return
-
-        pending_text = "\n".join(
-            f"{m['role']}: {m['content']}" for m in self._pending
-        )
-        prev = f"已有摘要：\n{self.context_summary}\n\n" if self.context_summary else ""
-
-        prompt = (
-            f"{prev}请将以下新对话内容压缩为简洁摘要（100字以内），"
-            f"保留关键信息和用户意图：\n\n{pending_text}"
-        )
-
-        resp = self._client.chat.completions.create(
-            model=SMALL_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=200,
-        )
-        self.context_summary = resp.choices[0].message.content.strip()
-        self._pending.clear()
+        """Add a message. When window is full, evict oldest into structured summary."""
+        if len(self.recent_messages) == config.MAX_RECENT_MESSAGES:
+            self._roll_into_summary(self.recent_messages[0])
+        self.recent_messages.append({"role": role, "content": content})
 
     def format_for_prompt(self) -> str:
-        """Format context as a prompt string for the rewriter and executor."""
+        """Serialize all three layers into a context block for rewriter and executor."""
         parts = []
+
+        # Layer 1: system/user context
+        sp = self.system_prompt
         if self.user_profile:
-            parts.append(f"[用户信息]\n{self.user_profile}")
-        if self.context_summary:
-            parts.append(f"[近期上下文总结]\n{self.context_summary}")
+            sp = f"{sp}\n[用户背景] {self.user_profile}" if sp else f"[用户背景] {self.user_profile}"
+        if sp:
+            parts.append(sp)
+
+        # Layer 2: structured summary
+        parts.append(f"[对话记忆]\n{self.context_summary}")
+
+        # Layer 3: verbatim recent
         if self.recent_messages:
-            msgs = "\n".join(
-                f"{m['role']}: {m['content']}" for m in self.recent_messages
-            )
+            msgs = "\n".join(f"  {m['role']}: {m['content']}" for m in self.recent_messages)
             parts.append(f"[最近 {len(self.recent_messages)} 条消息]\n{msgs}")
+
         return "\n\n".join(parts)
+
+    # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def save(self, path: str):
+        """Serialize memory to a JSON file."""
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        data = {
+            "system_prompt": self.system_prompt,
+            "user_profile": self.user_profile,
+            "context_summary": self.context_summary,
+            "recent_messages": list(self.recent_messages),
+        }
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    @classmethod
+    def load(cls, path: str) -> "ConversationMemory":
+        """Restore memory from a JSON file."""
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        mem = cls(
+            system_prompt=data.get("system_prompt", ""),
+            user_profile=data.get("user_profile", ""),
+        )
+        mem.context_summary = data.get("context_summary", EMPTY_SUMMARY)
+        for msg in data.get("recent_messages", []):
+            mem.recent_messages.append(msg)
+        return mem
+
+    # ------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------
+
+    def _roll_into_summary(self, evicted: dict):
+        """Update structured summary by integrating the evicted message via Qwen."""
+        new_line = f"{evicted['role']}: {evicted['content']}"
+        user_content = (
+            f"【当前摘要】\n{self.context_summary}\n\n"
+            f"【新消息】\n{new_line}\n\n"
+            f"请输出更新后的摘要（保持4个字段格式）："
+        )
+
+        try:
+            resp = self._client.chat.completions.create(
+                model=config.QWEN_MODEL,
+                messages=[
+                    {"role": "system", "content": SUMMARY_SYSTEM},
+                    {"role": "user", "content": user_content},
+                ],
+                max_tokens=300,
+            )
+            updated = resp.choices[0].message.content.strip()
+            # Sanity check: must contain at least one slot header
+            if "[关注车型]" in updated:
+                self.context_summary = updated
+            else:
+                # Fallback: append raw text to 对话脉络 slot
+                self.context_summary += f"\n(+) {new_line[:80]}"
+        except Exception:
+            self.context_summary += f"\n(+) {new_line[:80]}"

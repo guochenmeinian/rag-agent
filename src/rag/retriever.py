@@ -3,7 +3,7 @@ from pymilvus import (
     WeightedRanker,
 )
 
-def dense_search(col, query_dense_embedding, limit=10):
+def dense_search(col, query_dense_embedding, limit=5):
     search_params = {"metric_type": "IP", "params": {}}
     res = col.search(
         [query_dense_embedding],
@@ -12,9 +12,9 @@ def dense_search(col, query_dense_embedding, limit=10):
         output_fields=["text"],
         param=search_params,
     )[0]
-    return [hit.get("text") for hit in res]
+    return [(hit.get("text"), hit.score) for hit in res]
 
-def sparse_search(col, query_sparse_embedding, limit=10):
+def sparse_search(col, query_sparse_embedding, limit=5):
     search_params = {
         "metric_type": "IP",
         "params": {},
@@ -26,9 +26,9 @@ def sparse_search(col, query_sparse_embedding, limit=10):
         output_fields=["text"],
         param=search_params,
     )[0]
-    return [hit.get("text") for hit in res]
+    return [(hit.get("text"), hit.score) for hit in res]
 
-def hybrid_search(col, query_dense_embedding, query_sparse_embedding, sparse_weight=1.0, dense_weight=1.0, limit=10):
+def hybrid_search(col, query_dense_embedding, query_sparse_embedding, sparse_weight=1.0, dense_weight=0.7, limit=5):
     dense_search_params = {"metric_type": "IP", "params": {}}
     dense_req = AnnSearchRequest(
         [query_dense_embedding], "dense_vector", dense_search_params, limit=limit
@@ -41,4 +41,4 @@ def hybrid_search(col, query_dense_embedding, query_sparse_embedding, sparse_wei
     res = col.hybrid_search(
         [sparse_req, dense_req], rerank=rerank, limit=limit, output_fields=["text"]
     )[0]
-    return [hit.get("text") for hit in res]
+    return [(hit.get("text"), hit.score) for hit in res]

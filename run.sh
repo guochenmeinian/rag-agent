@@ -10,6 +10,7 @@ usage() {
   cat <<'EOF'
 Usage:
   ./run.sh setup   # create .venv and install pinned deps
+  ./run.sh serve   # start FastAPI server at http://localhost:8000
   ./run.sh test    # run src/tests/test_generator.py (full RAG E2E)
   ./run.sh test-milvus  # run src/tests/test_milvus.py
   ./run.sh doctor  # re-sign binary libs on macOS
@@ -100,12 +101,20 @@ run_test_milvus() {
   "$PYTHON_BIN" "$ROOT_DIR/src/tests/test_milvus.py"
 }
 
+run_serve() {
+  set_common_env
+  "$VENV_DIR/bin/uvicorn" api:app --reload --port 8000 --app-dir "$ROOT_DIR/src"
+}
+
 main() {
   local cmd="${1:-all}"
   case "$cmd" in
     setup)
       install_deps
       fix_macos_signatures
+      ;;
+    serve)
+      run_serve
       ;;
     test)
       run_test_e2e

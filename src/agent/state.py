@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import config
 
 
 @dataclass
@@ -6,13 +7,9 @@ class AgentState:
     user_input: str
     refined_query: str = ""
 
-    # Tool execution
-    tool_results: list[dict] = field(default_factory=list)  # [{id, name, query, result}]
+    tool_results: list[dict] = field(default_factory=list)
     answer: str = ""
-
-    # Reflection
     reflection_feedback: str = ""
 
-    # Loop control
     iteration: int = 0
-    MAX_ITER: int = 3
+    MAX_ITER: int = field(default_factory=lambda: config.MAX_ITERATIONS)
