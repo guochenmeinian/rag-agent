@@ -52,6 +52,7 @@ class Reflector:
                     {"role": "user", "content": user_content},
                 ],
                 max_tokens=300,
+                extra_body={"enable_thinking": False},
             )
             raw = resp.choices[0].message.content.strip()
             result = self._parse_json(raw)

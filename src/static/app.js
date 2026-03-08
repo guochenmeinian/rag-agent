@@ -1,6 +1,16 @@
 // ── Config ────────────────────────────────────────────────────────────────────
 marked.setOptions({ breaks: true, gfm: true });
 
+// Auto-assign a session_id if the user hasn't typed one, so each browser tab
+// gets its own isolated conversation (avoids the shared "__anon__" backend bug).
+function getOrInitSessionId() {
+  const stored = localStorage.getItem('nio_session_id');
+  if (stored) return stored;
+  const id = crypto.randomUUID();
+  localStorage.setItem('nio_session_id', id);
+  return id;
+}
+
 // ── State ─────────────────────────────────────────────────────────────────────
 let isStreaming = false;
 let traces = [];   // [{ turn, query, refined, events[], elapsed }]
@@ -15,6 +25,16 @@ const devToggle    = document.getElementById('devToggle');
 const devPanel     = document.getElementById('devPanel');
 const sessionInput = document.getElementById('sessionInput');
 const profileInput = document.getElementById('profileInput');
+
+// Populate session input: prefer user-typed value, fall back to auto-generated UUID
+if (!sessionInput.value.trim()) {
+  sessionInput.value = getOrInitSessionId();
+}
+// Persist any manual edits to localStorage
+sessionInput.addEventListener('change', () => {
+  const val = sessionInput.value.trim();
+  if (val) localStorage.setItem('nio_session_id', val);
+});
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

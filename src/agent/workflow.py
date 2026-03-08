@@ -170,6 +170,10 @@ class AgentWorkflow:
     # Internal
     # ------------------------------------------------------------------
 
+    @property
+    def session_path(self) -> str | None:
+        return self._session_path
+
     def _persist(self):
         if self._session_path:
             self.memory.save(self._session_path)

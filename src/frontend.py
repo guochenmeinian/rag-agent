@@ -252,6 +252,28 @@ if "messages" not in st.session_state:
     st.session_state.messages = []      # {role, content, tool_calls, trace}
 if "stats" not in st.session_state:
     st.session_state.stats = {"turns": 0, "tool_calls": 0, "retries": 0}
+if "_loaded_session" not in st.session_state:
+    st.session_state._loaded_session = None
+
+# Restore chat history when the user sets (or changes) their session_id
+_current_sid = st.session_state.get("session_id", "").strip()
+if _current_sid and st.session_state._loaded_session != _current_sid:
+    # Always reset state when switching sessions
+    st.session_state.messages = []
+    st.session_state.stats = {"turns": 0, "tool_calls": 0, "retries": 0}
+    for _k in ("workflow", "_wf_key"):
+        st.session_state.pop(_k, None)
+    # Load saved history if it exists
+    _path = os.path.join(config.MEMORY_DIR, f"{_current_sid}.json")
+    if os.path.exists(_path):
+        try:
+            import json as _json
+            with open(_path, encoding="utf-8") as _f:
+                _saved = _json.load(_f)
+            st.session_state.messages = _saved.get("ui_messages", [])
+        except Exception:
+            pass
+    st.session_state._loaded_session = _current_sid
 
 # ─────────────────────────────────────────────────────────────
 # Dialog windows
@@ -272,8 +294,11 @@ def dialog_tool_result():
         c2.markdown(r.get("car_model"))
     st.divider()
     raw = r.get("result")
-    content = raw.content if hasattr(raw, "content") else str(raw)
-    meta    = raw.metadata if hasattr(raw, "metadata") else {}
+    if isinstance(raw, dict):
+        content, meta = raw.get("content", ""), raw.get("metadata", {})
+    else:
+        content = raw.content if hasattr(raw, "content") else str(raw)
+        meta    = raw.metadata if hasattr(raw, "metadata") else {}
     st.code(content, language="text")
     if meta:
         st.json(meta, expanded=False)
@@ -329,7 +354,14 @@ def _render_trace_event_full(ev: dict):
         for r in ev.get("results", []):
             with st.expander(f"`{r['name']}` — {r.get('query','')[:50]}"):
                 raw = r.get("result")
-                st.code(raw.content if hasattr(raw, "content") else str(raw), language="text")
+                if isinstance(raw, dict):
+                    content, meta = raw.get("content", ""), raw.get("metadata", {})
+                else:
+                    content = raw.content if hasattr(raw, "content") else str(raw)
+                    meta    = raw.metadata if hasattr(raw, "metadata") else {}
+                st.code(content, language="text")
+                if meta:
+                    st.json(meta, expanded=False)
     elif etype == "reflecting":
         st.markdown("**🔎 反思校验**")
     elif etype == "retry":
@@ -342,6 +374,42 @@ def _render_trace_event_full(ev: dict):
 # ─────────────────────────────────────────────────────────────
 # Helpers — render
 # ─────────────────────────────────────────────────────────────
+
+def _serialize_tool_result(raw) -> dict:
+    """Convert a single ToolResult object to a JSON-serializable dict."""
+    if isinstance(raw, dict):
+        return raw
+    return {
+        "content":    getattr(raw, "content",    str(raw)),
+        "success":    getattr(raw, "success",    True),
+        "metadata":   getattr(raw, "metadata",   {}),
+        "latency_ms": getattr(raw, "latency_ms", 0),
+    }
+
+
+def _serialize_trace(trace: dict) -> dict:
+    """Convert ToolResult objects inside a trace to JSON-serializable dicts."""
+    serialized_events = []
+    for ev in trace.get("events", []):
+        ev_type = ev.get("type")
+        if ev_type == "tool_done":
+            results_copy = [
+                {**r, "result": _serialize_tool_result(r["result"])}
+                if "result" in r else r
+                for r in ev.get("results", [])
+            ]
+            serialized_events.append({**ev, "results": results_copy})
+        elif ev_type == "done" and ev.get("tool_results"):
+            tool_results_copy = [
+                {**r, "result": _serialize_tool_result(r["result"])}
+                if "result" in r else r
+                for r in ev["tool_results"]
+            ]
+            serialized_events.append({**ev, "tool_results": tool_results_copy})
+        else:
+            serialized_events.append(ev)
+    return {**trace, "events": serialized_events}
+
 
 def _tool_tags_html(calls: list[dict]) -> str:
     parts = []
@@ -480,16 +548,15 @@ def _render_dev_panel():
 
         st.markdown('<div class="section-label" style="margin-top:10px;">API 密钥</div>', unsafe_allow_html=True)
         st.markdown('<div class="dev-card">', unsafe_allow_html=True)
-        for label, key in [
-            ("OpenAI", config.OPENAI_API_KEY),
-            ("DashScope", config.DASHSCOPE_API_KEY),
-            ("Serper", config.SERPER_API_KEY),
+        for label, key, hint in [
+            ("OpenAI",    config.OPENAI_API_KEY,    exec_cfg.get("model", config.OPENAI_MODEL)),
+            ("DashScope", config.DASHSCOPE_API_KEY, qwen_cfg.get("model", config.QWEN_MODEL)),
+            ("Serper",    config.SERPER_API_KEY,    "web search"),
         ]:
-            dot = '<span class="dot-ok"></span>' if key else '<span class="dot-no"></span>'
-            masked = f"{key[:4]}…{key[-4:]}" if len(key) > 8 else ("已配置" if key else "未配置")
+            dot  = '<span class="dot-ok"></span>' if key else '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid #d1d5db;margin-right:6px;"></span>'
+            hint_html = f'<span class="stat-val">{hint}</span>'
             st.markdown(
-                f'<div class="stat-row"><span class="stat-lbl">{dot}{label}</span>'
-                f'<span class="stat-val">{masked}</span></div>',
+                f'<div class="stat-row"><span class="stat-lbl">{dot}{label}</span>{hint_html}</div>',
                 unsafe_allow_html=True,
             )
         st.markdown('</div>', unsafe_allow_html=True)
@@ -608,8 +675,14 @@ with st.sidebar:
     )
 
     if st.button("清空对话", use_container_width=True):
+        sid = st.session_state.get("session_id", "").strip()
+        if sid:
+            _del_path = os.path.join(config.MEMORY_DIR, f"{sid}.json")
+            if os.path.exists(_del_path):
+                os.remove(_del_path)
         st.session_state.messages = []
         st.session_state.stats    = {"turns": 0, "tool_calls": 0, "retries": 0}
+        st.session_state._loaded_session = None
         for k in ("workflow", "_wf_key"):
             st.session_state.pop(k, None)
         st.rerun()
@@ -789,4 +862,16 @@ if prompt := st.chat_input("问我关于蔚来汽车的任何问题…"):
         "trace":      trace,
     })
     st.session_state.stats["turns"] += 1
+
+    # Persist UI history to session JSON so it survives page refresh
+    _wf = st.session_state.get("workflow")
+    if _wf and _wf.session_path:
+        _wf.memory.ui_messages = [
+            {"role": m["role"], "content": m["content"],
+             "tool_calls": m.get("tool_calls") or [],
+             "trace": _serialize_trace(m["trace"]) if m.get("trace") else None}
+            for m in st.session_state.messages
+        ]
+        _wf.memory.save(_wf.session_path)
+
     st.rerun()

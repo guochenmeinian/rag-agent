@@ -34,5 +34,16 @@ def parse_documents(data_dir, parser):
     return documents
 
 
+def parse_single_file(filepath: str, parser) -> str:
+    if not os.path.exists(filepath):
+        raise ValueError(f"File {filepath} does not exist.")
+    
+    if parser is None:
+        raise ValueError("Parser is not initialized.")
+
+    documents = parser.load_data(filepath)
+    return merge_documents(documents)
+
+
 def merge_documents(documents):
     return "".join(doc.text for doc in documents)

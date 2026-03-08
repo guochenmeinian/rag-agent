@@ -1,10 +1,12 @@
+import os
 from typing import Any
 from dataclasses import dataclass
 from rag.chunker import chunk_text
 from rag.embedder import embed_query, embed_texts, load_bge_m3_embedder
-from rag.parser import build_llama_parser, merge_documents, parse_documents
+from rag.parser import build_llama_parser, parse_single_file
 from rag.retriever import hybrid_search
 from storage.vector_store import MilvusVectorStore
+from storage.ingest_manager import IngestManager
 
 @dataclass
 class RAGContext:
@@ -15,33 +17,116 @@ class RAGContext:
 
 _PROBE_DIM = 1024  # BGE-M3 dense dim; used only to open existing collections
 
+# Global IngestManager instance (shared across all ingest calls)
+_ingest_manager: IngestManager | None = None
 
-def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid"):
-    # --- Fast path: collection already populated, skip parse/embed/insert ---
+def get_ingest_manager() -> IngestManager:
+    """获取全局 IngestManager 实例"""
+    global _ingest_manager
+    if _ingest_manager is None:
+        _ingest_manager = IngestManager()
+    return _ingest_manager
+
+
+def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, file_filter=None):
+    """
+    Ingest PDF 文档到向量数据库
+
+    Args:
+        data_dir: 数据目录
+        uri: Milvus 连接 URI
+        col_name: Collection 名称
+        force: 是否强制重新 ingest（忽略缓存）
+        file_filter: 只处理匹配的文件名（如 "EC6.pdf"），None 表示处理所有 PDF
+
+    Returns:
+        RAGContext 包含 store, embedder 等信息
+
+    优化：
+    1. 文件指纹检测 - 检测文件是否变化，没变则跳过
+    2. Parse 缓存 - 即使需要 ingest，也优先使用缓存的 parse 结果
+    """
+    manager = get_ingest_manager()
+
+    # 收集要处理的 PDF 文件
+    pdf_files = []
+    if os.path.isdir(data_dir):
+        for f in os.listdir(data_dir):
+            if f.lower().endswith(".pdf"):
+                if file_filter is None or f == file_filter:
+                    pdf_files.append(os.path.join(data_dir, f))
+
+    if not pdf_files:
+        raise ValueError(f"No PDF files found in {data_dir}" +
+                         (f" matching '{file_filter}'" if file_filter else ""))
+
+    # 检查 collection 状态
     probe = MilvusVectorStore(uri=uri, col_name=col_name, dense_dim=_PROBE_DIM)
-    if probe.already_exists:
-        embedder = load_bge_m3_embedder()
-        actual_dim = probe.col.schema.fields[-1].params["dim"]
-        print(f"[ingest] {col_name}: reusing existing collection ({probe.col.num_entities} chunks).")
-        return RAGContext(store=probe, embedder=embedder, col_name=col_name, dense_dim=actual_dim)
+    collection_exists = probe.already_exists
+    collection_count = probe.col.num_entities if collection_exists else 0
 
-    # --- Slow path: parse → chunk → embed → insert ---
+    # 检查是否需要 ingest
+    if not force:
+        status = manager.check_ingest_status(
+            pdf_files=pdf_files,
+            col_name=col_name,
+            collection_exists=collection_exists,
+            collection_count=collection_count,
+        )
+
+        if status.skip:
+            embedder = load_bge_m3_embedder()
+            actual_dim = probe.col.schema.fields[-1].params["dim"]
+            print(f"[ingest] {col_name}: skipping - {status.reason}")
+            return RAGContext(store=probe, embedder=embedder, col_name=col_name, dense_dim=actual_dim)
+
+        print(f"[ingest] {col_name}: need to ingest - {status.reason}")
+    else:
+        print(f"[ingest] {col_name}: force re-ingest")
+
+    # Slow path: 需要 ingest
+    # 1. 初始化 parser
     parser = build_llama_parser()
-    docs = parse_documents(data_dir, parser)
-    text = merge_documents(docs)
 
-    chunks = chunk_text(text, max_chunk_size=300, hard_max_length=512)
+    # 2. Parse 每个文件（使用缓存）
+    all_text = []
+    for filepath in sorted(pdf_files):
+        parsed_text = manager.get_or_parse(
+            filepath,
+            lambda fp: parse_single_file(fp, parser),
+            verbose=True,
+        )
+        all_text.append(parsed_text)
+
+    # 3. Chunk
+    merged_text = "".join(all_text)
+    chunks = chunk_text(merged_text, max_chunk_size=300, hard_max_length=512)
     if not chunks:
         raise ValueError("No chunks generated from input documents")
 
+    print(f"[ingest] {col_name}: generated {len(chunks)} chunks")
+
+    # 4. Embed
     embedder = load_bge_m3_embedder()
     emb = embed_texts(chunks, embedder)
     dense_dim = emb["dense"][0].shape[0]
 
-    # Re-init with correct dim (probe used placeholder dim and found no data)
+    # 5. 如果 collection 已存在但需要重建，先删除
+    if collection_exists:
+        print(f"[ingest] {col_name}: dropping existing collection")
+        probe.col.drop()
+
+    # 6. 重新创建并插入
     store = MilvusVectorStore(uri=uri, col_name=col_name, dense_dim=dense_dim)
     store.insert(chunks, emb)
+
+    print(f"[ingest] {col_name}: inserted {len(chunks)} chunks")
+
+    # 7. 更新 manifest（只记录实际处理的文件）
+    manager.mark_ingested_files(col_name, pdf_files)
+
     return RAGContext(store=store, embedder=embedder, col_name=col_name, dense_dim=dense_dim)
+
 
 def _get_sparse_row(sparse_matrix, idx: int):
     """Safely extract one row from a scipy sparse matrix."""

@@ -5,7 +5,7 @@ Run:
     # or from project root:
     PYTHONPATH=src uvicorn src.api:app --reload --port 8000
 """
-import sys, os, json, threading, asyncio, shutil, tempfile
+import sys, os, json, threading, asyncio
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -55,9 +55,8 @@ def _load_rag_contexts() -> dict[str, RAGContext]:
             if os.path.isdir(subdir):
                 ctx = ingest(data_dir=subdir, uri=config.MILVUS_URI, col_name=col_name)
             elif os.path.isfile(flat_pdf):
-                with tempfile.TemporaryDirectory() as tmp:
-                    shutil.copy(flat_pdf, os.path.join(tmp, f"{model}.pdf"))
-                    ctx = ingest(data_dir=tmp, uri=config.MILVUS_URI, col_name=col_name)
+                ctx = ingest(data_dir=config.DATA_ROOT, uri=config.MILVUS_URI,
+                             col_name=col_name, file_filter=f"{model}.pdf")
             else:
                 continue
             contexts[model] = ctx
@@ -76,16 +75,18 @@ def _build_registry(rag_contexts: dict) -> ToolRegistry:
 
 
 def _get_or_create_workflow(session_id: str, user_profile: str) -> AgentWorkflow:
-    key = session_id or "__anon__"
-    if key not in _workflows:
-        _workflows[key] = AgentWorkflow(
+    if not session_id:
+        # No session_id: return a fresh stateless workflow, don't cache it
+        return AgentWorkflow(registry=_registry, user_profile=user_profile)
+    if session_id not in _workflows:
+        _workflows[session_id] = AgentWorkflow(
             registry=_registry,
             user_profile=user_profile,
-            session_id=session_id or None,
+            session_id=session_id,
         )
     elif user_profile:
-        _workflows[key].memory.user_profile = user_profile
-    return _workflows[key]
+        _workflows[session_id].memory.user_profile = user_profile
+    return _workflows[session_id]
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────

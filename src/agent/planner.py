@@ -36,7 +36,8 @@ class QueryRewriter:
                     {"role": "system", "content": prompt.SYSTEM},
                     {"role": "user", "content": user_content},
                 ],
-                max_tokens=150,
+                max_tokens=300,
+                extra_body={"enable_thinking": False},
             )
             refined = resp.choices[0].message.content.strip()
             return refined if len(refined) > 5 else user_input

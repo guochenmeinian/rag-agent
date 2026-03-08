@@ -26,6 +26,7 @@ class ConversationMemory:
         self.user_profile = user_profile
         self.context_summary: str = EMPTY_SUMMARY
         self.recent_messages: deque[dict] = deque(maxlen=config.MAX_RECENT_MESSAGES)
+        self.ui_messages: list[dict] = []   # full chat UI history for frontend restore
         self._client = get_qwen_client()
 
     # ------------------------------------------------------------------
@@ -71,6 +72,7 @@ class ConversationMemory:
             "user_profile": self.user_profile,
             "context_summary": self.context_summary,
             "recent_messages": list(self.recent_messages),
+            "ui_messages": self.ui_messages,
         }
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
@@ -78,8 +80,16 @@ class ConversationMemory:
     @classmethod
     def load(cls, path: str) -> "ConversationMemory":
         """Restore memory from a JSON file."""
-        with open(path, encoding="utf-8") as f:
-            data = json.load(f)
+        try:
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            # Corrupted file — start fresh and remove the broken file
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+            return cls()
         mem = cls(
             system_prompt=data.get("system_prompt", ""),
             user_profile=data.get("user_profile", ""),
@@ -87,6 +97,7 @@ class ConversationMemory:
         mem.context_summary = data.get("context_summary", EMPTY_SUMMARY)
         for msg in data.get("recent_messages", []):
             mem.recent_messages.append(msg)
+        mem.ui_messages = data.get("ui_messages", [])
         return mem
 
     # ------------------------------------------------------------------
@@ -110,6 +121,7 @@ class ConversationMemory:
                     {"role": "user", "content": user_content},
                 ],
                 max_tokens=300,
+                extra_body={"enable_thinking": False},
             )
             updated = resp.choices[0].message.content.strip()
             # Sanity check: must contain at least one slot header

@@ -29,16 +29,26 @@ from rag.pipeline import ingest, RAGContext
 
 def load_rag_contexts() -> dict[str, RAGContext]:
     contexts = {}
+    
     for model in config.NIO_CAR_MODELS:
-        data_dir = os.path.join(config.DATA_ROOT, model)
-        if not os.path.isdir(data_dir):
-            print(f"[warn] No data directory for {model}, skipping.")
+        pdf_path = os.path.join(config.DATA_ROOT, f"{model}.pdf")
+        
+        if not os.path.isfile(pdf_path):
+            print(f"[warn] No PDF file for {model} at {pdf_path}, skipping.")
             continue
+        
         print(f"[info] Ingesting {model}...")
         col_name = f"nio_{model.lower()}"
-        ctx = ingest(data_dir=data_dir, uri=config.MILVUS_URI, col_name=col_name)
+        
+        ctx = ingest(
+            data_dir=config.DATA_ROOT,
+            uri=config.MILVUS_URI,
+            col_name=col_name,
+            file_filter=f"{model}.pdf"
+        )
         contexts[model] = ctx
         print(f"[info] {model} ready.")
+    
     return contexts
 
 
