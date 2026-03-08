@@ -30,20 +30,23 @@ class RagSearchTool(BaseTool):
     @property
     def schema(self) -> dict:
         return {
-            "name": self.name,
-            "description": self.description,
-            "input_schema": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "查询内容，如'电池容量'、'续航里程'、'充电功率'",
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": self.description,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "查询内容，如'电池容量'、'续航里程'、'充电功率'",
+                        },
+                        "car_model": {
+                            "type": "string",
+                            "description": "蔚来车型名称，如EC6、ET5、ES8、ET7、EL6",
+                        },
                     },
-                    "car_model": {
-                        "type": "string",
-                        "description": "蔚来车型名称，如EC6、ET5、ES8、ET7、EL6",
-                    },
+                    "required": ["query", "car_model"],
                 },
-                "required": ["query", "car_model"],
             },
         }

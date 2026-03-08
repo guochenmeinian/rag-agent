@@ -1,9 +1,10 @@
 import os
+import json
 from dataclasses import dataclass, field
 from typing import Literal
-import anthropic
+from openai import OpenAI
 
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 
 _SYSTEM = """你是一个蔚来汽车智能助手，帮助用户了解蔚来车型信息和汽车选购决策。
 
@@ -21,50 +22,69 @@ _SYSTEM = """你是一个蔚来汽车智能助手，帮助用户了解蔚来车�
 
 
 @dataclass
+class ToolUseBlock:
+    id: str
+    name: str
+    input: dict
+
+
+@dataclass
 class ExecutorResponse:
     type: Literal["tool_call", "direct"]
     answer: str = ""
-    # Raw content blocks from Anthropic response (needed for message reconstruction)
-    raw_content: list = field(default_factory=list)
-    # tool_use blocks only, subset of raw_content
+    raw_content: dict = field(default_factory=dict)
     tool_use_blocks: list = field(default_factory=list)
 
 
 class AgentExecutor:
     def __init__(self, tool_schemas: list[dict]):
-        self._client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self._client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self._tool_schemas = tool_schemas
 
     def run(self, messages: list[dict]) -> ExecutorResponse:
-        """Single Claude API call. messages is the full conversation for this turn."""
-        response = self._client.messages.create(
-            model=CLAUDE_MODEL,
+        response = self._client.chat.completions.create(
+            model=OPENAI_MODEL,
             max_tokens=4096,
-            system=_SYSTEM,
             tools=self._tool_schemas,
-            messages=messages,
+            messages=[{"role": "system", "content": _SYSTEM}] + messages,
         )
         return self._parse(response)
 
     def _parse(self, response) -> ExecutorResponse:
-        tool_use_blocks = []
-        text_parts = []
+        msg = response.choices[0].message
 
-        for block in response.content:
-            if block.type == "tool_use":
-                tool_use_blocks.append(block)
-            elif block.type == "text":
-                text_parts.append(block.text)
-
-        if tool_use_blocks:
+        if msg.tool_calls:
+            blocks = [
+                ToolUseBlock(
+                    id=tc.id,
+                    name=tc.function.name,
+                    input=json.loads(tc.function.arguments),
+                )
+                for tc in msg.tool_calls
+            ]
+            raw = {
+                "role": "assistant",
+                "content": msg.content,
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }
+                    for tc in msg.tool_calls
+                ],
+            }
             return ExecutorResponse(
                 type="tool_call",
-                raw_content=response.content,
-                tool_use_blocks=tool_use_blocks,
+                raw_content=raw,
+                tool_use_blocks=blocks,
             )
 
         return ExecutorResponse(
             type="direct",
-            answer="\n".join(text_parts).strip(),
-            raw_content=response.content,
+            answer=msg.content or "",
+            raw_content={"role": "assistant", "content": msg.content},
         )

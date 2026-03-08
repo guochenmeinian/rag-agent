@@ -130,7 +130,7 @@ def render_tool_calls(calls: list[dict]):
     st.markdown(" ".join(badges), unsafe_allow_html=True)
 
 
-def render_message(msg: dict):
+def render_message(msg: dict, dev_mode: bool = False):
     with st.chat_message(msg["role"]):
         if msg["role"] == "assistant":
             tool_calls = msg.get("tool_calls", [])
@@ -138,6 +138,10 @@ def render_message(msg: dict):
                 with st.expander("🔍 工具调用", expanded=False):
                     render_tool_calls(tool_calls)
             st.markdown(msg["content"])
+            if dev_mode and msg.get("dev_logs"):
+                with st.expander("🔧 开发者日志", expanded=False):
+                    for log in msg["dev_logs"]:
+                        st.write(log)
         else:
             st.markdown(msg["content"])
 
@@ -176,7 +180,10 @@ with st.sidebar:
         st.info("未找到车型数据目录，仅使用网络搜索。\n\n`data/<车型>/` 放入文档后重启。")
 
     st.divider()
-    st.caption(f"主模型: `{config.CLAUDE_MODEL}`")
+    dev_mode = st.toggle("🔧 开发者模式", value=False)
+
+    st.divider()
+    st.caption(f"主模型: `{config.OPENAI_MODEL}`")
     st.caption(f"改写/反思: `{config.QWEN_MODEL}`")
 
 # ---------------------------------------------------------------------------
@@ -191,7 +198,7 @@ if "messages" not in st.session_state:
 
 # Render history
 for msg in st.session_state.messages:
-    render_message(msg)
+    render_message(msg, dev_mode=dev_mode)
 
 # Chat input
 if prompt := st.chat_input("问我关于蔚来汽车的任何问题..."):
@@ -207,10 +214,8 @@ if prompt := st.chat_input("问我关于蔚来汽车的任何问题..."):
     # Stream response
     with st.chat_message("assistant"):
         tool_calls_this_turn: list[dict] = []
+        dev_logs: list = []
         answer = ""
-
-        status_placeholder = st.empty()
-        answer_placeholder = st.empty()
 
         with st.status("思考中...", expanded=True) as status_box:
             for event in workflow.run_stream(prompt):
@@ -218,11 +223,15 @@ if prompt := st.chat_input("问我关于蔚来汽车的任何问题..."):
 
                 if etype == "rewriting":
                     st.write("✏️ 理解问题...")
+                    dev_logs.append("✏️ 理解问题...")
 
                 elif etype == "refined":
                     refined = event["query"]
-                    if refined != prompt:
+                    if dev_mode:
+                        st.write(f"💡 改写后问题: `{refined}`")
+                    elif refined != prompt:
                         st.write(f"💡 精准问题: *{refined}*")
+                    dev_logs.append(f"💡 改写后问题: {refined}")
 
                 elif etype == "tool_calling":
                     calls = event["calls"]
@@ -233,21 +242,37 @@ if prompt := st.chat_input("问我关于蔚来汽车的任何问题..."):
                         car = c.get("car_model", "")
                         if name == "rag_search":
                             st.write(f"📚 查询知识库: **{car}** — {query}")
+                            dev_logs.append(f"📚 rag_search | car={car} | query={query}")
                         else:
                             st.write(f"🌐 网络搜索: {query}")
+                            dev_logs.append(f"🌐 web_search | query={query}")
 
                 elif etype == "tool_done":
-                    st.write(f"✅ 获取到 {len(event['results'])} 条结果")
+                    results = event["results"]
+                    if dev_mode:
+                        for r in results:
+                            st.write(f"✅ `{r['name']}` 返回:")
+                            st.code(r["result"][:1000], language="text")
+                    else:
+                        st.write(f"✅ 获取到 {len(results)} 条结果")
+                    for r in results:
+                        dev_logs.append(f"✅ {r['name']} 结果:\n{r['result'][:500]}")
 
                 elif etype == "reflecting":
                     st.write("🔎 验证答案质量...")
+                    dev_logs.append("🔎 反思中...")
 
                 elif etype == "retry":
-                    st.write(f"⚠️ 重新生成 (反思反馈: {event['feedback'][:60]}...)")
+                    feedback = event["feedback"]
+                    if dev_mode:
+                        st.write(f"⚠️ 反思未通过: {feedback}")
+                    else:
+                        st.write(f"⚠️ 重新生成 (反思反馈: {feedback[:60]}...)")
+                    dev_logs.append(f"⚠️ 反思未通过: {feedback}")
 
                 elif etype == "done":
                     answer = event["answer"]
-                    status_box.update(label="完成", state="complete", expanded=False)
+                    status_box.update(label="完成", state="complete", expanded=dev_mode)
 
         # Render tool call summary if any
         if tool_calls_this_turn:
@@ -262,4 +287,5 @@ if prompt := st.chat_input("问我关于蔚来汽车的任何问题..."):
         "role": "assistant",
         "content": answer,
         "tool_calls": tool_calls_this_turn,
+        "dev_logs": dev_logs,
     })

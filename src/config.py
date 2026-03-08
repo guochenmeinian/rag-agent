@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- Models ---
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen3.5-instruct")
 
 # --- API Keys ---

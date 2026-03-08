@@ -80,16 +80,17 @@ class AgentWorkflow:
                     "calls": [{"name": c["name"], **c["input"]} for c in calls],
                 }
 
-                messages.append({"role": "assistant", "content": response.raw_content})
+                messages.append(response.raw_content)
                 tool_results = self.registry.run_parallel(calls)
                 state.tool_results = tool_results
                 yield {"type": "tool_done", "results": tool_results}
 
-                tool_result_blocks = [
-                    {"type": "tool_result", "tool_use_id": r["id"], "content": r["result"]}
-                    for r in tool_results
-                ]
-                messages.append({"role": "user", "content": tool_result_blocks})
+                for r in tool_results:
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": r["id"],
+                        "content": r["result"],
+                    })
                 state.iteration += 1
                 continue
 
@@ -114,7 +115,7 @@ class AgentWorkflow:
             # Reflection failed: feed back to Claude
             state.reflection_feedback = feedback
             yield {"type": "retry", "feedback": feedback}
-            messages.append({"role": "assistant", "content": response.raw_content})
+            messages.append(response.raw_content)
             messages.append({
                 "role": "user",
                 "content": (
