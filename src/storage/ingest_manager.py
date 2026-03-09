@@ -199,9 +199,9 @@ class IngestManager:
     # =========================================================================
     
     def _get_cache_paths(self, filepath: str) -> tuple[Path, Path]:
-        """获取缓存文件路径"""
+        """获取缓存文件路径（key = 文件内容 MD5，与路径无关，支持跨机器共享）"""
         filename = os.path.basename(filepath)
-        cache_subdir = self.cache_dir / hashlib.md5(filepath.encode()).hexdigest()[:8]
+        cache_subdir = self.cache_dir / self._file_hash(filepath)[:8]
         cache_subdir.mkdir(parents=True, exist_ok=True)
         
         parsed_cache = cache_subdir / f"{filename}.parsed.json"

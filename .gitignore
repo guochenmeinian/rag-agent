@@ -5,3 +5,27 @@ websearch/src/config/config.yaml
 BAAI/
 .venv
 ._____temp/
+
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# -------------------------
+# macOS
+# -------------------------
+.DS_Store
+
+# -------------------------
+# local runtime caches
+# -------------------------
+.sessions/
+.cache/
+.claude/
+
+# -------------------------
+# optional local env
+# -------------------------
+.env
