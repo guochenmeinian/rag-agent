@@ -352,16 +352,41 @@ def _render_trace_event_full(ev: dict):
     elif etype == "tool_done":
         st.markdown("**📦 工具返回**")
         for r in ev.get("results", []):
-            with st.expander(f"`{r['name']}` — {r.get('query','')[:50]}"):
-                raw = r.get("result")
-                if isinstance(raw, dict):
-                    content, meta = raw.get("content", ""), raw.get("metadata", {})
-                else:
-                    content = raw.content if hasattr(raw, "content") else str(raw)
-                    meta    = raw.metadata if hasattr(raw, "metadata") else {}
+            raw = r.get("result")
+            if isinstance(raw, dict):
+                content, meta = raw.get("content", ""), raw.get("metadata", {})
+            else:
+                content = raw.content if hasattr(raw, "content") else str(raw)
+                meta    = raw.metadata if hasattr(raw, "metadata") else {}
+
+            # Build expander label with score summary for rag_search
+            label = f"`{r['name']}` — {r.get('query','')[:50]}"
+            if r.get("name") == "rag_search" and meta:
+                n      = meta.get("result_count", 0)
+                total  = meta.get("total_before_filter", n)
+                thr    = meta.get("score_threshold", 0.0)
+                scores = meta.get("scores", [])
+                score_str = f"  |  {n}/{total} 片段通过过滤（阈值 {thr}）"
+                if scores:
+                    score_str += f"  |  分数 {min(scores):.3f}–{max(scores):.3f}"
+                label += score_str
+
+            with st.expander(label):
+                if r.get("name") == "rag_search" and meta.get("scores"):
+                    scores = meta["scores"]
+                    cols = st.columns(len(scores))
+                    for ci, (col, s) in enumerate(zip(cols, scores)):
+                        color = "#22c55e" if s >= 0.6 else "#f59e0b" if s >= 0.4 else "#ef4444"
+                        col.markdown(
+                            f'<div style="text-align:center;font-size:12px;">'
+                            f'<span style="color:{color};font-weight:600;">#{ci+1}</span><br>'
+                            f'<span style="color:{color};">{s:.3f}</span></div>',
+                            unsafe_allow_html=True,
+                        )
+                    if meta.get("truncated"):
+                        st.warning("内容已截断（超过 3000 字符）")
+                    st.divider()
                 st.code(content, language="text")
-                if meta:
-                    st.json(meta, expanded=False)
     elif etype == "reflecting":
         st.markdown("**🔎 反思校验**")
     elif etype == "retry":
@@ -486,7 +511,7 @@ def _render_dev_panel():
                     f"**Turn {len(assistant_msgs) - turn_num}** · {trace.get('original_query','')[:40]}… · {elapsed:.1f}s",
                     expanded=(turn_num == 0),
                 ):
-                    _render_trace_timeline(trace, msg_idx)
+                    _render_trace_timeline(trace, turn_num)
         st.markdown('</div>', unsafe_allow_html=True)
 
     # ── Tab 2: Memory state ──────────────────────────────────
@@ -584,7 +609,7 @@ def _render_dev_panel():
         st.markdown('</div>', unsafe_allow_html=True)
 
 
-def _render_trace_timeline(trace: dict, msg_idx: int):
+def _render_trace_timeline(trace: dict, turn_key: int):
     """Compact timeline inside an expander."""
     st.markdown(
         f'<div style="font-size:12px;color:#9B9B98;margin-bottom:6px;">'
@@ -592,6 +617,7 @@ def _render_trace_timeline(trace: dict, msg_idx: int):
         unsafe_allow_html=True,
     )
 
+    btn_counter = 0  # unique across all tool_done events in this trace
     for ev in trace.get("events", []):
         etype = ev["type"]
         ts    = ev.get("ts", 0)
@@ -622,18 +648,32 @@ def _render_trace_timeline(trace: dict, msg_idx: int):
             results = ev.get("results", [])
             _tl_row("tl-dot-tool", f"📦 返回结果 ({len(results)}条)", time_str)
             for i, r in enumerate(results):
+                raw  = r.get("result")
+                meta = raw.get("metadata", {}) if isinstance(raw, dict) else (getattr(raw, "metadata", {}) or {})
                 col1, col2 = st.columns([5, 1])
+                if r.get("name") == "rag_search" and meta.get("scores"):
+                    scores = meta["scores"]
+                    n      = meta.get("result_count", len(scores))
+                    total  = meta.get("total_before_filter", n)
+                    score_hint = f" · {n}/{total}片段 · {min(scores):.2f}–{max(scores):.2f}"
+                else:
+                    score_hint = ""
                 col1.markdown(
                     f'<div style="padding-left:16px;font-size:12px;color:#6B7280;">'
-                    f'{r.get("query","")[:40]} — {len((r.get("result") or "").content if hasattr(r.get("result"), "content") else str(r.get("result","")))} chars'
+                    f'{r.get("query","")[:40]}{score_hint}'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
-                if col2.button("展开", key=f"tool_result_{msg_idx}_{i}"):
+                if col2.button("展开", key=f"tool_result_{turn_key}_{btn_counter}"):
                     st.session_state._dlg_tool = {**r, "car_model": r.get("car_model", "")}
                     dialog_tool_result()
+                btn_counter += 1
 
         elif etype == "reflecting":
+            # If no tool calls happened before this reflect, show a "direct answer" marker
+            had_tools = any(e.get("type") == "tool_calling" for e in trace.get("events", []))
+            if not had_tools:
+                _tl_row("tl-dot-info", "💬 模型直接回答（未调用工具）", time_str)
             _tl_row("tl-dot-info", "🔎 质量校验", time_str)
         elif etype == "retry":
             _tl_row("tl-dot-fail", f"↩️ 重试 — {ev.get('feedback','')[:50]}", time_str)

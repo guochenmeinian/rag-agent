@@ -137,11 +137,11 @@ def _get_sparse_row(sparse_matrix, idx: int):
     return sparse_matrix[idx]
 
 
-def retrieve(query, ctx, limit=5, sparse_weight=1.0, dense_weight=0.7, score_threshold=0.0):
+def retrieve(query, ctx, limit=5, sparse_weight=1.0, dense_weight=0.7, score_threshold=0.4):
     query_emb = embed_query(query, ctx.embedder)
     dense = query_emb["dense"][0]
     sparse = _get_sparse_row(query_emb["sparse"], 0)
-    results = hybrid_search(
+    raw = hybrid_search(
         ctx.store.col,
         dense,
         sparse,
@@ -149,9 +149,15 @@ def retrieve(query, ctx, limit=5, sparse_weight=1.0, dense_weight=0.7, score_thr
         dense_weight=dense_weight,
         limit=limit,
     )
+    total_before_filter = len(raw)
     if score_threshold > 0:
-        results = [(t, s) for t, s in results if s >= score_threshold]
-    return [{"text": t, "score": round(s, 4), "rank": i + 1} for i, (t, s) in enumerate(results)]
+        raw = [(t, s) for t, s in raw if s >= score_threshold]
+    items = [{"text": t, "score": round(s, 4), "rank": i + 1} for i, (t, s) in enumerate(raw)]
+    # Attach retrieval stats for downstream use
+    for item in items:
+        item["_total_before_filter"] = total_before_filter
+        item["_score_threshold"] = score_threshold
+    return items
 
 
 def format_citations(items):

@@ -9,7 +9,7 @@ from .result import ToolResult
 MAX_CONTENT = 3000   # chars — prevents context overflow
 
 # Valid NIO model codes; Pydantic rejects anything outside this set
-CarModel = Literal["EC6", "EC7", "ES6", "ES8", "ET5", "ET5T", "ET7", "ET9", "EL6"]
+CarModel = Literal["EC6", "EC7", "ES6", "ES8", "ET5", "ET5T", "ET7", "ET9"]
 
 
 class RagSearchInput(BaseModel):
@@ -21,7 +21,7 @@ class RagSearchInput(BaseModel):
     )
     car_model: CarModel = Field(
         ...,
-        description="蔚来车型代号，必须是以下之一: EC6 EC7 ES6 ES8 ET5 ET5T ET7 ET9 EL6",
+        description="蔚来车型代号，必须是以下之一: EC6 EC7 ES6 ES8 ET5 ET5T ET7 ET9",
     )
 
 
@@ -51,11 +51,21 @@ class RagSearchTool(BaseTool):
             )
 
         results = retrieve(inputs.query, ctx)
+        total_before = results[0].get("_total_before_filter", 0) if results else 0
+        threshold    = results[0].get("_score_threshold", 0.0)   if results else 0.0
+
         if not results:
             return ToolResult(
                 content=f"未找到 {inputs.car_model} 关于「{inputs.query}」的相关信息。",
                 success=True,
-                metadata={"car_model": inputs.car_model, "query": inputs.query, "result_count": 0},
+                metadata={
+                    "car_model": inputs.car_model,
+                    "query": inputs.query,
+                    "result_count": 0,
+                    "total_before_filter": total_before,
+                    "score_threshold": threshold,
+                    "scores": [],
+                },
             )
 
         content   = f"[{inputs.car_model}] {inputs.query} 检索结果：\n" + format_citations(results)
@@ -66,8 +76,11 @@ class RagSearchTool(BaseTool):
             success=True,
             truncated=truncated,
             metadata={
-                "car_model":    inputs.car_model,
-                "query":        inputs.query,
-                "result_count": len(results),
+                "car_model":           inputs.car_model,
+                "query":               inputs.query,
+                "result_count":        len(results),
+                "total_before_filter": total_before,
+                "score_threshold":     threshold,
+                "scores":              [r["score"] for r in results],
             },
         )
