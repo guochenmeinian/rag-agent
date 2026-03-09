@@ -3,3 +3,5 @@ websearch/src/config/config.yaml
 *.db
 *.db.lock
 BAAI/
+.venv
+._____temp/

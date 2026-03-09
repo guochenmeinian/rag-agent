@@ -1,69 +1,101 @@
-# RAG-Agent: Retrieval-Augmented Generation with Agent Workflow
+# RAG-Agent: 蔚来汽车智能问答
 
-This project demonstrates the integration of Retrieval-Augmented Generation (RAG) and Agent-based reasoning for intelligent document and web-augmented question answering. It is designed for learning and experimenting with multi-step reasoning, tool selection, and dynamic answer generation.
+基于 RAG + Agent 的蔚来汽车购车顾问，支持多轮对话、工具调用、记忆与反思。
 
-## Key Features
-- **Local Document RAG**: Parse, chunk, embed, and semantically retrieve information from local PDFs and other documents.
-- **Web-Augmented QA**: Optionally enhance answers with real-time web search (via Serper API and lightweight crawling).
-- **Agent Workflow**: The agent plans, decomposes user queries, selects tools (local/web), and executes multi-step reasoning.
-- **Session Memory**: Each reasoning session accumulates retrieved information and intermediate results as memory/context, which is used for final answer synthesis.
-- **Reflection & Reasoning**: The agent uses reflection prompts to check if enough information has been gathered, and finally leverages a powerful reasoning model (e.g., deepseek-r1) to generate a persuasive and styled answer.
+## 特性
 
-## Directory Structure
+- **RAG 检索**：LlamaParse 解析 PDF → BGE-M3 嵌入 → Milvus 混合检索
+- **Agent 流程**：Rewrite（查询改写）→ Execute（工具调用/直接回答）→ Reflect（答案校验）
+- **多轮记忆**：fact list + 最近消息，支持指代消解与上下文追问
+- **可选模型**：Executor 可切换 OpenAI / Kimi / DeepSeek 等；Qwen 系负责改写与反思
+
+## 目录结构
+
 ```
 rag-agent/
-├── rag-agent.ipynb         # Main notebook: Agent/RAG workflow and demos
-├── websearch/              # (Optional) Web search and augmentation modules
-│   └── src/
-│       └── ...             # Web crawling, retrieval, config, etc.
-├── data/                   # Local PDF/document samples
-├── BAAI/bge-m3/            # Local embedding model (e.g., bge-m3)
-├── milvus.db               # Local vector database
-└── ...
+├── src/
+│   ├── config.py          # 配置（含 get_executor_cfg / get_qwen_cfg）
+│   ├── main.py            # REPL 入口
+│   ├── api.py             # FastAPI 入口
+│   ├── frontend.py        # Streamlit 入口
+│   ├── cache_cli.py      #  ingest 缓存管理
+│   ├── agent/             # Rewriter / Executor / Reflector / Memory
+│   ├── prompts/           # 各组件的 system prompt
+│   ├── rag/               # 解析、分块、嵌入、检索
+│   ├── storage/           # Milvus + ingest 管理
+│   ├── tools/             # rag_search / web_search
+│   └── tests/             # 评估与 benchmark
+├── data/                  # 蔚来车型 PDF（EC6.pdf, ET5.pdf 等）
+├── .env                   # API key、模型配置
+└── run.sh                 # setup / serve
 ```
 
-## Installation
-Python 3.10+ is recommended. Install core dependencies:
+## 安装与运行
 
 ```bash
-pip install langchain openai chromadb sentence-transformers pymilvus transformers tqdm requests pyyaml bs4
+# 1. 安装
+./run.sh setup
+
+# 2. 配置 .env（复制 .env.example 并填写）
+cp .env.example .env
+
+# 3. 启动（三选一）
+./run.sh serve                              # FastAPI → http://localhost:8000
+cd src && streamlit run frontend.py         # Streamlit
+PYTHONPATH=src .venv/bin/python src/main.py --session demo   # 命令行 REPL
 ```
 
-For local embedding models (e.g., bge-m3), see [FlagEmbedding](https://github.com/FlagOpen/FlagEmbedding).
+## 配置：模型选择
 
-## Configuration
-1. Copy and edit `websearch/src/config/config.yaml` with your OpenAI API Key, Serper API Key, and model settings.
-2. For Milvus or local models, follow the notebook examples to set up paths and database connections.
+在 `.env` 中配置各组件使用的模型，可分开指定 Executor 与 Qwen 系：
 
-## Quick Start
-- Run `rag-agent.ipynb` to experience local document parsing, RAG retrieval, web-augmented QA, and multi-step agent reasoning.
-- Refer to scripts in `websearch/src/` for modular usage if needed.
+| 组件 |  env 变量 | 默认 | 说明 |
+|------|-----------|------|------|
+| **Executor**（推理引擎） | `EXECUTOR_MODEL`<br>`EXECUTOR_API_KEY`<br>`EXECUTOR_BASE_URL` | gpt-4o / OpenAI | 工具调用与回答，可换成 Kimi / DeepSeek |
+| **Qwen 系**（改写、反思、记忆） | `QWEN_MODEL`<br>`QWEN_API_KEY`<br>`QWEN_BASE_URL` | qwen3.5-instruct / DashScope | 多轮改写与答案校验 |
 
-## Core Workflow
-1. **Planning**: The agent analyzes the user query, decomposes it, and decides which tools to use (local/document search or web search).
-2. **Session Memory**: Each retrieval or search result is stored in a session memory list, which is passed to the final answer stage.
-3. **Reflection**: The agent uses a reflection prompt to check if the gathered information is sufficient, and may trigger further retrieval if needed.
-4. **Reasoning & Answer Generation**: All collected memory is fed to a reasoning model (e.g., deepseek-r1) to generate a comprehensive, persuasive answer, often in a sales-oriented style.
+**使用 Kimi 作为 Executor：**
 
-> Note: The current memory mechanism is session-based (short-term). For persistent or long-term memory, consider extending with a database or file storage.
+```env
+EXECUTOR_MODEL=moonshot-v1-8k
+EXECUTOR_API_KEY=sk-...
+EXECUTOR_BASE_URL=https://api.moonshot.cn/v1
+```
 
-## Main Dependencies
-- LangChain
-- OpenAI
-- ChromaDB
-- Sentence-Transformers
-- FlagEmbedding/BGE-M3
-- Milvus
-- Serper API
-- BeautifulSoup4, Requests, PyYAML, tqdm
+**使用 DeepSeek：**
 
-## Reference
-- [llamacloud-demo](https://github.com/run-llama/llamacloud-demo)
-- [Milvus-BGE-M3](https://milvus.io/docs/embed-with-bgm-m3.md)
-- [DeepSeek-Access-API](https://platform.deepseek.com/api_keys)
-- [DeepSeek-R1](https://api-docs.deepseek.com/zh-cn/guides/reasoning_model)
-- Sample product documents (e.g., for ES9 EV) are included for RAG demos.
-- For detailed logic and workflow, see `rag-agent.ipynb` and `Agent+RAG实现检索.pdf`.
+```env
+EXECUTOR_MODEL=deepseek-chat
+EXECUTOR_API_KEY=sk-...
+EXECUTOR_BASE_URL=https://api.deepseek.com/v1
+```
+
+兼容旧变量：`OPENAI_MODEL` / `OPENAI_API_KEY` 会作为 Executor 的 fallback；`DASHSCOPE_API_KEY` 会作为 Qwen 的 fallback。
+
+## Agent 流程
+
+```
+用户输入
+  → Memory.add_message(user)
+  → format_for_prompt() 生成 [用户背景][用户记忆][最近消息]
+  → Rewriter 改写为 standalone 问题
+  → Executor 决策：tool_call 或 direct
+       ├─ tool_call → rag_search / web_search（并行）
+       └─ direct    → Reflector 校验 grounding
+                        ├─ 通过 → update_facts, persist, done
+                        └─ 未过 → 带反馈重试
+```
+
+## 后续优化方向
+
+- 多轮 benchmark 自动化
+- 抽取质量评估与 prompt 微调
+- 可选：用 Qwen 等替代 Executor 降低成本
 
 ---
-For questions or contributions, feel free to open an issue or contact the author.
+
+## 参考
+
+- 早期实现：`v1.ipynb`、`v1.pdf`（Agent+RAG 检索实现）
+- [LlamaCloud Demo](https://github.com/run-llama/llamacloud-demo)
+- [Milvus + BGE-M3](https://milvus.io/docs/embed-with-bgm-m3.md)

@@ -42,6 +42,7 @@ from agent.memory import ConversationMemory
 from agent.workflow import AgentWorkflow
 from tools.registry import ToolRegistry
 from tools.rag_search import RagSearchTool
+from tools.grep_search import GrepSearchTool
 from tools.web_search import WebSearchTool
 
 
@@ -66,6 +67,7 @@ def make_workflow(contexts: dict | None = None) -> AgentWorkflow:
     """Build a fresh workflow per case (no cross-case memory leak)."""
     registry = ToolRegistry()
     registry.register(RagSearchTool(contexts=contexts or {}))
+    registry.register(GrepSearchTool())
     registry.register(WebSearchTool())
     return AgentWorkflow(registry=registry)
 
@@ -75,9 +77,15 @@ def inject_context(workflow: AgentWorkflow, ctx: dict | None):
     if not ctx:
         return
     if summary := ctx.get("summary"):
-        workflow.memory.context_summary = summary
+        workflow.memory.global_user_info.raw = summary
+    if "focus_models" in ctx:
+        workflow.memory.global_user_info.focus_models = ctx["focus_models"]
+    if "facts" in ctx:
+        workflow.memory.facts = ctx["facts"]
     for msg in ctx.get("recent_messages", []):
-        workflow.memory.add_message(msg["role"], msg["content"])
+        role = msg.get("role", "user")
+        content = msg.get("content", "")
+        workflow.memory.add_message(role, content)
 
 
 # ─────────────────────────────────────────────────────────────

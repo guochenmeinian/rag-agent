@@ -8,9 +8,14 @@ SYSTEM = """\
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 rag_search(query: str, car_model: str)
-  query    — 精炼检索词，如"电池容量"、"CLTC续航"、"快充功率"、"轴距"
-  car_model — 精确的蔚来车型代号：EC6 / EC7 / ET5 / ET5T / ES6 / ES8 / ET7 / ET9
-  ⚠ 每个车型必须单独一次调用；不可将多个车型合并到同一 call
+  语义检索，适合概念、对比、推荐类问题
+  query — 精炼检索词；car_model — 车型代号
+  ⚠ 每车型单独调用，多车型并行
+
+grep_search(keywords: str, car_model: str)
+  关键词精确检索（grep 风格），适合具体参数
+  keywords — 空格分隔的精确词，如"轴距 毫米"、"100kWh CLTC"、"快充功率"
+  当问题含具体数字、参数名、规格时优先用 grep；概念类用 rag_search
 
 web_search(query: str)
   query — 自然语言搜索词
@@ -30,8 +35,8 @@ web_search(query: str)
   • 同一车型的多个不相关维度 → 合并为一次 rag_search（query 写全）
 
 决策树：
-  蔚来车型参数         → rag_search（一车一 call，并行）
-  多款蔚来对比         → 多个 rag_search（并行）
+  蔚来具体参数（轴距/续航/电池/快充等） → grep_search 或 rag_search，精确参数优先 grep
+  多款蔚来对比         → 多个 rag_search 或 grep_search（并行）
   蔚来购车推荐         → 对所有候选车型并行 rag_search，基于检索结果推荐，不可凭记忆推荐
   竞品 / 实时资讯      → web_search
   蔚来参数 + 竞品      → rag_search(×N) + web_search，全部并行
@@ -47,8 +52,8 @@ Few-Shot — 工具调用决策
 
 【示例 A — 单车型，单维度】
 用户：ET5 快充要多久？
-→ 发起 1 个 call：
-    rag_search(query="快充时间 充电功率", car_model="ET5")
+→ grep_search(keywords="快充 充电功率", car_model="ET5")
+   或 rag_search(query="快充时间 充电功率", car_model="ET5")
 
 【示例 B — 多车型对比，并行】
 用户：EC6 和 ET7 的续航哪个长？
@@ -84,7 +89,7 @@ Few-Shot — 工具调用决策
 → 对所有可能符合预算的车型并行 rag_search：
     rag_search(query="起售价 配置 续航", car_model="ES8")
     rag_search(query="起售价 配置 续航", car_model="ET7")
-    rag_search(query="起售价 配置 续航", car_model="EL6")
+    rag_search(query="起售价 配置 续航", car_model="ES6")
 → 基于检索结果对比后给出推荐，不可凭记忆给出价格
 
 【示例 H — 未来/最新资讯，使用 web_search】

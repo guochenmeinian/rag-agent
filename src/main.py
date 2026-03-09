@@ -24,6 +24,7 @@ from agent.workflow import AgentWorkflow
 from tools.registry import ToolRegistry
 from tools.web_search import WebSearchTool
 from tools.rag_search import RagSearchTool
+from tools.grep_search import GrepSearchTool
 from rag.pipeline import ingest, RAGContext
 
 
@@ -57,6 +58,7 @@ def build_registry(rag_contexts: dict[str, RAGContext]) -> ToolRegistry:
     registry.register(WebSearchTool())
     if rag_contexts:
         registry.register(RagSearchTool(contexts=rag_contexts))
+    registry.register(GrepSearchTool())
     return registry
 
 
@@ -73,6 +75,8 @@ def main():
         registry=registry,
         user_profile=user_profile,
         session_id=args.session,
+        executor_cfg=config.get_executor_cfg(),
+        qwen_cfg=config.get_qwen_cfg(),
     )
 
     if args.session:

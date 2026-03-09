@@ -1,12 +1,15 @@
 import os
 from typing import Any
 from dataclasses import dataclass
+
+import config
 from rag.chunker import chunk_text
 from rag.embedder import embed_query, embed_texts, load_bge_m3_embedder
 from rag.parser import build_llama_parser, parse_single_file
 from rag.retriever import hybrid_search
 from storage.vector_store import MilvusVectorStore
 from storage.ingest_manager import IngestManager
+from storage.grep_index import GrepIndex
 
 @dataclass
 class RAGContext:
@@ -20,6 +23,29 @@ _PROBE_DIM = 1024  # BGE-M3 dense dim; used only to open existing collections
 # Global IngestManager instance (shared across all ingest calls)
 _ingest_manager: IngestManager | None = None
 
+def _backfill_grep_if_missing(col_name: str, pdf_files: list, manager: IngestManager):
+    """Skip 路径：若 grep 无该 col 数据，从 parse 缓存回填。"""
+    grep_path = getattr(config, "GREP_INDEX_PATH", None)
+    if not grep_path:
+        return
+    try:
+        gidx = GrepIndex(grep_path)
+        if gidx.has_chunks(col_name):
+            return
+        parser = build_llama_parser()
+        all_text = []
+        for fp in sorted(pdf_files):
+            t = manager.get_or_parse(fp, lambda f: parse_single_file(f, parser), verbose=False)
+            all_text.append(t)
+        merged = "".join(all_text)
+        chunks = chunk_text(merged, max_chunk_size=300, hard_max_length=512)
+        if chunks:
+            gidx.insert_chunks(col_name, chunks)
+            print(f"[ingest] {col_name}: grep index backfilled from cache ({len(chunks)} chunks)")
+    except Exception as e:
+        print(f"[ingest] {col_name}: grep backfill skipped - {e}")
+
+
 def get_ingest_manager() -> IngestManager:
     """获取全局 IngestManager 实例"""
     global _ingest_manager
@@ -28,7 +54,7 @@ def get_ingest_manager() -> IngestManager:
     return _ingest_manager
 
 
-def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, file_filter=None):
+def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, file_filter=None, grep_path=None):
     """
     Ingest PDF 文档到向量数据库
 
@@ -78,6 +104,8 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
             embedder = load_bge_m3_embedder()
             actual_dim = probe.col.schema.fields[-1].params["dim"]
             print(f"[ingest] {col_name}: skipping - {status.reason}")
+            # 若 grep 索引缺失，从 parse 缓存回填
+            _backfill_grep_if_missing(col_name, pdf_files, manager)
             return RAGContext(store=probe, embedder=embedder, col_name=col_name, dense_dim=actual_dim)
 
         print(f"[ingest] {col_name}: need to ingest - {status.reason}")
@@ -121,6 +149,13 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
     store.insert(chunks, emb)
 
     print(f"[ingest] {col_name}: inserted {len(chunks)} chunks")
+
+    # 6b. 写入 grep 全文索引（Claude 风格 keyword 检索）
+    grep_path = grep_path or getattr(config, "GREP_INDEX_PATH", None)
+    if grep_path:
+        gidx = GrepIndex(grep_path)
+        gidx.insert_chunks(col_name, chunks)
+        print(f"[ingest] {col_name}: grep index updated")
 
     # 7. 更新 manifest（只记录实际处理的文件）
     manager.mark_ingested_files(col_name, pdf_files)

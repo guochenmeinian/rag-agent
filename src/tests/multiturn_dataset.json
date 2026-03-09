@@ -1,0 +1,169 @@
+{
+  "version": "1.0",
+  "description": "蔚来汽车助手 — 多轮对话 Benchmark 数据集",
+  "what_we_test": {
+    "coreference": "代词/省略解析（'那它的' '这款' 指代上文车型）",
+    "memory_accumulation": "跨轮记忆累积（预算/家庭信息应在后续轮被利用）",
+    "topic_shift": "话题切换后记忆不串扰",
+    "parallel_tool": "多轮后期触发并行工具调用",
+    "fact_update": "用户修正信息后记忆应更新（不应保留旧值）"
+  },
+  "conversations": [
+    {
+      "id": "conv001",
+      "description": "单车型追问 — 代词解析 + 参数追问",
+      "turns": [
+        {
+          "turn": 1,
+          "input": "ET5的续航是多少？",
+          "expected_tools": [{"name": "rag_search", "car_model": "ET5"}],
+          "expected_rewrite_contains": ["ET5", "续航"],
+          "expected_answer_keywords": ["km", "续航", "ET5"],
+          "expected_facts_after": ["关注ET5"],
+          "notes": "基础单车问，建立初始记忆"
+        },
+        {
+          "turn": 2,
+          "input": "那它的电池容量呢？",
+          "expected_tools": [{"name": "rag_search", "car_model": "ET5"}],
+          "expected_rewrite_contains": ["ET5", "电池容量"],
+          "expected_answer_keywords": ["kWh", "ET5"],
+          "notes": "代词 '它' 应被展开为 ET5，依赖第1轮记忆"
+        },
+        {
+          "turn": 3,
+          "input": "快充需要多长时间",
+          "expected_tools": [{"name": "rag_search", "car_model": "ET5"}],
+          "expected_rewrite_contains": ["ET5", "快充"],
+          "expected_answer_keywords": ["分钟", "充电"],
+          "notes": "无主语省略，应继续解析为ET5"
+        }
+      ]
+    },
+    {
+      "id": "conv002",
+      "description": "需求积累 + 推荐切换 — 记忆驱动推荐",
+      "turns": [
+        {
+          "turn": 1,
+          "input": "我预算大概45万左右，家里有两个孩子",
+          "expected_tools": [],
+          "expected_answer_keywords": ["蔚来", "推荐", "车型"],
+          "expected_facts_after": ["用户预算约45万", "有两个孩子"],
+          "notes": "无具体车型，应直接回答并提示可以询问具体车型"
+        },
+        {
+          "turn": 2,
+          "input": "ES8合适吗",
+          "expected_tools": [{"name": "rag_search", "car_model": "ES8"}],
+          "expected_rewrite_contains": ["ES8", "适合"],
+          "expected_answer_keywords": ["ES8", "座", "空间"],
+          "expected_facts_after": ["用户预算约45万", "有两个孩子", "关注ES8"],
+          "notes": "结合已有预算和孩子信息，检索ES8适配性"
+        },
+        {
+          "turn": 3,
+          "input": "ET7呢，对比一下",
+          "expected_tools": [
+            {"name": "rag_search", "car_model": "ES8"},
+            {"name": "rag_search", "car_model": "ET7"}
+          ],
+          "expected_parallel": true,
+          "expected_rewrite_contains": ["ET7", "ES8", "对比"],
+          "expected_answer_keywords": ["ET7", "ES8"],
+          "notes": "应触发并行 rag_search(ES8) + rag_search(ET7)"
+        }
+      ]
+    },
+    {
+      "id": "conv003",
+      "description": "记忆更新 — 用户修正预算",
+      "turns": [
+        {
+          "turn": 1,
+          "input": "我想买辆蔚来，预算30万",
+          "expected_tools": [],
+          "expected_facts_after": ["用户预算约30万"],
+          "notes": "建立预算记忆"
+        },
+        {
+          "turn": 2,
+          "input": "ET5 CLTC续航多少",
+          "expected_tools": [{"name": "rag_search", "car_model": "ET5"}],
+          "expected_answer_keywords": ["ET5", "续航", "km"],
+          "notes": "正常检索"
+        },
+        {
+          "turn": 3,
+          "input": "其实预算可以到50万，那ET7值得看吗",
+          "expected_tools": [{"name": "rag_search", "car_model": "ET7"}],
+          "expected_rewrite_contains": ["ET7"],
+          "expected_answer_keywords": ["ET7"],
+          "expected_facts_after": ["用户预算约50万", "关注ET7"],
+          "must_not_facts_contain": ["30万"],
+          "notes": "预算已更新为50万，旧的30万应从facts删除"
+        }
+      ]
+    },
+    {
+      "id": "conv004",
+      "description": "话题切换 — 换车型后不串扰",
+      "turns": [
+        {
+          "turn": 1,
+          "input": "EC6的尺寸参数",
+          "expected_tools": [{"name": "rag_search", "car_model": "EC6"}],
+          "expected_answer_keywords": ["EC6", "mm"],
+          "notes": "先问EC6"
+        },
+        {
+          "turn": 2,
+          "input": "换个话题，ES6的电池有几种",
+          "expected_tools": [{"name": "rag_search", "car_model": "ES6"}],
+          "expected_rewrite_contains": ["ES6", "电池"],
+          "expected_answer_keywords": ["ES6", "kWh"],
+          "notes": "明确说换话题，应解析为ES6，不与EC6混淆"
+        },
+        {
+          "turn": 3,
+          "input": "那尺寸呢",
+          "expected_tools": [{"name": "rag_search", "car_model": "ES6"}],
+          "expected_rewrite_contains": ["ES6", "尺寸"],
+          "expected_answer_keywords": ["ES6"],
+          "notes": "'那' 指代的是上一轮的ES6，不是更早的EC6"
+        }
+      ]
+    },
+    {
+      "id": "conv005",
+      "description": "工具混用 — RAG + web_search 组合",
+      "turns": [
+        {
+          "turn": 1,
+          "input": "ET9有什么特别的功能",
+          "expected_tools": [{"name": "rag_search", "car_model": "ET9"}],
+          "expected_answer_keywords": ["ET9"],
+          "notes": "先RAG"
+        },
+        {
+          "turn": 2,
+          "input": "ET9什么时候交付，现在能订吗",
+          "expected_tools": [{"name": "web_search"}],
+          "expected_rewrite_contains": ["ET9", "交付"],
+          "notes": "时效性问题，应走web_search而非rag_search"
+        },
+        {
+          "turn": 3,
+          "input": "对比一下ET9和ET7的参数",
+          "expected_tools": [
+            {"name": "rag_search", "car_model": "ET9"},
+            {"name": "rag_search", "car_model": "ET7"}
+          ],
+          "expected_parallel": true,
+          "expected_answer_keywords": ["ET9", "ET7"],
+          "notes": "参数对比回到rag_search，且应并行"
+        }
+      ]
+    }
+  ]
+}

@@ -20,6 +20,7 @@ from agent.workflow import AgentWorkflow
 from tools.registry import ToolRegistry
 from tools.web_search import WebSearchTool
 from tools.rag_search import RagSearchTool
+from tools.grep_search import GrepSearchTool
 from rag.pipeline import ingest, RAGContext
 
 app = FastAPI(title="NIO AI Assistant")
@@ -71,18 +72,27 @@ def _build_registry(rag_contexts: dict) -> ToolRegistry:
     reg.register(WebSearchTool())
     if rag_contexts:
         reg.register(RagSearchTool(contexts=rag_contexts))
+    reg.register(GrepSearchTool())
     return reg
 
 
 def _get_or_create_workflow(session_id: str, user_profile: str) -> AgentWorkflow:
+    exec_cfg = config.get_executor_cfg()
+    qwen_cfg = config.get_qwen_cfg()
     if not session_id:
-        # No session_id: return a fresh stateless workflow, don't cache it
-        return AgentWorkflow(registry=_registry, user_profile=user_profile)
+        return AgentWorkflow(
+            registry=_registry,
+            user_profile=user_profile,
+            executor_cfg=exec_cfg,
+            qwen_cfg=qwen_cfg,
+        )
     if session_id not in _workflows:
         _workflows[session_id] = AgentWorkflow(
             registry=_registry,
             user_profile=user_profile,
             session_id=session_id,
+            executor_cfg=exec_cfg,
+            qwen_cfg=qwen_cfg,
         )
     elif user_profile:
         _workflows[session_id].memory.user_profile = user_profile
@@ -156,9 +166,9 @@ async def status():
     return {
         "rag": {"models": rag_models},
         "api_keys": {
-            "OpenAI":    bool(config.OPENAI_API_KEY),
-            "DashScope": bool(config.DASHSCOPE_API_KEY),
-            "Serper":    bool(config.SERPER_API_KEY),
+            "Executor":  bool(config.EXECUTOR_API_KEY),
+            "Qwen":     bool(config.QWEN_API_KEY),
+            "Serper":   bool(config.SERPER_API_KEY),
         },
     }
 

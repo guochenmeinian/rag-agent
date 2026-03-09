@@ -48,6 +48,7 @@ class AgentWorkflow:
             # Allow caller to override profile/system_prompt on resume
             if user_profile:
                 self.memory.user_profile = user_profile
+                self.memory.global_user_info.raw = user_profile
             if system_prompt:
                 self.memory.system_prompt = system_prompt
         else:
@@ -136,6 +137,7 @@ class AgentWorkflow:
 
             if passed:
                 self.memory.add_message("assistant", state.answer)
+                self.memory.update_facts(user_input, state.answer)
                 self._persist()
                 yield {
                     "type": "done",
@@ -159,6 +161,7 @@ class AgentWorkflow:
 
         # Max iterations reached: return best-effort answer
         self.memory.add_message("assistant", state.answer)
+        self.memory.update_facts(user_input, state.answer)
         self._persist()
         yield {
             "type": "done",

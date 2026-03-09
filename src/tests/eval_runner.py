@@ -23,6 +23,7 @@ from agent.memory import ConversationMemory
 from tools.registry import ToolRegistry
 from tools.web_search import WebSearchTool
 from tools.rag_search import RagSearchTool
+from tools.grep_search import GrepSearchTool
 from rag.pipeline import ingest, RAGContext
 
 
@@ -44,6 +45,7 @@ def build_workflow(rag_contexts: dict[str, RAGContext]) -> AgentWorkflow:
     registry.register(WebSearchTool())
     if rag_contexts:
         registry.register(RagSearchTool(contexts=rag_contexts))
+    registry.register(GrepSearchTool())
     return AgentWorkflow(registry=registry)
 
 
@@ -78,7 +80,11 @@ def inject_context(workflow: AgentWorkflow, context: dict | None):
     if not context:
         return
     if "summary" in context:
-        workflow.memory.context_summary = context["summary"]
+        workflow.memory.global_user_info.raw = context["summary"]
+    if "focus_models" in context:
+        workflow.memory.global_user_info.focus_models = context["focus_models"]
+    if "facts" in context:
+        workflow.memory.facts = context["facts"]
     for msg in context.get("recent_messages", []):
         workflow.memory.recent_messages.append(msg)
 

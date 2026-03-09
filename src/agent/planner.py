@@ -16,7 +16,7 @@ class QueryRewriter:
         self._model = model or config.QWEN_MODEL
         if api_key or base_url:
             from openai import OpenAI
-            client_kwargs: dict = {"api_key": api_key or config.DASHSCOPE_API_KEY}
+            client_kwargs: dict = {"api_key": api_key or config.QWEN_API_KEY}
             if base_url:
                 client_kwargs["base_url"] = base_url
             self._client = OpenAI(**client_kwargs)

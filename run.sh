@@ -29,8 +29,24 @@ EOF
 }
 
 ensure_venv() {
+  local need_recreate=false
   if [[ ! -x "$PYTHON_BIN" ]]; then
-    python3 -m venv "$VENV_DIR"
+    need_recreate=true
+  elif ! "$PYTHON_BIN" -c 'import sys; sys.exit(0 if sys.version_info < (3, 13) else 1)' 2>/dev/null; then
+    echo "[setup] .venv has Python 3.13; tokenizers needs ≤3.12. Recreating venv..."
+    rm -rf "$VENV_DIR"
+    need_recreate=true
+  fi
+
+  if [[ "$need_recreate" == "true" ]]; then
+    for py in ${PYTHON:-python python3.12 python3.11 python3}; do
+      if command -v "$py" &>/dev/null && "$py" -c 'import sys; exit(0 if sys.version_info < (3, 13) else 1)' 2>/dev/null; then
+        "$py" -m venv "$VENV_DIR"
+        return 0
+      fi
+    done
+    echo "ERROR: Need Python 3.12 or 3.11. Install with: brew install python@3.12"
+    exit 1
   fi
 }
 
@@ -103,7 +119,8 @@ run_test_milvus() {
 
 run_serve() {
   set_common_env
-  "$VENV_DIR/bin/uvicorn" api:app --reload --port 8000 --app-dir "$ROOT_DIR/src"
+  # --loop asyncio: nest_asyncio 不兼容 uvloop，用标准 asyncio
+  "$VENV_DIR/bin/uvicorn" api:app --reload --port 8000 --app-dir "$ROOT_DIR/src" --loop asyncio
 }
 
 main() {

@@ -17,6 +17,7 @@ from agent.workflow import AgentWorkflow
 from tools.registry import ToolRegistry
 from tools.web_search import WebSearchTool
 from tools.rag_search import RagSearchTool
+from tools.grep_search import GrepSearchTool
 from rag.pipeline import ingest, RAGContext
 
 # ─────────────────────────────────────────────────────────────
@@ -168,17 +169,30 @@ _PROVIDER_NAMES = list(PROVIDER_CATALOG)
 def _provider_defaults(role: str) -> tuple[str, str]:
     """Return (provider_name, model) defaults from config for a given role."""
     if role == "executor":
-        return "OpenAI", config.OPENAI_MODEL
+        base = (config.EXECUTOR_BASE_URL or "").lower()
+        if "moonshot" in base:
+            return "Moonshot (Kimi)", config.EXECUTOR_MODEL
+        if "deepseek" in base:
+            return "DeepSeek", config.EXECUTOR_MODEL
+        if "bigmodel" in base or "zhipu" in base:
+            return "智谱 (GLM)", config.EXECUTOR_MODEL
+        return "OpenAI", config.EXECUTOR_MODEL
     return "DashScope (Qwen)", config.QWEN_MODEL
 
 
 def _build_model_cfg(role: str) -> dict:
-    """Read session_state model config for a role and return kwargs dict."""
+    """Read session_state + config for a role and return kwargs dict."""
     provider_name = st.session_state.get(f"{role}_provider", _provider_defaults(role)[0])
     provider      = PROVIDER_CATALOG.get(provider_name, PROVIDER_CATALOG["OpenAI"])
-    model         = st.session_state.get(f"{role}_model", "") or provider["default_model"]
-    api_key       = st.session_state.get(f"{role}_api_key", "")
-    base_url      = st.session_state.get(f"{role}_base_url", "") or provider["base_url"]
+    model         = st.session_state.get(f"{role}_model", "") or (
+        config.EXECUTOR_MODEL if role == "executor" else config.QWEN_MODEL
+    ) or provider["default_model"]
+    api_key       = st.session_state.get(f"{role}_api_key", "") or (
+        config.EXECUTOR_API_KEY if role == "executor" else config.QWEN_API_KEY
+    )
+    base_url      = st.session_state.get(f"{role}_base_url", "") or provider["base_url"] or (
+        config.EXECUTOR_BASE_URL if role == "executor" else config.QWEN_BASE_URL
+    )
 
     cfg: dict = {"model": model}
     if api_key:
@@ -221,6 +235,7 @@ def build_registry() -> ToolRegistry:
     reg.register(WebSearchTool())
     if ctx:
         reg.register(RagSearchTool(contexts=ctx))
+    reg.register(GrepSearchTool())
     return reg
 
 
@@ -311,8 +326,14 @@ def dialog_memory():
         st.info("尚未创建工作流。")
         return
     mem = wf.memory
-    st.markdown("#### 结构化摘要")
-    st.code(mem.context_summary, language="text")
+    gui = mem.global_user_info.summary()
+    if gui:
+        st.markdown("#### 用户背景")
+        st.markdown(gui)
+    if mem.facts:
+        st.markdown("#### 事实列表")
+        for f in mem.facts:
+            st.markdown(f"- {f}")
     st.markdown("#### 最近消息")
     if mem.recent_messages:
         for m in mem.recent_messages:
@@ -322,7 +343,7 @@ def dialog_memory():
     else:
         st.caption("暂无最近消息")
     if mem.user_profile:
-        st.markdown("#### 用户偏好")
+        st.markdown("#### 用户偏好（原始）")
         st.markdown(mem.user_profile)
 
 
@@ -478,17 +499,6 @@ def _render_assistant_message_dev(msg: dict, turn_idx: int):
                 dialog_trace()
 
 
-def _parse_memory_slots(summary: str) -> dict:
-    """Parse the 4-slot structured summary into a dict."""
-    slots = {"关注车型": "", "用户需求": "", "已确认数据": "", "对话脉络": ""}
-    for line in summary.splitlines():
-        for key in slots:
-            prefix = f"[{key}]"
-            if line.strip().startswith(prefix):
-                slots[key] = line.strip()[len(prefix):].strip()
-    return slots
-
-
 def _render_dev_panel():
     """Right-column developer panel with 3 tabs."""
     tab_trace, tab_mem, tab_sys = st.tabs(["📋 执行轨迹", "🧠 记忆状态", "⚙️ 系统信息"])
@@ -521,11 +531,11 @@ def _render_dev_panel():
             st.markdown('<p style="font-size:13px;color:#9B9B98;margin-top:12px;">发送第一条消息后记忆状态将显示在这里。</p>', unsafe_allow_html=True)
         else:
             mem = wf.memory
-            slots = _parse_memory_slots(mem.context_summary)
+            slots = mem.get_memory_slots()
 
-            st.markdown('<div class="section-label">结构化摘要</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-label">记忆摘要</div>', unsafe_allow_html=True)
             html = '<div class="dev-card"><div class="mem-grid">'
-            labels = {"关注车型": "CAR", "用户需求": "NEEDS", "已确认数据": "DATA", "对话脉络": "THREAD"}
+            labels = {"用户背景": "背景", "事实列表": "事实"}
             for key, abbr in labels.items():
                 val = slots.get(key, "无") or "无"
                 html += f'<div class="mem-key">{abbr}</div><div class="mem-val">{val}</div>'
@@ -574,8 +584,8 @@ def _render_dev_panel():
         st.markdown('<div class="section-label" style="margin-top:10px;">API 密钥</div>', unsafe_allow_html=True)
         st.markdown('<div class="dev-card">', unsafe_allow_html=True)
         for label, key, hint in [
-            ("OpenAI",    config.OPENAI_API_KEY,    exec_cfg.get("model", config.OPENAI_MODEL)),
-            ("DashScope", config.DASHSCOPE_API_KEY, qwen_cfg.get("model", config.QWEN_MODEL)),
+            ("OpenAI",    config.EXECUTOR_API_KEY,  exec_cfg.get("model", config.EXECUTOR_MODEL)),
+            ("DashScope", config.QWEN_API_KEY,      qwen_cfg.get("model", config.QWEN_MODEL)),
             ("Serper",    config.SERPER_API_KEY,    "web search"),
         ]:
             dot  = '<span class="dot-ok"></span>' if key else '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid #d1d5db;margin-right:6px;"></span>'

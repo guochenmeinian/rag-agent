@@ -32,8 +32,8 @@ class AgentExecutor:
         api_key: str | None = None,
         base_url: str | None = None,
     ):
-        self._model = model or config.OPENAI_MODEL
-        client_kwargs: dict = {"api_key": api_key or config.OPENAI_API_KEY}
+        self._model = model or config.EXECUTOR_MODEL
+        client_kwargs: dict = {"api_key": api_key or config.EXECUTOR_API_KEY}
         if base_url:
             client_kwargs["base_url"] = base_url
         self._client = OpenAI(**client_kwargs)
