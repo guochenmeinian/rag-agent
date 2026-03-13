@@ -4,7 +4,10 @@ from llama_cloud_services import LlamaParse
 import os
 from dotenv import load_dotenv
 
-nest_asyncio.apply()
+try:
+    nest_asyncio.apply()
+except ValueError:
+    pass  # uvloop doesn't need patching
 load_dotenv()
 
 def build_llama_parser():

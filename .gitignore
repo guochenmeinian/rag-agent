@@ -24,6 +24,14 @@ __pycache__/
 .sessions/
 .cache/
 .claude/
+.parse_cache/
+
+# -------------------------
+# frontend local artifacts
+# -------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
 
 # -------------------------
 # optional local env

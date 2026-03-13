@@ -119,7 +119,15 @@ class ToolRegistry:
 
     @staticmethod
     def _run_with_timeout(tool: BaseTool, kwargs: dict, timeout_s: int) -> ToolResult:
-        """Execute tool.run() in a separate thread with a hard timeout."""
-        with ThreadPoolExecutor(max_workers=1) as ex:
-            future = ex.submit(tool.run, **kwargs)
-            return future.result(timeout=timeout_s)   # raises FuturesTimeout if exceeded
+        """Execute tool.run() in a separate thread with a hard timeout.
+
+        Must NOT use 'with ThreadPoolExecutor' — the context manager calls
+        shutdown(wait=True) on exit, which blocks forever if the thread is hung.
+        Instead, shutdown(wait=False) to release immediately after timeout.
+        """
+        ex = ThreadPoolExecutor(max_workers=1)
+        future = ex.submit(tool.run, **kwargs)
+        try:
+            return future.result(timeout=timeout_s)
+        finally:
+            ex.shutdown(wait=False, cancel_futures=True)

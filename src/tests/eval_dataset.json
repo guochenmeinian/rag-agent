@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "蔚来汽车智能助手 — Golden QA 评估数据集",
+  "description": "Nio汽车智能助手 — Golden QA 评估数据集",
   "categories": {
     "single_car_param": "单车型参数查询",
     "multi_car_compare": "多车型横向对比",
@@ -110,7 +110,7 @@
     {
       "id": "q009",
       "category": "no_tool",
-      "input": "蔚来的换电模式是怎么运作的？",
+      "input": "Nio的换电模式是怎么运作的？",
       "context": null,
       "expected_tools": [],
       "expected_answer_keywords": ["换电", "电池"],
@@ -120,7 +120,7 @@
     {
       "id": "q010",
       "category": "no_tool",
-      "input": "你好，我想了解蔚来的车",
+      "input": "你好，我想了解Nio的车",
       "context": null,
       "expected_tools": [],
       "expected_answer_keywords": [],

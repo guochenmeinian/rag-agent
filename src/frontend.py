@@ -1,4 +1,4 @@
-"""蔚来 AI 助手 — Notion 风格双视图前端
+"""Nio AI 助手 — Notion 风格双视图前端
 
 视图：
   💬 对话    — 用户端，简洁聊天界面
@@ -24,7 +24,7 @@ from rag.pipeline import ingest, RAGContext
 # Page config
 # ─────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="蔚来 AI 助手",
+    page_title="Nio AI 助手",
     page_icon="○",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -705,7 +705,7 @@ def _tl_row(dot_cls: str, text: str, time_str: str):
 # Sidebar
 # ─────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown('<div class="notion-title">蔚来 AI 助手</div>', unsafe_allow_html=True)
+    st.markdown('<div class="notion-title">Nio AI 助手</div>', unsafe_allow_html=True)
     st.markdown('<div class="notion-sub">RAG + Agent 智能问答</div>', unsafe_allow_html=True)
     st.divider()
 
@@ -837,7 +837,7 @@ with tab_dev:
 # ─────────────────────────────────────────────────────────────
 # Chat input — at page bottom, feeds both views
 # ─────────────────────────────────────────────────────────────
-if prompt := st.chat_input("问我关于蔚来汽车的任何问题…"):
+if prompt := st.chat_input("问我关于Nio汽车的任何问题…"):
     # Append user message immediately
     st.session_state.messages.append({"role": "user", "content": prompt})
 

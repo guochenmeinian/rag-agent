@@ -82,7 +82,7 @@ def main():
     if args.session:
         print(f"[info] Session: {args.session}")
 
-    print("蔚来汽车助手已启动，输入 'quit' 退出\n")
+    print("Nio汽车助手已启动，输入 'quit' 退出\n")
     while True:
         try:
             user_input = input("你: ").strip()

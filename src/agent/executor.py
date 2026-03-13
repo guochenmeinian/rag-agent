@@ -1,26 +1,10 @@
 import json
-from dataclasses import dataclass, field
-from typing import Literal
 
 from openai import OpenAI
 
 import config
 from prompts import executor as prompt
-
-
-@dataclass
-class ToolUseBlock:
-    id: str
-    name: str
-    input: dict
-
-
-@dataclass
-class ExecutorResponse:
-    type: Literal["tool_call", "direct"]
-    answer: str = ""
-    raw_content: dict = field(default_factory=dict)
-    tool_use_blocks: list = field(default_factory=list)
+from .contracts import ExecutorResponse, ToolUseBlock
 
 
 class AgentExecutor:
@@ -39,14 +23,23 @@ class AgentExecutor:
         self._client = OpenAI(**client_kwargs)
         self._tool_schemas = tool_schemas
 
-    def run(self, messages: list[dict]) -> ExecutorResponse:
-        response = self._client.chat.completions.create(
+    def run(
+        self,
+        messages: list[dict],
+        extra_system: str = "",
+        force_direct: bool = False,
+    ) -> ExecutorResponse:
+        sys_content = f"{prompt.SYSTEM}\n\n{extra_system}" if extra_system else prompt.SYSTEM
+        create_kwargs: dict = dict(
             model=self._model,
             max_tokens=4096,
             tools=self._tool_schemas,
             parallel_tool_calls=True,
-            messages=[{"role": "system", "content": prompt.SYSTEM}] + messages,
+            messages=[{"role": "system", "content": sys_content}] + messages,
         )
+        if force_direct:
+            create_kwargs["tool_choice"] = "none"
+        response = self._client.chat.completions.create(**create_kwargs)
         return self._parse(response)
 
     def _parse(self, response) -> ExecutorResponse:

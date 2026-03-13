@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "description": "蔚来汽车助手 — 多轮对话 Benchmark 数据集",
+  "description": "Nio汽车助手 — 多轮对话 Benchmark 数据集",
   "what_we_test": {
     "coreference": "代词/省略解析（'那它的' '这款' 指代上文车型）",
     "memory_accumulation": "跨轮记忆累积（预算/家庭信息应在后续轮被利用）",
@@ -48,7 +48,7 @@
           "turn": 1,
           "input": "我预算大概45万左右，家里有两个孩子",
           "expected_tools": [],
-          "expected_answer_keywords": ["蔚来", "推荐", "车型"],
+          "expected_answer_keywords": ["Nio", "推荐", "车型"],
           "expected_facts_after": ["用户预算约45万", "有两个孩子"],
           "notes": "无具体车型，应直接回答并提示可以询问具体车型"
         },
@@ -81,7 +81,7 @@
       "turns": [
         {
           "turn": 1,
-          "input": "我想买辆蔚来，预算30万",
+          "input": "我想买辆Nio，预算30万",
           "expected_tools": [],
           "expected_facts_after": ["用户预算约30万"],
           "notes": "建立预算记忆"

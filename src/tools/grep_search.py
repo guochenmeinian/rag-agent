@@ -1,15 +1,13 @@
 """Grep 风格关键词检索 — 精确匹配参数、型号、数字等。"""
-from typing import Literal
-
 from pydantic import BaseModel, Field
 
 import config
 from storage.grep_index import GrepIndex
 from .base import BaseTool
 from .result import ToolResult
+from .rag_search import CarModel
 
 MAX_CONTENT = 3000
-CarModel = Literal["EC6", "EC7", "ES6", "ES8", "ET5", "ET5T", "ET7", "ET9"]
 
 
 class GrepSearchInput(BaseModel):
@@ -21,7 +19,7 @@ class GrepSearchInput(BaseModel):
     )
     car_model: CarModel = Field(
         ...,
-        description="蔚来车型代号: EC6 EC7 ES6 ES8 ET5 ET5T ET7 ET9",
+        description="Nio车型代号: EC6 EC7 ES6 ES8 ET5 ET5T ET7 ET9",
     )
 
 

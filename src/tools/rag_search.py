@@ -21,7 +21,7 @@ class RagSearchInput(BaseModel):
     )
     car_model: CarModel = Field(
         ...,
-        description="蔚来车型代号，必须是以下之一: EC6 EC7 ES6 ES8 ET5 ET5T ET7 ET9",
+        description="Nio车型代号，必须是以下之一: EC6 EC7 ES6 ES8 ET5 ET5T ET7 ET9",
     )
 
 
@@ -30,8 +30,8 @@ class RagSearchTool(BaseTool):
 
     name        = "rag_search"
     description = (
-        "从蔚来汽车知识库检索车型参数、规格、配置信息。"
-        "仅用于蔚来车型相关查询，需指定具体车型（car_model）。"
+        "从Nio汽车知识库检索车型参数、规格、配置信息。"
+        "仅用于Nio车型相关查询，需指定具体车型（car_model）。"
     )
     InputModel  = RagSearchInput
     timeout     = 15

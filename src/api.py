@@ -5,7 +5,7 @@ Run:
     # or from project root:
     PYTHONPATH=src uvicorn src.api:app --reload --port 8000
 """
-import sys, os, json, threading, asyncio
+import sys, os, json, threading, asyncio, dataclasses
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,6 +22,14 @@ from tools.web_search import WebSearchTool
 from tools.rag_search import RagSearchTool
 from tools.grep_search import GrepSearchTool
 from rag.pipeline import ingest, RAGContext
+
+class _Encoder(json.JSONEncoder):
+    """Serialize dataclasses (e.g. ToolResult) that json.dumps can't handle natively."""
+    def default(self, o):
+        if dataclasses.is_dataclass(o) and not isinstance(o, type):
+            return dataclasses.asdict(o)
+        return super().default(o)
+
 
 app = FastAPI(title="NIO AI Assistant")
 
@@ -130,7 +138,7 @@ async def chat_stream(
             ev = await event_q.get()
             if ev is None:
                 break
-            yield f"data: {json.dumps(ev, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps(ev, cls=_Encoder, ensure_ascii=False)}\n\n"
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(
@@ -155,6 +163,20 @@ async def clear_session(req: ClearRequest):
     return {"ok": True}
 
 
+@app.get("/api/session/memory")
+async def get_memory(session_id: str = Query(default="")):
+    key = session_id.strip() or "__anon__"
+    wf = _workflows.get(key)
+    if not wf:
+        return {"facts": [], "global_user_info": {}, "recent_messages": []}
+    mem = wf.memory
+    return {
+        "facts": mem.facts,
+        "global_user_info": mem.global_user_info.to_dict(),
+        "recent_messages": list(mem.recent_messages),
+    }
+
+
 @app.get("/api/status")
 async def status():
     rag_models = {}
@@ -165,6 +187,10 @@ async def status():
             rag_models[model] = "?"
     return {
         "rag": {"models": rag_models},
+        "models": {
+            "executor": config.EXECUTOR_MODEL,
+            "qwen": config.QWEN_MODEL,
+        },
         "api_keys": {
             "Executor":  bool(config.EXECUTOR_API_KEY),
             "Qwen":     bool(config.QWEN_API_KEY),

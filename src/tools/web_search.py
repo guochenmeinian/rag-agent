@@ -30,8 +30,8 @@ class WebSearchTool(BaseTool):
 
     name        = "web_search"
     description = (
-        "搜索实时网络信息，用于非蔚来专属查询（竞品对比、实时资讯、通用知识）。"
-        "不要用于蔚来车型参数查询，那些请用 rag_search。"
+        "搜索实时网络信息，用于非Nio专属查询（竞品对比、实时资讯、通用知识）。"
+        "不要用于Nio车型参数查询，那些请用 rag_search。"
     )
     InputModel  = WebSearchInput
     timeout     = 15

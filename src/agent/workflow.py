@@ -6,7 +6,6 @@ from .state import AgentState
 from .memory import ConversationMemory
 from .planner import QueryRewriter
 from .executor import AgentExecutor
-from .reflector import Reflector
 from tools.registry import ToolRegistry
 
 
@@ -16,11 +15,10 @@ class AgentWorkflow:
     user_input
       → memory (structured rolling summary + recent messages)
       → Qwen rewriter  →  refined standalone question
+                           clarify  →  short-circuit, return directly
       → GPT-4o executor
             tool_call  →  parallel tool runs  →  back to GPT-4o
-            direct     →  Qwen reflector (grounding check)
-                              pass  →  save to memory, yield done
-                              fail  →  re-run with feedback
+            direct     →  save to memory, yield done
     """
 
     def __init__(
@@ -57,9 +55,8 @@ class AgentWorkflow:
                 user_profile=user_profile,
             )
 
-        self.rewriter  = QueryRewriter(**(qwen_cfg or {}))
-        self.executor  = AgentExecutor(tool_schemas=registry.schemas, **(executor_cfg or {}))
-        self.reflector = Reflector(**(qwen_cfg or {}))
+        self.rewriter = QueryRewriter(**(qwen_cfg or {}))
+        self.executor = AgentExecutor(tool_schemas=registry.schemas, **(executor_cfg or {}))
         self.registry = registry
 
     # ------------------------------------------------------------------
@@ -79,27 +76,35 @@ class AgentWorkflow:
 
         Event schema:
             {"type": "rewriting"}
+            {"type": "clarify",      "message": str}          # rewriter short-circuit
             {"type": "refined",      "query": str}
             {"type": "tool_calling", "calls": [{"name": str, "query": str, ...}]}
             {"type": "tool_done",    "results": list[dict]}
-            {"type": "reflecting"}
-            {"type": "retry",        "feedback": str}
             {"type": "done",         "answer": str, "tool_results": list[dict] | None}
         """
         self.memory.add_message("user", user_input)
         context_prompt = self.memory.format_for_prompt()
 
         yield {"type": "rewriting"}
-        refined_query = self.rewriter.rewrite(user_input, context_prompt)
+        rewrite_result = self.rewriter.rewrite(user_input, context_prompt)
+
+        # Short-circuit: rewriter decided to clarify/reject
+        if rewrite_result.type == "clarify":
+            msg = rewrite_result.content
+            self.memory.add_message("assistant", msg)
+            self._persist()
+            yield {"type": "clarify", "message": msg}
+            yield {"type": "done", "answer": msg, "tool_results": None}
+            return
+
+        refined_query = rewrite_result.content
         yield {"type": "refined", "query": refined_query}
 
         state = AgentState(user_input=user_input, refined_query=refined_query)
-        messages = [
-            {"role": "user", "content": f"{context_prompt}\n\n[当前问题]\n{refined_query}"}
-        ]
+        messages = [{"role": "user", "content": refined_query}]
 
         while state.iteration < config.MAX_ITERATIONS:
-            response = self.executor.run(messages)
+            response = self.executor.run(messages, extra_system=context_prompt)
 
             # --- Tool call branch ---
             if response.type == "tool_call":
@@ -114,7 +119,7 @@ class AgentWorkflow:
 
                 messages.append(response.raw_content)
                 tool_results = self.registry.run_parallel(calls)
-                state.tool_results.extend(tool_results)   # accumulate across rounds
+                state.tool_results.extend(tool_results)
                 yield {"type": "tool_done", "results": tool_results}
 
                 for r in tool_results:
@@ -128,38 +133,21 @@ class AgentWorkflow:
 
             # --- Direct answer branch ---
             state.answer = response.answer
-            yield {"type": "reflecting"}
-            passed, feedback = self.reflector.reflect(
-                query=state.refined_query,
-                answer=state.answer,
-                tool_results=state.tool_results or None,
-            )
+            self.memory.add_message("assistant", state.answer)
+            self.memory.update_facts(user_input, state.answer)
+            self._persist()
+            yield {
+                "type": "done",
+                "answer": state.answer,
+                "tool_results": state.tool_results or None,
+            }
+            return
 
-            if passed:
-                self.memory.add_message("assistant", state.answer)
-                self.memory.update_facts(user_input, state.answer)
-                self._persist()
-                yield {
-                    "type": "done",
-                    "answer": state.answer,
-                    "tool_results": state.tool_results or None,
-                }
-                return
+        # Max iterations reached: force a direct answer if we only did tool calls
+        if not state.answer:
+            final = self.executor.run(messages, extra_system=context_prompt, force_direct=True)
+            state.answer = final.answer
 
-            # Reflection failed: feed back to model
-            state.reflection_feedback = feedback
-            yield {"type": "retry", "feedback": feedback}
-            messages.append(response.raw_content)
-            messages.append({
-                "role": "user",
-                "content": (
-                    f"[质量反馈] {feedback}\n"
-                    "请严格基于已检索到的信息重新回答，不要使用先验知识中的具体数字。"
-                ),
-            })
-            state.iteration += 1
-
-        # Max iterations reached: return best-effort answer
         self.memory.add_message("assistant", state.answer)
         self.memory.update_facts(user_input, state.answer)
         self._persist()
