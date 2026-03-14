@@ -59,3 +59,4 @@ class ExecutorResponse:
     answer: str = ""
     raw_content: dict[str, Any] = field(default_factory=dict)
     tool_use_blocks: list[ToolUseBlock] = field(default_factory=list)
+    usage: dict[str, int] = field(default_factory=dict)  # prompt_tokens, completion_tokens, total_tokens

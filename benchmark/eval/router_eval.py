@@ -14,12 +14,13 @@ parameter  (0/1) × 3 sub-checks
   3. correct_content — car_model matches, query_keywords appear in query arg
 
 multi_query  (0/1) × 2 sub-checks
-  1. efficient    — total calls ≤ max_calls (no redundant calls)
+  1. efficient    — total calls ≤ max_calls AND no duplicate (name, car_model, query) calls
   2. complete     — total calls ≥ min_calls (all required tools called)
   + parallelism   — if must_be_parallel: all expected tools in one batch
 """
 from __future__ import annotations
 
+import re
 from collections import Counter
 
 
@@ -156,14 +157,27 @@ def score_parameter(actual_calls: list[dict], gt: dict) -> dict:
 # multi_query (2 sub-checks + parallelism)
 # ─────────────────────────────────────────────────────────────
 
+def _call_signature(call: dict) -> tuple:
+    """Normalized identity tuple for detecting semantically redundant calls."""
+    query = re.sub(r"\s+", "", str(
+        call.get("query") or call.get("keywords") or call.get("query_keywords") or ""
+    )).lower()
+    return (call.get("name", ""), call.get("car_model", ""), query)
+
+
 def score_multi_query(actual_calls: list[dict], batches: list[list[dict]], gt: dict) -> dict:
     n_calls = len(actual_calls)
     min_c   = gt.get("min_calls", 1)
     max_c   = gt.get("max_calls", 1)
     must_parallel = gt.get("must_be_parallel", False)
 
-    # Sub-check 1: efficient (≤ max_calls)
-    efficient = n_calls <= max_c
+    # Redundant call detection: same (name, car_model, normalized_query)
+    sig_counts = Counter(_call_signature(c) for c in actual_calls)
+    dup_count  = sum(v - 1 for v in sig_counts.values() if v > 1)
+    no_redundant = dup_count == 0
+
+    # Sub-check 1: efficient (≤ max_calls AND no redundant calls)
+    efficient = n_calls <= max_c and no_redundant
 
     # Sub-check 2: complete (≥ min_calls)
     complete = n_calls >= min_c
@@ -183,6 +197,7 @@ def score_multi_query(actual_calls: list[dict], batches: list[list[dict]], gt: d
             "n_calls": n_calls,
             "min_calls": min_c,
             "max_calls": max_c,
+            "duplicate_call_count": dup_count,
             "max_batch_size": max_batch_size,
             "must_be_parallel": must_parallel,
         },
@@ -256,5 +271,10 @@ def aggregate_router(results: list[dict]) -> dict:
         )
         for s in mq_subs
     } if results else {}
+
+    # Diagnostic: average redundant calls per case
+    agg["avg_duplicate_calls"] = round(
+        sum(r["detail"]["multi_query"]["detail"].get("duplicate_call_count", 0) for r in results) / len(results), 3
+    ) if results else 0.0
 
     return {"n": len(results), **agg}

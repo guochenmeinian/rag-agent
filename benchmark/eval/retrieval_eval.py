@@ -2,10 +2,17 @@
 
 Metrics
 ───────
-hit@k   (0/1) — does at least one relevant chunk appear in top-k results?
-MRR         — mean reciprocal rank of the first relevant chunk
+hit@k        (0/1) — does at least one relevant chunk appear in top-k results?
+MRR              — mean reciprocal rank of the first relevant chunk
+no_hit_ok    (0/1) — for expect_no_hit cases: 1 if retriever returns 0 chunks, 0 otherwise
 
 Input: a ranked list of retrieved chunk IDs and the ground truth relevant set.
+
+expect_no_hit
+─────────────
+Set retrieval_gt.expect_no_hit = true for out-of-domain queries where the retriever
+should return nothing (score_threshold filters all chunks).
+These cases are excluded from hit@k / MRR aggregation and tracked separately.
 """
 from __future__ import annotations
 
@@ -36,9 +43,28 @@ def eval_retrieval_case(
 
     Returns:
         Dict with hit@k scores, MRR, and debug detail.
+        For expect_no_hit cases: only no_hit_ok metric is set.
     """
     gt = case.get("retrieval_gt", {})
-    relevant = set(gt.get("relevant_chunk_ids", []))
+    expect_no_hit = gt.get("expect_no_hit", False)
+
+    # ── expect_no_hit branch ──────────────────────────────────────
+    if expect_no_hit:
+        no_hit_ok = int(len(ranked_chunk_ids) == 0)
+        return {
+            "id":            case["id"],
+            "input":         case["input"],
+            "skip":          False,
+            "expect_no_hit": True,
+            "metrics":       {"no_hit_ok": no_hit_ok},
+            "detail": {
+                "n_chunks_returned": len(ranked_chunk_ids),
+                "ranked_top5":       ranked_chunk_ids[:5],
+            },
+        }
+
+    # ── normal hit@k / MRR branch ─────────────────────────────────
+    relevant  = set(gt.get("relevant_chunk_ids", []))
     eval_at_k = gt.get("eval_at_k", [1, 3, 5])
 
     if not relevant:
@@ -71,22 +97,33 @@ def eval_retrieval_case(
 
 
 def aggregate_retrieval(results: list[dict]) -> dict:
-    valid = [r for r in results if not r.get("skip")]
-    if not valid:
-        return {"n": 0, "skipped": len(results)}
+    # Separate expect_no_hit cases from normal cases
+    no_hit_cases = [r for r in results if r.get("expect_no_hit")]
+    normal_cases = [r for r in results if not r.get("expect_no_hit")]
 
-    # Collect all k values seen
-    all_k = set()
-    for r in valid:
-        all_k.update(int(k.split("@")[1]) for k in r["metrics"] if k.startswith("hit@"))
+    valid = [r for r in normal_cases if not r.get("skip")]
+    skipped = len(normal_cases) - len(valid)
 
-    agg: dict = {"n": len(valid), "skipped": len(results) - len(valid)}
-    for k in sorted(all_k):
-        key = f"hit@{k}"
-        vals = [r["metrics"].get(key, 0) for r in valid]
-        agg[key] = round(sum(vals) / len(vals), 3)
+    agg: dict = {"n": len(valid), "skipped": skipped}
 
-    mrr_vals = [r["metrics"]["mrr"] for r in valid]
-    agg["mrr"] = round(sum(mrr_vals) / len(mrr_vals), 4)
+    if valid:
+        # Collect all k values seen
+        all_k = set()
+        for r in valid:
+            all_k.update(int(k.split("@")[1]) for k in r["metrics"] if k.startswith("hit@"))
+
+        for k in sorted(all_k):
+            key = f"hit@{k}"
+            vals = [r["metrics"].get(key, 0) for r in valid]
+            agg[key] = round(sum(vals) / len(vals), 3)
+
+        mrr_vals = [r["metrics"]["mrr"] for r in valid]
+        agg["mrr"] = round(sum(mrr_vals) / len(mrr_vals), 4)
+
+    # expect_no_hit aggregation
+    if no_hit_cases:
+        no_hit_scores = [r["metrics"]["no_hit_ok"] for r in no_hit_cases]
+        agg["no_hit_n"]  = len(no_hit_cases)
+        agg["no_hit_ok"] = round(sum(no_hit_scores) / len(no_hit_scores), 3)
 
     return agg

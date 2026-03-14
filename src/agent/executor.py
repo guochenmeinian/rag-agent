@@ -44,6 +44,13 @@ class AgentExecutor:
 
     def _parse(self, response) -> ExecutorResponse:
         msg = response.choices[0].message
+        usage: dict[str, int] = {}
+        if response.usage:
+            usage = {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens,
+            }
 
         if msg.tool_calls:
             blocks = [
@@ -69,10 +76,11 @@ class AgentExecutor:
                     for tc in msg.tool_calls
                 ],
             }
-            return ExecutorResponse(type="tool_call", raw_content=raw, tool_use_blocks=blocks)
+            return ExecutorResponse(type="tool_call", raw_content=raw, tool_use_blocks=blocks, usage=usage)
 
         return ExecutorResponse(
             type="direct",
             answer=msg.content or "",
             raw_content={"role": "assistant", "content": msg.content},
+            usage=usage,
         )

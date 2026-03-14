@@ -128,6 +128,7 @@ def parse_events(events: list[dict]) -> dict:
     batches:        list[list] = []
     answer:         str = ""
     tool_results:   list[dict] = []
+    usage:          dict = {}
 
     for ev in events:
         t = ev["type"]
@@ -143,6 +144,7 @@ def parse_events(events: list[dict]) -> dict:
             tool_results.extend(ev.get("results", []))
         elif t == "done":
             answer = ev.get("answer", "")
+            usage  = ev.get("usage", {})
 
     return {
         "rewrite_result": rewrite_result,
@@ -150,6 +152,7 @@ def parse_events(events: list[dict]) -> dict:
         "batches":        batches,
         "answer":         answer,
         "tool_results":   tool_results,
+        "usage":          usage,
     }
 
 
@@ -198,6 +201,7 @@ def run_case(
         "category":  case.get("category", ""),
         "input":     case["input"],
         "latency_s": latency,
+        "usage":     parsed.get("usage", {}),
         "metrics":   {},
         "detail":    {},
     }
@@ -278,6 +282,12 @@ def aggregate_all(results: list[dict], layers: list[str]) -> dict:
             "p95": s[min(int(len(s) * 0.95), len(s) - 1)],
         }
 
+    summary["cost"] = {
+        "total_prompt_tokens":     sum(r.get("usage", {}).get("prompt_tokens", 0) for r in valid),
+        "total_completion_tokens": sum(r.get("usage", {}).get("completion_tokens", 0) for r in valid),
+        "total_tokens":            sum(r.get("usage", {}).get("total_tokens", 0) for r in valid),
+    }
+
     return summary
 
 
@@ -296,18 +306,22 @@ def print_summary(summary: dict):
             ("standalone",                 "standalone_n"),
             ("entity_extraction_accuracy", "entity_n"),
             ("clarify_detection",          "clarify_n"),
+            ("coref_resolution_rate",      None),
+            ("ellipsis_fill_rate",         None),
         ],
         "router":    [
             ("tool_classification_accuracy", None),
             ("parameter",                    None),
             ("multi_query",                  None),
+            ("avg_duplicate_calls",          None),
         ],
-        "retrieval": [("hit@1", None), ("hit@3", None), ("hit@5", None), ("mrr", None)],
+        "retrieval": [("hit@1", None), ("hit@3", None), ("hit@5", None), ("mrr", None), ("no_hit_ok", "no_hit_n")],
         "answer":    [
-            ("match_avg",           None),
-            ("match_full",          None),
-            ("hallucination_clean", None),
-            ("clarification_acc",   None),
+            ("match_avg",               None),
+            ("match_full",              None),
+            ("hallucination_clean",     None),
+            ("clarification_acc",       None),
+            ("key_facts_coverage_avg",  None),
         ],
     }
 
@@ -320,12 +334,18 @@ def print_summary(summary: dict):
             if m not in data:
                 continue
             n_str = f"  n={data[n_key]}" if n_key and n_key in data else ""
-            print(f"    {m:<35} {data[m]:.3f}{n_str}")
+            val = data[m]
+            val_str = "N/A" if val is None else f"{val:.3f}"
+            print(f"    {m:<35} {val_str}{n_str}")
         print()
 
     if "latency" in summary:
         lat = summary["latency"]
         print(f"  LATENCY  p50={lat['p50']}s  p95={lat['p95']}s")
+
+    if "cost" in summary:
+        c = summary["cost"]
+        print(f"  COST     prompt={c['total_prompt_tokens']}  completion={c['total_completion_tokens']}  total={c['total_tokens']} tokens")
 
     print("=" * 65 + "\n")
 

@@ -6,6 +6,7 @@ Run:
     PYTHONPATH=src uvicorn src.api:app --reload --port 8000
 """
 import sys, os, json, threading, asyncio, dataclasses
+from contextlib import asynccontextmanager
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -31,15 +32,6 @@ class _Encoder(json.JSONEncoder):
         return super().default(o)
 
 
-app = FastAPI(title="NIO AI Assistant")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # ── Global singletons ─────────────────────────────────────────────────────────
 
 _rag_contexts: dict[str, RAGContext] = {}
@@ -47,11 +39,22 @@ _registry: ToolRegistry | None = None
 _workflows: dict[str, AgentWorkflow] = {}
 
 
-@app.on_event("startup")
-async def _startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global _rag_contexts, _registry
     _rag_contexts = _load_rag_contexts()
     _registry = _build_registry(_rag_contexts)
+    yield
+
+
+app = FastAPI(title="NIO AI Assistant", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def _load_rag_contexts() -> dict[str, RAGContext]:

@@ -184,10 +184,27 @@ def aggregate_rewriter(results: list[dict]) -> dict:
             for m in ("standalone", "entity_extraction_accuracy", "clarify_detection")
         }
 
+    # Diagnostics: coref and ellipsis hard-check pass rates
+    # Only over cases where standalone was evaluated (should_clarify=False)
+    standalone_details = [
+        r["detail"]["standalone"]["hard"]
+        for r in results
+        if r.get("detail", {}).get("standalone", {}).get("hard") is not None
+    ]
+    coref_rate = round(
+        sum(1 for d in standalone_details if d["coref"]["pass"]) / len(standalone_details), 3
+    ) if standalone_details else None
+    ellipsis_rate = round(
+        sum(1 for d in standalone_details if d["ellipsis"]["pass"]) / len(standalone_details), 3
+    ) if standalone_details else None
+
     return {
         "n":                          len(results),
         "standalone":                 sa_avg,  "standalone_n":  sa_n,
         "entity_extraction_accuracy": en_avg,  "entity_n":      en_n,
         "clarify_detection":          cl_avg,  "clarify_n":     cl_n,
+        # Diagnostics
+        "coref_resolution_rate":  coref_rate,
+        "ellipsis_fill_rate":     ellipsis_rate,
         "by_category":                cat_summary,
     }

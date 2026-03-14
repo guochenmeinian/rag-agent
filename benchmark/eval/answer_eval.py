@@ -33,8 +33,11 @@ from benchmark.eval.llm_judge import (
 # ─────────────────────────────────────────────────────────────
 
 def _check_key_facts(answer: str, key_facts: list[str]) -> dict:
+    if not key_facts:
+        return {"pass": True, "missing": [], "coverage": 1.0}
     missing = [f for f in key_facts if f.lower() not in answer.lower()]
-    return {"pass": len(missing) == 0, "missing": missing}
+    coverage = round((len(key_facts) - len(missing)) / len(key_facts), 3)
+    return {"pass": len(missing) == 0, "missing": missing, "coverage": coverage}
 
 
 def _check_forbidden_content(answer: str, forbidden: list[str]) -> dict:
@@ -142,10 +145,20 @@ def aggregate_answer(results: list[dict]) -> dict:
         vals = [r["metrics"][key] for r in results]
         return round(sum(vals) / len(vals), 3)
 
+    # Diagnostic: key_facts coverage (0–1) — how many facts were present on average
+    kf_coverages = [
+        r["detail"]["match"]["hard"]["coverage"]
+        for r in results
+        if r.get("detail", {}).get("match", {}).get("hard", {}).get("coverage") is not None
+    ]
+    kf_coverage_avg = round(sum(kf_coverages) / len(kf_coverages), 3) if kf_coverages else None
+
     return {
         "n":             len(results),
         "match_avg":     avg("match"),         # 0–2 scale
         "match_full":    round(sum(1 for r in results if r["metrics"]["match"] == 2) / len(results), 3),
         "hallucination_clean": avg("hallucination"),
         "clarification_acc":   avg("clarification"),
+        # Diagnostics
+        "key_facts_coverage_avg": kf_coverage_avg,
     }

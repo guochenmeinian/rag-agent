@@ -4,7 +4,7 @@ from typing import Generator
 import config
 from .state import AgentState
 from .memory import ConversationMemory
-from .planner import QueryRewriter
+from .rewriter import QueryRewriter
 from .executor import AgentExecutor
 from tools.registry import ToolRegistry
 
@@ -102,9 +102,12 @@ class AgentWorkflow:
 
         state = AgentState(user_input=user_input, refined_query=refined_query)
         messages = [{"role": "user", "content": refined_query}]
+        _usage: dict[str, int] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
         while state.iteration < config.MAX_ITERATIONS:
             response = self.executor.run(messages, extra_system=context_prompt)
+            for k in _usage:
+                _usage[k] += response.usage.get(k, 0)
 
             # --- Tool call branch ---
             if response.type == "tool_call":
@@ -140,6 +143,7 @@ class AgentWorkflow:
                 "type": "done",
                 "answer": state.answer,
                 "tool_results": state.tool_results or None,
+                "usage": dict(_usage),
             }
             return
 
@@ -147,6 +151,8 @@ class AgentWorkflow:
         if not state.answer:
             final = self.executor.run(messages, extra_system=context_prompt, force_direct=True)
             state.answer = final.answer
+            for k in _usage:
+                _usage[k] += final.usage.get(k, 0)
 
         self.memory.add_message("assistant", state.answer)
         self.memory.update_facts(user_input, state.answer)
@@ -155,6 +161,7 @@ class AgentWorkflow:
             "type": "done",
             "answer": state.answer,
             "tool_results": state.tool_results or None,
+            "usage": dict(_usage),
         }
 
     # ------------------------------------------------------------------
