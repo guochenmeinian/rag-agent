@@ -51,6 +51,7 @@ class AgentWorkflow:
         session_id: str | None = None,
         executor_cfg: dict | None = None,
         qwen_cfg: dict | None = None,
+        disabled: set[str] | None = None,
     ):
         """
         executor_cfg / qwen_cfg — optional runtime model overrides, e.g.:
@@ -80,6 +81,7 @@ class AgentWorkflow:
         self.rewriter = QueryRewriter(**(qwen_cfg or {}))
         self.executor = AgentExecutor(tool_schemas=registry.schemas, **(executor_cfg or {}))
         self.registry = registry
+        self.disabled: set[str] = disabled or set()
 
     # ------------------------------------------------------------------
     # Public API
@@ -107,20 +109,24 @@ class AgentWorkflow:
         self.memory.add_message("user", user_input)
         context_prompt = self.memory.format_for_prompt()
 
-        yield {"type": "rewriting"}
-        rewrite_result = self.rewriter.rewrite(user_input, context_prompt)
+        if "rewriter" in self.disabled:
+            refined_query = user_input
+            yield {"type": "refined", "query": refined_query, "rewriter_skipped": True}
+        else:
+            yield {"type": "rewriting"}
+            rewrite_result = self.rewriter.rewrite(user_input, context_prompt)
 
-        # Short-circuit: rewriter decided to clarify/reject
-        if rewrite_result.type == "clarify":
-            msg = rewrite_result.content
-            self.memory.add_message("assistant", msg)
-            self._persist()
-            yield {"type": "clarify", "message": msg}
-            yield {"type": "done", "answer": msg, "tool_results": None}
-            return
+            # Short-circuit: rewriter decided to clarify/reject
+            if rewrite_result.type == "clarify":
+                msg = rewrite_result.content
+                self.memory.add_message("assistant", msg)
+                self._persist()
+                yield {"type": "clarify", "message": msg}
+                yield {"type": "done", "answer": msg, "tool_results": None}
+                return
 
-        refined_query = rewrite_result.content
-        yield {"type": "refined", "query": refined_query}
+            refined_query = rewrite_result.content
+            yield {"type": "refined", "query": refined_query}
 
         state = AgentState(user_input=user_input, refined_query=refined_query)
         messages = [{"role": "user", "content": refined_query}]

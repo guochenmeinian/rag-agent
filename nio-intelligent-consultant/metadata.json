@@ -1,0 +1,5 @@
+{
+  "name": "NIO Intelligent Consultant",
+  "description": "An intelligent RAG-powered car consulting agent for NIO, providing detailed vehicle information, comparisons, and personalized recommendations.",
+  "requestFramePermissions": []
+}

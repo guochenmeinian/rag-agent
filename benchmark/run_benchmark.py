@@ -86,17 +86,23 @@ def load_rag_contexts() -> dict[str, "RAGContext"]:
     return contexts
 
 
-def make_workflow(rag_contexts: dict[str, "RAGContext"] | None = None) -> AgentWorkflow:
+def make_workflow(
+    rag_contexts: dict[str, "RAGContext"] | None = None,
+    disabled: set[str] | None = None,
+) -> AgentWorkflow:
     from tools.registry import ToolRegistry
     from tools.rag_search import RagSearchTool
     from tools.grep_search import GrepSearchTool
     from tools.web_search import WebSearchTool
 
+    disabled = disabled or set()
     registry = ToolRegistry()
-    registry.register(RagSearchTool(contexts=rag_contexts or {}))
-    registry.register(GrepSearchTool())
-    registry.register(WebSearchTool())
-    return AgentWorkflow(registry=registry)
+    if "rag" not in disabled:
+        registry.register(RagSearchTool(contexts=rag_contexts or {}))
+        registry.register(GrepSearchTool())
+    if "web" not in disabled:
+        registry.register(WebSearchTool())
+    return AgentWorkflow(registry=registry, disabled=disabled)
 
 
 def inject_context(workflow: AgentWorkflow, ctx: dict | None):
@@ -184,13 +190,16 @@ def run_case(
     layers: list[str],
     dry_run: bool = False,
     rag_contexts: dict[str, "RAGContext"] | None = None,
+    disabled: set[str] | None = None,
 ) -> dict:
     if dry_run:
         return {"id": case["id"], "dry_run": True, "input": case["input"]}
 
+    disabled = disabled or set()
     targets = case.get("layer_targets", [])
-    workflow = make_workflow(rag_contexts=rag_contexts)
-    inject_context(workflow, case.get("context"))
+    workflow = make_workflow(rag_contexts=rag_contexts, disabled=disabled)
+    if "memory" not in disabled:
+        inject_context(workflow, case.get("context"))
 
     events: list[dict] = []
     t0 = time.monotonic()
@@ -214,10 +223,13 @@ def run_case(
     }
 
     if "rewriter" in layers and "rewriter" in targets and case.get("rewriter_gt"):
-        r = eval_rewriter_case(case, parsed["rewrite_result"])
-        result["metrics"].update({f"rewriter/{k}": v for k, v in r["metrics"].items()})
-        result["detail"]["rewriter"] = r["detail"]
-        result["rewrite_result"] = parsed["rewrite_result"]
+        if "rewriter" in disabled:
+            result["detail"]["rewriter"] = {"skipped": True, "reason": "rewriter disabled"}
+        else:
+            r = eval_rewriter_case(case, parsed["rewrite_result"])
+            result["metrics"].update({f"rewriter/{k}": v for k, v in r["metrics"].items()})
+            result["detail"]["rewriter"] = r["detail"]
+            result["rewrite_result"] = parsed["rewrite_result"]
 
     if "router" in layers and "router" in targets and case.get("router_gt"):
         r = eval_router_case(case, parsed["actual_calls"], parsed["batches"])
@@ -384,6 +396,9 @@ def print_case_row(r: dict):
 # CLI
 # ─────────────────────────────────────────────────────────────
 
+DISABLEABLE = ["rewriter", "rag", "web", "memory"]
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Run layered RAG agent benchmark")
     p.add_argument("--dataset",  default=str(bm_config.CASES_FILE))
@@ -392,11 +407,15 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--category", default="", help="Filter by category (= synthesis target id)")
     p.add_argument("--out",      default="", help="Write JSON results to file")
     p.add_argument("--dry-run",  action="store_true")
+    p.add_argument("--disable",  nargs="+", default=[], choices=DISABLEABLE,
+                   metavar="COMPONENT",
+                   help=f"Disable pipeline components for ablation. Choices: {DISABLEABLE}")
     return p.parse_args()
 
 
 def main():
     args = parse_args()
+    disabled = set(args.disable)
     cases = load_dataset(args.dataset)
     rag_contexts = None if args.dry_run else load_rag_contexts()
     if not args.dry_run and not rag_contexts:
@@ -412,12 +431,14 @@ def main():
         print("No cases matched the filter.")
         return
 
-    print(f"\nRunning {len(cases)} cases | layers: {args.layers}\n")
+    disabled_str = f" | disabled: {sorted(disabled)}" if disabled else ""
+    print(f"\nRunning {len(cases)} cases | layers: {args.layers}{disabled_str}\n")
 
     results = []
     for case in cases:
         print(f"  → {case['id']} : {case['input'][:55]}")
-        r = run_case(case, layers=args.layers, dry_run=args.dry_run, rag_contexts=rag_contexts)
+        r = run_case(case, layers=args.layers, dry_run=args.dry_run,
+                     rag_contexts=rag_contexts, disabled=disabled)
         results.append(r)
         print_case_row(r)
 
