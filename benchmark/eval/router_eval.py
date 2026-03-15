@@ -115,9 +115,16 @@ def _check_correct_content(actual_calls: list[dict], gt: dict) -> dict:
                 failures.append(f"{name}: car_model expected '{expected_model}', got '{actual_model}'")
 
         # query_keywords: at least one should appear in the query argument
+        # grep_search uses "keywords", rag_search/web_search use "query"
         kws = params.get("query_keywords", [])
         if kws:
-            query_arg = call.get("query", call.get("input", {}).get("query", ""))
+            query_arg = (
+                call.get("query")
+                or call.get("keywords")
+                or call.get("input", {}).get("query", "")
+                or call.get("input", {}).get("keywords", "")
+                or ""
+            )
             found = [kw for kw in kws if kw.lower() in query_arg.lower()]
             if not found:
                 failures.append(f"{name}: none of {kws} found in query arg '{query_arg[:60]}'")

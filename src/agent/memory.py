@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 from collections import deque
 from dataclasses import dataclass, field
 
@@ -83,11 +84,24 @@ class ConversationMemory:
     def update_facts(self, user_input: str, assistant_answer: str):
         """Extract/update facts from the just-completed turn. Called once per accepted answer."""
         current = "\n".join(self.facts) if self.facts else "无"
+
+        # Include recent context, explicitly excluding the current turn by content match
+        prior_messages = [
+            m for m in self.recent_messages
+            if not (m["role"] == "user" and m["content"] == user_input)
+            and not (m["role"] == "assistant" and m["content"] == assistant_answer)
+        ]
+        context_str = ""
+        if prior_messages:
+            lines = "\n".join(f"  {m['role']}: {m['content'][:200]}" for m in prior_messages[-4:])
+            context_str = f"【近期上下文】\n{lines}\n\n"
+
         user_content = (
             f"【当前事实列表】\n{current}\n\n"
+            f"{context_str}"
             f"【本轮对话】\n"
             f"user: {user_input}\n"
-            f"assistant: {assistant_answer[:800]}\n\n"
+            f"assistant: {assistant_answer[:600]}\n\n"
             f"请输出更新后的事实列表："
         )
         try:
@@ -105,8 +119,39 @@ class ConversationMemory:
                 self.facts = []
             else:
                 self.facts = [line.strip() for line in raw.splitlines() if line.strip()]
+            self._sync_global_user_info()
         except Exception:
             pass  # keep existing facts on failure
+
+    def _sync_global_user_info(self):
+        """Parse facts and update GlobalUserInfo fields to keep them in sync."""
+        car_models = {"EC6", "EC7", "ES6", "ES8", "ET5", "ET5T", "ET7", "ET9"}
+        # Reset derived fields so stale values don't persist after facts are removed
+        self.global_user_info.budget = ""
+        self.global_user_info.family = ""
+        self.global_user_info.preferences = ""
+        found_models: set[str] = set(self.global_user_info.focus_models)
+
+        for fact in self.facts:
+            if fact.startswith("【脉络】"):
+                continue
+            # Budget: match "预算XX万" or "预算XX万元"
+            m = re.search(r"预算\s*(\d+[\d.]*\s*万?)", fact)
+            if m:
+                self.global_user_info.budget = m.group(1).strip()
+            # Family
+            if any(kw in fact for kw in ["孩子", "家庭", "家用", "老人", "父母", "座"]):
+                self.global_user_info.family = fact
+            # Preferences
+            if any(kw in fact for kw in ["注重", "偏好", "喜欢", "需要", "用途", "通勤", "长途", "越野"]):
+                self.global_user_info.preferences = fact
+            # Focus models: collect all mentioned car models
+            for model in car_models:
+                if model in fact:
+                    found_models.add(model)
+
+        if found_models:
+            self.global_user_info.focus_models = sorted(found_models)
 
     def format_for_prompt(self) -> str:
         """Serialize memory into context for rewriter and executor."""

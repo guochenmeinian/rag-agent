@@ -18,8 +18,8 @@ EXECUTOR_MODEL = os.getenv("EXECUTOR_MODEL") or os.getenv("OPENAI_MODEL", "gpt-4
 EXECUTOR_API_KEY = os.getenv("EXECUTOR_API_KEY") or OPENAI_API_KEY
 EXECUTOR_BASE_URL = os.getenv("EXECUTOR_BASE_URL", "")  # 空则用 OpenAI 默认
 
-# --- Qwen 系 (Rewriter / Reflector / Memory 改写、反思、记忆) ---
-QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen3.5-instruct")
+# --- Qwen 系 (Rewriter / Reflector / Memory 改写、反思、记忆) ---  
+QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen3.5-flash")
 QWEN_API_KEY = os.getenv("QWEN_API_KEY") or DASHSCOPE_API_KEY
 QWEN_BASE_URL = os.getenv("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
 

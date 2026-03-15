@@ -156,16 +156,23 @@ def parse_events(events: list[dict]) -> dict:
     }
 
 
-def _extract_chunk_ids(tool_results: list[dict]) -> list[str]:
-    ids: list[str] = []
+def _extract_chunks(tool_results: list[dict]) -> list[dict]:
+    """Extract retrieved content as [{"id": str, "content": str}] from tool results.
+
+    rag_search stores formatted citations in ToolResult.content (not individual chunk IDs),
+    so each tool call becomes one entry keyed by tool_name + car_model.
+    """
+    chunks_out: list[dict] = []
     for tr in tool_results:
-        result_obj = tr.get("result", {})
-        chunks = getattr(result_obj, "chunks", None) or result_obj.get("chunks", [])
-        for chunk in chunks:
-            cid = chunk.get("chunk_id") or chunk.get("id")
-            if cid:
-                ids.append(str(cid))
-    return ids
+        result_obj = tr.get("result")
+        if result_obj is None or not getattr(result_obj, "success", True):
+            continue
+        content = getattr(result_obj, "content", "") or ""
+        meta    = getattr(result_obj, "metadata", {}) or {}
+        cid = f"{tr.get('name', 'tool')}:{meta.get('car_model', meta.get('query', '?'))}"
+        if content:
+            chunks_out.append({"id": cid, "content": content})
+    return chunks_out
 
 
 # ─────────────────────────────────────────────────────────────
@@ -219,11 +226,13 @@ def run_case(
         result["actual_calls"] = parsed["actual_calls"]
 
     if "retrieval" in layers and "retrieval" in targets and case.get("retrieval_gt"):
-        ranked_ids = _extract_chunk_ids(parsed["tool_results"])
-        r = eval_retrieval_case(case, ranked_ids)
+        ranked_chunks = _extract_chunks(parsed["tool_results"])
+        r = eval_retrieval_case(case, ranked_chunks)
         if not r.get("skip"):
             result["metrics"].update({f"retrieval/{k}": v for k, v in r["metrics"].items()})
-            result["detail"]["retrieval"] = r["detail"]
+            result["detail"]["retrieval"] = {**r.get("detail", {}), "mode": r.get("mode")}
+            if r.get("expect_no_hit"):
+                result["detail"]["retrieval"]["expect_no_hit"] = True
 
     if "answer" in layers and "answer" in targets and case.get("answer_gt"):
         r = eval_answer_case(case, parsed["answer"])
@@ -266,9 +275,12 @@ def aggregate_all(results: list[dict], layers: list[str]) -> dict:
         elif layer == "router":
             summary["router"] = aggregate_router(flat)
         elif layer == "retrieval":
+            ret_detail = lambda r: r.get("detail", {}).get("retrieval", {})
             full = [{"id": r["id"], "input": r["input"], "skip": False,
-                     "metrics": _strip_prefix(r["metrics"], prefix),
-                     "detail":  r.get("detail", {}).get("retrieval", {})}
+                     "metrics":      _strip_prefix(r["metrics"], prefix),
+                     "detail":       ret_detail(r),
+                     "mode":         ret_detail(r).get("mode"),
+                     "expect_no_hit": ret_detail(r).get("expect_no_hit", False)}
                     for r in layer_results]
             summary["retrieval"] = aggregate_retrieval(full)
         elif layer == "answer":
@@ -315,7 +327,11 @@ def print_summary(summary: dict):
             ("multi_query",                  None),
             ("avg_duplicate_calls",          None),
         ],
-        "retrieval": [("hit@1", None), ("hit@3", None), ("hit@5", None), ("mrr", None), ("no_hit_ok", "no_hit_n")],
+        "retrieval": [
+            ("hit@1", None), ("hit@3", None), ("hit@5", None), ("mrr", "n_chunk_id"),
+            ("relevance@5", "n_llm_judge"), ("facts_coverage_avg", None),
+            ("no_hit_ok", "no_hit_n"),
+        ],
         "answer":    [
             ("match_avg",               None),
             ("match_full",              None),

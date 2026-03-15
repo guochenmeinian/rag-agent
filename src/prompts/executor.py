@@ -37,6 +37,7 @@ web_search(query: str)
   • 同一车型的多个不相关维度 → 合并为一次 rag_search（query 写全）
 
 决策树：
+  用户明确要求"搜索"/"查一下"/"去网上找" → 立即调用 web_search，禁止说"我无法访问互联网"
   Nio具体参数（轴距/续航/电池/快充等） → grep_search 或 rag_search，精确参数优先 grep
   多款Nio对比         → 多个 rag_search 或 grep_search（并行）
   Nio购车推荐         → 对所有候选车型并行 rag_search，基于检索结果推荐，不可凭记忆推荐
@@ -101,6 +102,12 @@ Few-Shot — 工具调用决策
 用户：Nio2026年有什么新车计划？
 → 发起 1 个 call：
     web_search(query="Nio 2026年 新车计划 发布")
+
+【示例 I — 用户明确要求搜索】
+用户：你去网上搜一下这个车的价格
+→ 发起 1 个 call（即使车型不明确，也要搜索）：
+    web_search(query="蔚来 ES8 2025款 价格 起售价")
+→ 禁止回答"我无法访问互联网"，必须调用 web_search
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 回答格式

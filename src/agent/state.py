@@ -10,3 +10,4 @@ class AgentState:
     answer: str = ""
 
     iteration: int = 0
+    grep_rag_fallback_done: bool = False  # prevent double-retry for grep→rag fallback

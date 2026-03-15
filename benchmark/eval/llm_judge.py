@@ -163,6 +163,50 @@ score=0: rewrite adds facts not inferable from context.
 
 
 # ─────────────────────────────────────────────────────────────
+# Retrieval judges
+# ─────────────────────────────────────────────────────────────
+
+def judge_retrieval_relevance(
+    query: str,
+    chunks: list[dict],
+    gt: dict,
+) -> dict:
+    """Score: 1 = retrieved chunks are relevant to the query intent, 0 = not relevant.
+
+    Args:
+        query:  the rewritten user query
+        chunks: top-k retrieved chunks, each {"id": str, "content": str}
+        gt:     retrieval_gt with query_intent and optional expected_facts
+    """
+    query_intent = gt.get("query_intent", query)
+    expected_facts = gt.get("expected_facts", [])
+
+    chunks_text = "\n\n".join(
+        f"[Chunk {i+1}] (id={c.get('id', '?')})\n{c.get('content', '')}"
+        for i, c in enumerate(chunks)
+    )
+
+    system = """\
+You are a retrieval evaluation judge. Given a user query and a set of retrieved chunks,
+assess whether the chunks collectively contain the information needed to answer the query.
+
+Return JSON: {"score": 0 or 1, "reason": "<brief explanation>"}
+
+score=1: at least one chunk is clearly relevant and contains useful information for the query.
+score=0: none of the chunks are relevant, or the chunks are completely off-topic.
+"""
+    facts_line = f"\nEXPECTED FACTS (should appear in retrieved content): {expected_facts}" if expected_facts else ""
+    user = f"""\
+USER QUERY: {query}
+QUERY INTENT: {query_intent}{facts_line}
+
+RETRIEVED CHUNKS:
+{chunks_text}
+"""
+    return _call(system, user)
+
+
+# ─────────────────────────────────────────────────────────────
 # Answer judges
 # ─────────────────────────────────────────────────────────────
 

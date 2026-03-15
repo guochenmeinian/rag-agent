@@ -124,14 +124,31 @@ class RouterGT(TypedDict):
 # Layer 4 — Retrieval ground truth
 # ─────────────────────────────────────────────────────────────
 
-class RetrievalGT(TypedDict):
-    """Ground truth for hit@k and MRR.
+class RetrievalGT(TypedDict, total=False):
+    """Ground truth for retrieval evaluation. Two modes:
 
-    relevant_chunk_ids — chunk IDs that count as a "hit"
-    eval_at_k          — k values to evaluate (default [1, 3, 5])
+    Mode A — chunk-ID based (offline annotation, precise):
+        relevant_chunk_ids — chunk IDs that count as a "hit"
+        eval_at_k          — k values to evaluate (default [1, 3, 5])
+
+    Mode B — LLM-judge based (no chunk IDs needed, annotation-free):
+        query_intent    — describes what a relevant chunk should contain
+        expected_facts  — key strings that should appear somewhere in top-k chunks
+        eval_at_k       — k value to judge (default [5])
+
+    Shared:
+        expect_no_hit   — True for out-of-domain queries (retriever should return nothing)
     """
+    # Mode A
     relevant_chunk_ids: list[str]
+
+    # Mode B
+    query_intent: str
+    expected_facts: list[str]
+
+    # Shared
     eval_at_k: list[int]
+    expect_no_hit: bool
 
 
 # ─────────────────────────────────────────────────────────────

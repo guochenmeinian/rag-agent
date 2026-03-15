@@ -80,6 +80,7 @@ rag-agent/
 
 # 2. 配置（复制模板并填写 key）
 cp .env.example .env
+source .venv/bin/activate
 
 # 3. 启动
 ./run.sh serve                                              # 后端 FastAPI（uvicorn）→ http://localhost:8000
