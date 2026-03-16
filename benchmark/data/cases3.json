@@ -1,0 +1,962 @@
+{
+  "version": "3.0",
+  "description": "NIO assistant benchmark — mixed RAG-critical and general knowledge answer/retrieval cases",
+  "cases": [
+    {
+      "id": "ans_rag_critical_001",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "EC7各电池版本的精确整备质量因轮圈不同而差异细微，GPT-4o无法知道75kWh+20寸轮圈与21寸轮圈之间的具体差值",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的75kWh版本，选20寸轮圈和21寸轮圈，整备质量分别是多少千克？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7 75kWh（类型B）版本：选配20寸轮圈时整备质量为2399kg，选配21寸轮圈时整备质量为2420kg，两者相差21kg。（注：75kWh类型A版本仅提供21寸，整备质量为2420kg；75kWh类型B版本20寸整备质量为2399kg，21寸为2420kg。）",
+        "key_facts": ["2399kg", "2420kg", "75kWh", "20寸", "21寸"],
+        "forbidden_content": ["2350kg", "2380kg", "2400kg", "2410kg", "约2.4吨"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_002",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "EC7 150kWh超长续航版本的精确CLTC续航里程，以及对应能耗，GPT-4o不熟悉150kWh换电版的具体参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的150kWh超长续航版，CLTC工况下能跑多少公里？百公里能耗是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册规格参数，EC7 150kWh版本配备255/50 R20轮胎（滚阻6.0）时，CLTC工况续航里程为940km，百公里能耗为175Wh/km。整备质量为2448kg（20寸轮圈）。",
+        "key_facts": ["940km", "175Wh/km", "150kWh", "2448kg"],
+        "forbidden_content": ["1000km", "850km", "900km", "160Wh/km", "180Wh/km"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_003",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET9整车尺寸及4座设定，GPT-4o可能混淆ET9与ES8的座位数或尺寸，且ET9轴距3250mm是非常具体的数字",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的车身长宽高和轴距各是多少？它是几座的车？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9整车参数如下：长5325mm、宽2017mm（不含外后视镜）、高1621mm、轴距3250mm。ET9为4座设定（行政旗舰轿车），前轮距1731mm，后轮距1758mm，离地间隙200mm，最高车速220km/h。",
+        "key_facts": ["5325mm", "2017mm", "1621mm", "3250mm", "4座", "220km/h"],
+        "forbidden_content": ["5座", "3060mm", "3100mm", "5100mm", "5200mm", "200km/h"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_004",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET9电池包精确参数：102kWh三元锂，电池包尺寸2062x1500x124.8mm，重量545kg，单体数量204个，GPT-4o不会知道这些内部参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的高压动力电池参数是什么？电池包重多少千克？里面有多少个单体电芯？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9配备102kWh三元锂离子电池，单体额定电压3.74V，单体额定容量132Ah。电池包系统额定电压763V，额定容量134.1Ah。电池包长×宽×高为2062×1500×124.8mm，包含204个单体电芯，电池包重量545kg。",
+        "key_facts": ["102kWh", "三元锂离子电池", "204个", "545kg", "2062x1500x124.8mm", "763V"],
+        "forbidden_content": ["磷酸铁锂", "150kWh", "100kWh", "192个", "384个", "500kg", "600kg"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_005",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET9车载冰箱温度范围及智能模式数量，这是ET9独有的精细配置，GPT-4o不会知道具体温度范围和模式名称",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的车载冰箱温度可以调到多少度？有哪些智能预设模式？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9车载冰箱温度调节范围为-2℃至55℃。冰箱提供6种智能模式：冰镇模式、果蔬模式、香槟模式、红酒模式、常温模式和暖饮模式。此外还支持离车冰箱保持开启功能，车辆续航高于20km时冰箱将在离车后持续工作。",
+        "key_facts": ["-2~55℃", "6种智能模式", "冰镇模式", "香槟模式", "红酒模式", "20km"],
+        "forbidden_content": ["-10℃", "-5℃", "4种模式", "5种模式", "0℃"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_006",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET5T与ET5在整备质量上的差异，两车底盘相同但ET5T为旅行版，质量更重，GPT-4o容易混淆两者具体重量",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5和ET5T在75kWh配置下，整备质量分别是多少？两者相差多少千克？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册质量参数：ET5 75kWh版本（19寸轮圈）整备质量为2165kg；ET5T 75kWh版本（19寸轮圈）整备质量为2205kg。两者相差40kg，ET5T因旅行版车身（行李架等）更重。两车满载质量分别为：ET5为2690kg，ET5T为2730kg。",
+        "key_facts": ["2165kg", "2205kg", "40kg", "ET5T", "ET5", "75kWh"],
+        "forbidden_content": ["2100kg", "2200kg", "2250kg", "20kg", "30kg", "50kg"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_007",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ES8的前备箱容积（230L）和最大承载质量（50kg），与其他车型不同，GPT-4o不会知道这个精确数字",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8的前备箱容积是多少升？最多能放多重的东西？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES8前备箱储物容积为230L，前备箱最大承载质量为50kg，超载可能导致结构变形或部件损坏。后备箱（含隐藏式储物格）最大容积为547L，后备箱最大承载重量为75kg。",
+        "key_facts": ["230L", "50kg", "547L", "75kg"],
+        "forbidden_content": ["100L", "150L", "200L", "30kg", "75kg（前备箱）", "300L"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_008",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET9前备箱容积105L，最大承载30kg，与ES8前备箱不同，且ET9前备箱更小，GPT-4o可能错误回答",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的前备箱能放多少东西？最大承载重量是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9前备箱储物容积为105L，前备箱最大承载质量为30kg，超载可能导致结构变形或部件损坏。ET9后备箱（含隐藏式储物格）容积为544L，后备箱最大承载重量为75kg。",
+        "key_facts": ["105L", "30kg", "544L"],
+        "forbidden_content": ["230L", "50kg", "100L", "150L", "60kg", "75kg（前备箱）"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_009",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ES6与EC6的后备箱容积对比：ES6为542L（座椅竖立）/1430L（放倒），EC6为505L/1402L，两者相差明显，GPT-4o会混淆",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6和EC6的后备箱容积分别是多少？后排座椅放倒后最大容积是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册储物参数：ES6后备箱储物容积542L（含隐藏式储物格631L），后排座椅放倒后最大1430L；EC6后备箱储物容积505L（含隐藏式储物格594L），后排座椅放倒后最大1402L。ES6（SUV）比EC6（轿跑SUV）后备箱更大，两者标准容积相差37L。",
+        "key_facts": ["542L", "1430L", "505L", "1402L", "ES6", "EC6"],
+        "forbidden_content": ["600L", "500L", "1500L", "1200L", "相同", "1450L"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_010",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET7 150kWh版本的CLTC续航（1050km）和精确的能耗（163Wh/km），以及轮胎型号（245/45 R20普利司通），GPT-4o不会知道这种精细数据",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7的150kWh超长续航版，CLTC工况续航能跑多少公里？能耗是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册动力性参数，ET7 150kWh版本配备245/45 R20（普利司通，轮胎滚阻5.4）轮胎时，CLTC工况续航里程为1050km，百公里能耗为163Wh/km。ET7 150kWh版本整备质量（20寸轮圈）为2434kg，最高车速200km/h。",
+        "key_facts": ["1050km", "163Wh/km", "150kWh", "ET7"],
+        "forbidden_content": ["1200km", "900km", "1000km", "180Wh/km", "150Wh/km"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_011",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "EC7的电机参数：前永磁同步（180kW峰值/350N·m）+后异步（300kW峰值/500N·m），型号TZ180S001/YS300S002，GPT-4o不会知道型号",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的前后电机类型和峰值参数是什么？前后驱动电机型号分别是什么？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册电机参数，EC7采用前永磁同步+后异步的双电机布局：前电机为交流永磁同步电机，型号TZ180S001，峰值功率180kW，峰值转矩350N·m；后电机为交流异步电机，型号YS300S002，峰值功率300kW，峰值转矩500N·m。系统总峰值功率480kW。",
+        "key_facts": ["TZ180S001", "YS300S002", "180kW", "300kW", "350N·m", "500N·m", "前永磁同步", "后异步"],
+        "forbidden_content": ["前异步后永磁", "250kW", "200kW", "400N·m", "TZ300", "YS180"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_012",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET9线控转向故障分级处理，具体时间（20小时/10分钟）和限速（80/10km/h）是独特的技术细节，GPT-4o不会知道",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的线控转向系统出现故障时会怎么处理？系统会如何限速？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9线控转向故障分三级处理：①转向能力正常但亮黄色故障灯：系统将在故障发生后20小时自动限速至80km/h；②转向能力部分失效亮红色警告灯：系统立即限速至80km/h，并在10分钟后进一步降至10km/h；③转向能力完全失效：系统自动介入减速，直接限速至10km/h。三种情况均需立即停车并联系蔚来服务中心。",
+        "key_facts": ["20小时", "80km/h", "10分钟", "10km/h", "三级", "线控转向"],
+        "forbidden_content": ["5小时", "60km/h", "30分钟", "20km/h", "立即限速"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_013",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET5T拖挂能力（最大牵引质量1400kg），而ES6/EC6仅为1200kg，对比数字是RAG才能得到的精确信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5T能不能拖车？最大牵引质量是多少？和ES6相比谁的拖车能力更强？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET5T支持外挂拖车，配备ECE R55标准球形联轴器（球头直径50mm）电动拖钩，最大牵引质量为1400kg，电动拖钩最大垂直承载质量为75kg。ES6的最大牵引质量为1200kg。因此ET5T的拖车能力更强，比ES6多200kg。拖挂时需持C6驾驶证，车辆总质量不超过4500kg，胎压保持在2.9bar。",
+        "key_facts": ["1400kg", "1200kg", "ET5T", "ES6", "ECE R55", "75kg", "C6驾驶证"],
+        "forbidden_content": ["相同", "1500kg", "1000kg", "2000kg", "不支持拖车"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_014",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ES8唯一电池版本102kWh（三元锂）的CLTC续航因轮胎不同有显著差异：265/45 R21为635km，265/40 R22仅412km，GPT-4o可能只知道635km",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8选22寸轮毂和21寸轮毂，CLTC续航里程分别是多少？差距大吗？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册动力性参数，ES8（102kWh）配备265/45 R21轮胎时CLTC续航为635km；配备265/40 R22轮胎时CLTC续航仅为412km，两者相差223km，差距非常显著。ES8仅有102kWh一种电池版本，百公里能耗在21寸时为166Wh/km。整备质量2630kg，满载质量3250kg，最高车速220km/h。",
+        "key_facts": ["635km", "412km", "223km", "265/45 R21", "265/40 R22", "102kWh"],
+        "forbidden_content": ["580km", "450km", "100kWh", "75kWh", "差距不大", "600km"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_015",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "EC7后备箱容积对比：标准442L、含隐藏储物格532L、后排放倒1449L；且EC7的EC7后备箱最大承载75kg这是精确信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7后备箱能放多少东西？后排座椅放倒后最大有多少升？后备箱最大承载重量是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7后备箱储物容积为442L，含隐藏式储物格后为532L，后排座椅完全放倒后最大储物容积达1449L。后备箱最大承载重量为75千克，超载可能造成后备箱损坏。载荷固定扣环最大承重为300kg。",
+        "key_facts": ["442L", "532L", "1449L", "75千克", "EC7"],
+        "forbidden_content": ["500L", "600L", "1500L", "1200L", "100kg", "50kg"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_016",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET9的整备质量2700kg及满载质量3100kg，相比ES8（2630/3250）和ET7（2349/2900）有独特差异，车辆型号NAL7003BSEVD1也是RAG特有信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的整备质量和满载质量分别是多少千克？和ES8相比哪个更重？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册质量参数，ET9整备质量为2700kg，满载质量为3100kg，车辆型号为NAL7003BSEVD1。ES8整备质量为2630kg，满载质量为3250kg。ET9整备质量更重（重70kg），但ES8满载质量更高（多150kg），因为ES8是6/7座SUV，载员更多。ET9离地间隙200mm也高于ES8的165mm。",
+        "key_facts": ["2700kg", "3100kg", "ET9", "2630kg", "3250kg", "ES8", "NAL7003BSEVD1"],
+        "forbidden_content": ["2500kg", "2800kg", "3000kg", "相同", "ET9更轻"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_017",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "EC6与ES6轮胎规格相同但使用不同制冷剂：两车均用R-134a（四氟乙烷），而EC7/ET9用R1234yf（四氟丙烯），这是很难猜到的差异",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7和ES6的空调制冷剂型号一样吗？分别用的是什么型号的制冷剂？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册推荐油液参数，两车制冷剂不同：EC7使用R1234yf（四氟丙烯），用量为1000g；ES6使用R-134a（四氟乙烷）。R1234yf是更环保的新型制冷剂（全球变暖潜能值GWP更低），而R-134a是传统制冷剂。ET9同样使用R1234yf，用量1100g。",
+        "key_facts": ["R1234yf", "R-134a", "EC7", "ES6", "1000g"],
+        "forbidden_content": ["相同", "都用R-134a", "都用R1234yf", "R410a", "R32"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_018",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET7的车身尺寸和离地间隙（128mm），比EC7（162mm）低很多，且ET7接近角在整备和满载状态下不同，GPT-4o不会知道这些精确差异",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7的车身尺寸是多少？它的离地间隙和EC7相比哪个更低？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7整车参数：长5101mm、宽1987mm（不含外后视镜）、高1509mm、轴距3060mm，离地间隙128mm。EC7离地间隙为162mm。ET7离地间隙比EC7低34mm，EC7更适合通过性要求高的场景。ET7接近角在整备状态为14°（满载13°），离去角整备17°（满载16°）。",
+        "key_facts": ["5101mm", "1987mm", "1509mm", "3060mm", "128mm", "162mm", "ET7更低"],
+        "forbidden_content": ["135mm", "150mm", "相同", "ET7更高", "3100mm", "5000mm"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_019",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "EC7的75kWh电池有类型A（三元锂）和类型B（三元锂/磷酸铁锂混合）两种化学体系，且对应不同续航，GPT-4o极可能不知道这个区别",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的75kWh电池分几种类型？化学体系有什么区别？CLTC续航一样吗？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7的75kWh电池分两种类型：75kWh类型A为三元锂离子/磷酸铁锂混合电池，单体额定电压3.73/3.2V；75kWh类型B同样为三元锂离子/磷酸铁锂混合电池结构相同，但续航不同。配备255/50 R20（滚阻6.0）轮胎时：类型A续航455km，类型B续航490km；配备265/45 R21时两者均为455km。整备质量：类型A（21寸）2420kg，类型B（20寸）2399kg，（21寸）2420kg。",
+        "key_facts": ["类型A", "类型B", "三元锂离子/磷酸铁锂", "455km", "490km", "75kWh"],
+        "forbidden_content": ["只有一种", "全部三元锂", "磷酸铁锂", "续航相同", "500km", "520km"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_020",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET5T与ET5后备箱容积对比：ET5T（旅行版）后备箱更大（450L vs 386L），放倒后1300L vs 1135L，这是典型的跨型号对比RAG题",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5T旅行版的后备箱比ET5标准版大多少？两者后排座椅放倒后分别有多少升？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册储物参数，ET5T后备箱储物容积为450L（含隐藏储物格492L），后排座椅放倒后最大1300L；ET5后备箱储物容积为386L（含隐藏储物格394L），后排座椅放倒后最大1135L。ET5T比ET5标准后备箱大64L，放倒后多165L。两车后备箱最大承载重量均为75kg。",
+        "key_facts": ["450L", "386L", "1300L", "1135L", "64L", "165L", "ET5T", "ET5"],
+        "forbidden_content": ["相同", "ET5T小", "1400L", "1500L", "500L", "400L"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ret_rag_critical_001",
+      "layer_targets": ["retrieval"],
+      "category": "ret_rag_critical",
+      "notes": "检索ET9电池包物理参数，需要找到电池包系统尺寸和重量",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9电池包重量和尺寸",
+      "retrieval_gt": {
+        "query_intent": "ET9高压动力电池包系统物理参数：重量、长宽高尺寸、单体数量",
+        "expected_facts": ["ET9", "102kWh", "545kg", "2062x1500x124.8mm", "204个单体", "三元锂离子电池"],
+        "eval_at_k": [5]
+      }
+    },
+    {
+      "id": "ret_rag_critical_002",
+      "layer_targets": ["retrieval"],
+      "category": "ret_rag_critical",
+      "notes": "检索ES8与21寸/22寸轮胎的续航差异，需要找到动力性参数表",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8 22寸轮毂续航多少",
+      "retrieval_gt": {
+        "query_intent": "ES8配备22寸轮胎（265/40 R22）时的CLTC工况续航里程",
+        "expected_facts": ["ES8", "265/40 R22", "412km", "102kWh", "动力性参数"],
+        "eval_at_k": [5]
+      }
+    },
+    {
+      "id": "ret_rag_critical_003",
+      "layer_targets": ["retrieval"],
+      "category": "ret_rag_critical",
+      "notes": "检索EC7拖车能力和拖钩规格，需要找到储物与装载章节中的外挂拖车内容",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7拖车最大承重多少",
+      "retrieval_gt": {
+        "query_intent": "EC7外挂拖车最大牵引质量及电动拖钩承载规格",
+        "expected_facts": ["EC7", "2000kg", "最大牵引质量", "电动拖钩", "100kg", "ECE R55"],
+        "eval_at_k": [5]
+      }
+    },
+    {
+      "id": "ret_rag_critical_004",
+      "layer_targets": ["retrieval"],
+      "category": "ret_rag_critical",
+      "notes": "检索ET9线控转向故障分级限速机制，需要精确找到三种故障场景的具体处置时间",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9线控转向故障怎么处理",
+      "retrieval_gt": {
+        "query_intent": "ET9线控转向系统故障的分级应对方案，包括限速时间和车速限制数值",
+        "expected_facts": ["ET9", "线控转向", "20小时", "80km/h", "10分钟", "10km/h", "三级故障"],
+        "eval_at_k": [5]
+      }
+    },
+    {
+      "id": "ret_rag_critical_005",
+      "layer_targets": ["retrieval"],
+      "category": "ret_rag_critical",
+      "notes": "检索EC7 150kWh电池的化学类型和电池包规格，需要找到高压动力电池参数表",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7 150kWh电池是什么类型的？多重？",
+      "retrieval_gt": {
+        "query_intent": "EC7 150kWh高压动力电池化学类型、电池包重量及单体数量",
+        "expected_facts": ["EC7", "150kWh", "三元锂离子电池", "575kg", "384个单体", "高压动力电池参数"],
+        "eval_at_k": [5]
+      }
+    },
+    {
+      "id": "ans_general_001",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "蔚来换电站服务是NIO的标志性功能，基本操作流程和换电时间是广为人知的品牌信息，LLM应当能合理作答",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "NIO的换电站服务如何使用？换电大概需要几分钟？",
+      "answer_gt": {
+        "ground_truth": "蔚来换电站支持全自动换电，用户通过NIO App或车机系统找到附近换电站并导航前往。到达后将车辆驶入换电区域，系统自动识别车辆并完成电池更换，全程无需下车操作。换电时间通常约为5分钟左右，换上的是充满电的标准电池包。换电服务对蔚来用户开放，部分套餐包含免费换电次数，超出次数按次收费。",
+        "key_facts": ["自动换电", "约5分钟", "NIO App", "无需下车", "充满电的电池"],
+        "forbidden_content": ["需要下车操作", "30分钟", "1小时", "需要预约才能换电", "换电需要技术人员手动操作"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_general_002",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "NOMI是蔚来标志性的车载AI助手，其主要功能和语音控制能力是品牌广泛宣传的内容，LLM具备基本认知",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "NOMI智能助手能做什么？它是否支持语音控制导航？",
+      "answer_gt": {
+        "ground_truth": "NOMI是蔚来专属的车载AI智能助手，配备在仪表台上的球形屏幕，可以通过表情与用户互动。NOMI的主要功能包括：语音控制导航（支持设置目的地、途经点等）、控制车窗和天窗、调节空调温度和风量、播放音乐、拨打电话、查询天气，以及与用户进行日常对话。NOMI支持语音唤醒，用户说「你好，NOMI」即可激活。NOMI也会根据用户习惯学习偏好，提供个性化服务。",
+        "key_facts": ["NOMI", "语音控制", "导航", "车窗", "空调", "音乐", "语音唤醒"],
+        "forbidden_content": ["NOMI不支持语音", "NOMI只能播放音乐", "需要触摸屏才能操作", "NOMI不能控制导航"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_general_003",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "NIO Pilot是蔚来的辅助驾驶系统，其主要功能模块是公开宣传的品牌信息，LLM应能给出合理的功能概述",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "蔚来的NIO Pilot辅助驾驶有哪些主要功能？",
+      "answer_gt": {
+        "ground_truth": "NIO Pilot是蔚来的高级辅助驾驶系统，主要功能模块包括：自适应巡航控制（ACC）、车道居中保持（LCC）、自动变道辅助（NCA）、交通拥堵辅助（TJA）、自动泊车（APA）、车道偏离预警（LDW）、前碰撞预警及自动紧急制动（FCW/AEB）、盲点监测（BSM）。部分高阶版本（如NAD）还支持城市场景辅助驾驶。NIO Pilot通过车顶激光雷达、摄像头和毫米波雷达等传感器融合感知环境。",
+        "key_facts": ["NIO Pilot", "自适应巡航", "车道居中", "自动变道", "自动泊车", "AEB"],
+        "forbidden_content": ["NIO Pilot不支持自动变道", "没有自动泊车功能", "不具备紧急制动", "NIO Pilot只有巡航功能"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_general_004",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "电动车冬季续航下降是通用EV知识，任何LLM都应能给出合理建议，不依赖蔚来特定文档",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "电动车在冬天低温下续航会下降吗？有什么方法可以缓解？",
+      "answer_gt": {
+        "ground_truth": "电动车在低温下续航确实会明显下降，主要原因是：①低温降低锂电池的电化学活性，内阻增大；②暖风空调（尤其是PTC电加热）耗电量大；③轮胎气压下降增加滚动阻力。缓解措施包括：出发前在插充电或换电状态下预热车厢（蔚来支持App远程预热）；选择热泵空调车型（蔚来多款车型标配热泵）；驾驶时使用座椅加热和方向盘加热代替大风量暖风；保持车辆停放在室内或有遮蔽的场所；避免频繁快充；及时充换电避免电量过低。",
+        "key_facts": ["低温续航下降", "电池活性降低", "暖风耗电", "预热车厢", "热泵空调", "座椅加热"],
+        "forbidden_content": ["电动车冬天续航不受影响", "低温对电池没有影响", "完全没有办法缓解"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_general_005",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "蔚来一键加电是上门充电服务，是NIO广泛推广的品牌服务，LLM对其基本概念应有认知",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "蔚来的一键加电服务是什么？需要提前预约吗？",
+      "answer_gt": {
+        "ground_truth": "蔚来「一键加电」是蔚来提供的上门充电服务，用户通过NIO App发起请求后，蔚来服务人员会携带移动充电设备上门为车辆充电，免去用户自行前往充电桩的不便。该服务通常支持在App内预约时间段，也支持紧急情况下的即时呼叫（视区域和人员调配而定）。服务覆盖范围以蔚来服务网络为准，部分会员套餐包含一定次数的免费一键加电，超出次数收费。",
+        "key_facts": ["上门充电", "NIO App", "移动充电", "预约", "会员套餐"],
+        "forbidden_content": ["一键加电是换电服务", "不需要App", "一键加电完全免费无限次", "不支持预约"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_general_006",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "ET7与ET5的定位差异是品牌层面的公开信息，家庭选车建议属于一般咨询，LLM能给出合理定性对比",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7和ET5哪款更适合家庭用车？主要考虑因素是什么？",
+      "answer_gt": {
+        "ground_truth": "ET7和ET5各有适合家庭的侧重点：ET7是蔚来的旗舰轿车，车身更长、内部空间更宽敞，后排腿部空间更充裕，配置更高，适合对驾乘舒适性和品质感要求较高的家庭；ET5是紧凑型轿车，尺寸更小巧灵活，城市驾驶更便捷，价格更亲民，适合对操控性有需求或停车空间有限的家庭。主要考虑因素包括：家庭成员数量（ET7更适合三口及以上家庭）、日常使用场景（城市通勤vs长途出行）、预算、对空间和后排乘坐舒适度的需求，以及是否需要更大的后备箱。如果需要更大储物空间，ET5T旅行版也是家庭用车的好选择。",
+        "key_facts": ["ET7空间更大", "ET5更灵活", "后排空间", "预算", "家庭人数"],
+        "forbidden_content": ["ET5比ET7大", "ET7不适合家庭", "两者没有区别", "ET7是SUV"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_general_007",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "V2G/V2L放电功能是近年EV行业热点，蔚来车型是否支持是较为广泛讨论的品牌话题",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "蔚来车型支持V2G/V2L放电功能吗？",
+      "answer_gt": {
+        "ground_truth": "蔚来部分车型支持V2L（车辆到负载）对外放电功能，可以通过车辆的外放电接口为外部设备或电器供电，例如露营时为家电提供电力。ET9、EC7等较新车型支持对外放电，用户可通过车机或专用适配器使用该功能。V2G（车辆到电网）是更高阶的双向充电功能，目前蔚来的支持情况以具体车型和地区政策为准，部分市场正在推进中。建议查阅具体车型配置页面或咨询蔚来官方获取最新支持情况。",
+        "key_facts": ["V2L", "对外放电", "露营", "部分车型支持", "V2G"],
+        "forbidden_content": ["蔚来完全不支持放电", "所有车型都支持V2G", "V2L和V2G是同一功能"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_general_008",
+      "layer_targets": ["answer"],
+      "category": "ans_general",
+      "notes": "蔚来高速应急服务是品牌服务体系的重要组成，NIO App道路救援功能是公开宣传内容，LLM能给出合理概述",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "如果我在高速上电量不足，蔚来提供什么应急服务？",
+      "answer_gt": {
+        "ground_truth": "蔚来针对高速电量不足提供多项应急服务：①道路救援上门充电：通过NIO App呼叫蔚来救援，服务人员携带移动充电设备赶到现场补电，帮助车辆行驶至最近换电站或充电站；②拖车服务：若电量耗尽无法行驶，蔚来提供免费拖车至最近蔚来服务网点；③高速换电站覆盖：蔚来已在全国主要高速公路服务区布局换电站，可提前规划途经换电站；④NIO App实时导航：App提供沿途换电站和充电站导航，并在低电量时主动提醒。建议出行前在App中规划换电/充电节点，开启低电量预警。",
+        "key_facts": ["道路救援", "上门充电", "拖车服务", "NIO App", "高速换电站", "低电量预警"],
+        "forbidden_content": ["蔚来不提供道路救援", "高速没有换电站", "电量不足只能自己想办法", "拖车需要额外付费"],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ret_general_001",
+      "layer_targets": ["retrieval"],
+      "category": "ret_general",
+      "notes": "检索换电站操作流程，相关内容可能在用车指南或服务说明章节中出现",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "蔚来换电站如何操作",
+      "retrieval_gt": {
+        "query_intent": "NIO换电站自助换电操作流程步骤",
+        "expected_facts": ["换电", "操作步骤", "自动", "约5分钟"],
+        "eval_at_k": [5]
+      }
+    },
+    {
+      "id": "ret_general_002",
+      "layer_targets": ["retrieval"],
+      "category": "ret_general",
+      "notes": "检索NOMI助手功能说明，相关内容可能在车载系统或智能互联章节中出现",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "NOMI能做什么",
+      "retrieval_gt": {
+        "query_intent": "NOMI智能助手的主要功能和使用方式",
+        "expected_facts": ["NOMI", "语音", "助手", "功能"],
+        "eval_at_k": [5]
+      }
+    },
+    {
+      "id": "ret_general_003",
+      "layer_targets": ["retrieval"],
+      "category": "ret_general",
+      "notes": "检索NIO Pilot辅助驾驶功能列表，相关内容可能在辅助驾驶或安全功能章节中出现",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "NIO Pilot功能列表",
+      "retrieval_gt": {
+        "query_intent": "NIO Pilot辅助驾驶系统支持的功能模块",
+        "expected_facts": ["NIO Pilot", "辅助驾驶", "功能"],
+        "eval_at_k": [5]
+      }
+    }
+  ]
+}

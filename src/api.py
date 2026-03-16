@@ -180,6 +180,52 @@ async def get_memory(session_id: str = Query(default="")):
     }
 
 
+@app.get("/api/sessions")
+async def list_sessions():
+    """List all saved sessions, sorted by last-modified descending."""
+    import glob
+    sessions = []
+    pattern = os.path.join(config.MEMORY_DIR, "*.json")
+    for path in sorted(glob.glob(pattern), key=os.path.getmtime, reverse=True):
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            session_id = os.path.basename(path).replace(".json", "")
+            messages = data.get("recent_messages", [])
+            preview = next((m["content"] for m in messages if m["role"] == "user"), "")
+            sessions.append({
+                "session_id": session_id,
+                "preview": preview[:80],
+                "message_count": len(messages),
+                "last_modified": os.path.getmtime(path),
+            })
+        except Exception:
+            pass
+    return sessions
+
+
+@app.get("/api/session/messages")
+async def get_session_messages(session_id: str = Query(default="")):
+    """Return recent messages for a session (from disk or in-memory workflow)."""
+    sid = session_id.strip()
+    if not sid:
+        return {"recent_messages": []}
+    # Prefer in-memory workflow (has latest state)
+    wf = _workflows.get(sid)
+    if wf:
+        return {"recent_messages": list(wf.memory.recent_messages)}
+    # Fall back to disk
+    path = os.path.join(config.MEMORY_DIR, f"{sid}.json")
+    if os.path.exists(path):
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            return {"recent_messages": data.get("recent_messages", [])}
+        except Exception:
+            pass
+    return {"recent_messages": []}
+
+
 @app.get("/api/status")
 async def status():
     rag_models = {}

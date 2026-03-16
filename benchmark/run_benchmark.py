@@ -162,14 +162,18 @@ def parse_events(events: list[dict]) -> dict:
     }
 
 
-def _extract_chunks(tool_results: list[dict]) -> list[dict]:
-    """Extract retrieved content as [{"id": str, "content": str}] from tool results.
+_RAG_TOOL_NAMES = {"rag_search", "grep_search"}
 
-    rag_search stores formatted citations in ToolResult.content (not individual chunk IDs),
-    so each tool call becomes one entry keyed by tool_name + car_model.
+
+def _extract_chunks(tool_results: list[dict]) -> list[dict]:
+    """Extract retrieved content as [{"id": str, "content": str}] from RAG/grep tool results only.
+
+    Deliberately excludes web_search — retrieval eval must only measure the RAG pipeline.
     """
     chunks_out: list[dict] = []
     for tr in tool_results:
+        if tr.get("name") not in _RAG_TOOL_NAMES:
+            continue  # web_search results must NOT count as retrieved chunks
         result_obj = tr.get("result")
         if result_obj is None or not getattr(result_obj, "success", True):
             continue
@@ -238,13 +242,16 @@ def run_case(
         result["actual_calls"] = parsed["actual_calls"]
 
     if "retrieval" in layers and "retrieval" in targets and case.get("retrieval_gt"):
-        ranked_chunks = _extract_chunks(parsed["tool_results"])
-        r = eval_retrieval_case(case, ranked_chunks)
-        if not r.get("skip"):
-            result["metrics"].update({f"retrieval/{k}": v for k, v in r["metrics"].items()})
-            result["detail"]["retrieval"] = {**r.get("detail", {}), "mode": r.get("mode")}
-            if r.get("expect_no_hit"):
-                result["detail"]["retrieval"]["expect_no_hit"] = True
+        if "rag" in disabled:
+            result["detail"]["retrieval"] = {"skipped": True, "reason": "rag disabled — retrieval not meaningful"}
+        else:
+            ranked_chunks = _extract_chunks(parsed["tool_results"])
+            r = eval_retrieval_case(case, ranked_chunks)
+            if not r.get("skip"):
+                result["metrics"].update({f"retrieval/{k}": v for k, v in r["metrics"].items()})
+                result["detail"]["retrieval"] = {**r.get("detail", {}), "mode": r.get("mode")}
+                if r.get("expect_no_hit"):
+                    result["detail"]["retrieval"]["expect_no_hit"] = True
 
     if "answer" in layers and "answer" in targets and case.get("answer_gt"):
         r = eval_answer_case(case, parsed["answer"])
@@ -410,6 +417,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--disable",  nargs="+", default=[], choices=DISABLEABLE,
                    metavar="COMPONENT",
                    help=f"Disable pipeline components for ablation. Choices: {DISABLEABLE}")
+    p.add_argument("--delay",    type=float, default=3.0,
+                   help="Seconds to sleep between cases (default: 3.0, avoids 429 rate limits)")
     return p.parse_args()
 
 
@@ -435,7 +444,9 @@ def main():
     print(f"\nRunning {len(cases)} cases | layers: {args.layers}{disabled_str}\n")
 
     results = []
-    for case in cases:
+    for i, case in enumerate(cases):
+        if i > 0 and not args.dry_run and args.delay > 0:
+            time.sleep(args.delay)
         print(f"  → {case['id']} : {case['input'][:55]}")
         r = run_case(case, layers=args.layers, dry_run=args.dry_run,
                      rag_contexts=rag_contexts, disabled=disabled)

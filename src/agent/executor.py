@@ -33,12 +33,15 @@ class AgentExecutor:
         create_kwargs: dict = dict(
             model=self._model,
             max_tokens=4096,
-            tools=self._tool_schemas,
-            parallel_tool_calls=True,
             messages=[{"role": "system", "content": sys_content}] + messages,
         )
-        if force_direct:
+        if self._tool_schemas and not force_direct:
+            create_kwargs["tools"] = self._tool_schemas
+            create_kwargs["parallel_tool_calls"] = True
+        elif self._tool_schemas and force_direct:
+            create_kwargs["tools"] = self._tool_schemas
             create_kwargs["tool_choice"] = "none"
+        # else: no tools at all → omit both, LLM answers directly
         response = self._client.chat.completions.create(**create_kwargs)
         return self._parse(response)
 

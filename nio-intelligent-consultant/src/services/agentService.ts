@@ -11,6 +11,16 @@ export function getSessionId(): string {
   return id;
 }
 
+export function setSessionId(id: string): void {
+  localStorage.setItem(SESSION_ID_KEY, id);
+}
+
+export function newSessionId(): string {
+  const id = Math.random().toString(36).substring(2, 11);
+  localStorage.setItem(SESSION_ID_KEY, id);
+  return id;
+}
+
 export const processChat = async (
   messages: Message[],
   onUpdate: (updatedMessages: Message[]) => void,

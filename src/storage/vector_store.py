@@ -25,7 +25,7 @@ class MilvusVectorStore():
             FieldSchema(
                 name="pk", dtype=DataType.VARCHAR, is_primary=True, auto_id=True, max_length=100
             ),
-            FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=512),
+            FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=1024),
             FieldSchema(name="sparse_vector", dtype=DataType.SPARSE_FLOAT_VECTOR),
             FieldSchema(name="dense_vector", dtype=DataType.FLOAT_VECTOR, dim=self.dense_dim),
         ]

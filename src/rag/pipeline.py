@@ -38,7 +38,7 @@ def _backfill_grep_if_missing(col_name: str, pdf_files: list, manager: IngestMan
             t = manager.get_or_parse(fp, lambda f: parse_single_file(f, parser), verbose=False)
             all_text.append(t)
         merged = "".join(all_text)
-        chunks = chunk_text(merged, max_chunk_size=300, hard_max_length=512)
+        chunks = chunk_text(merged, max_chunk_size=600, hard_max_length=900)
         if chunks:
             gidx.insert_chunks(col_name, chunks)
             print(f"[ingest] {col_name}: grep index backfilled from cache ({len(chunks)} chunks)")
@@ -108,6 +108,7 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
             _backfill_grep_if_missing(col_name, pdf_files, manager)
             return RAGContext(store=probe, embedder=embedder, col_name=col_name, dense_dim=actual_dim)
 
+
         print(f"[ingest] {col_name}: need to ingest - {status.reason}")
     else:
         print(f"[ingest] {col_name}: force re-ingest")
@@ -128,7 +129,7 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
 
     # 3. Chunk
     merged_text = "".join(all_text)
-    chunks = chunk_text(merged_text, max_chunk_size=300, hard_max_length=512)
+    chunks = chunk_text(merged_text, max_chunk_size=600, hard_max_length=900)
     if not chunks:
         raise ValueError("No chunks generated from input documents")
 
@@ -172,7 +173,17 @@ def _get_sparse_row(sparse_matrix, idx: int):
     return sparse_matrix[idx]
 
 
-def retrieve(query, ctx, limit=5, sparse_weight=1.0, dense_weight=0.7, score_threshold=0.4):
+def retrieve(query, ctx, limit=5, search_limit=15, sparse_weight=0.5, dense_weight=1.0, score_threshold=0.35):
+    """Hybrid retrieval with two-stage candidate selection.
+
+    Args:
+        limit:        Max chunks returned to caller (after filtering).
+        search_limit: Candidates fetched from Milvus before threshold filtering.
+                      Larger → higher recall at the cost of more computation.
+        sparse_weight: Weight for BM25 keyword matching (lower → less keyword bias).
+        dense_weight:  Weight for semantic dense embedding (higher → better concept recall).
+        score_threshold: Minimum score to keep a chunk. Lower → more permissive.
+    """
     query_emb = embed_query(query, ctx.embedder)
     dense = query_emb["dense"][0]
     sparse = _get_sparse_row(query_emb["sparse"], 0)
@@ -182,13 +193,14 @@ def retrieve(query, ctx, limit=5, sparse_weight=1.0, dense_weight=0.7, score_thr
         sparse,
         sparse_weight=sparse_weight,
         dense_weight=dense_weight,
-        limit=limit,
+        limit=search_limit,  # fetch more candidates before filtering
     )
     total_before_filter = len(raw)
     if score_threshold > 0:
         raw = [(t, s) for t, s in raw if s >= score_threshold]
+    # Keep only top-`limit` after filtering
+    raw = raw[:limit]
     items = [{"text": t, "score": round(s, 4), "rank": i + 1} for i, (t, s) in enumerate(raw)]
-    # Attach retrieval stats for downstream use
     for item in items:
         item["_total_before_filter"] = total_before_filter
         item["_score_threshold"] = score_threshold

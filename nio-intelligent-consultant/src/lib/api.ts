@@ -15,3 +15,20 @@ export async function fetchMemory(sessionId: string) {
     r.json()
   );
 }
+
+export interface SessionMeta {
+  session_id: string;
+  preview: string;
+  message_count: number;
+  last_modified: number;
+}
+
+export async function fetchSessions(): Promise<SessionMeta[]> {
+  return fetch('/api/sessions').then((r) => r.json());
+}
+
+export async function fetchSessionMessages(sessionId: string): Promise<{ role: string; content: string }[]> {
+  return fetch(`/api/session/messages?session_id=${encodeURIComponent(sessionId)}`)
+    .then((r) => r.json())
+    .then((d) => d.recent_messages ?? []);
+}

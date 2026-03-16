@@ -7,8 +7,8 @@ import { VehicleCard } from './components/VehicleCard';
 import { VehicleDetail } from './components/VehicleDetail';
 import { DevDrawer } from './components/DevDrawer';
 import { NIO_MODELS } from './data/nio_data';
-import { processChat, getSessionId } from './services/agentService';
-import { clearSession, fetchStatus } from './lib/api';
+import { processChat, getSessionId, setSessionId, newSessionId } from './services/agentService';
+import { clearSession, fetchStatus, fetchSessions, fetchSessionMessages, SessionMeta } from './lib/api';
 import { Language, translations } from './lib/translations';
 
 export default function App() {
@@ -35,12 +35,22 @@ export default function App() {
   const [isDevOpen, setIsDevOpen] = useState(false);
   const [userProfile, setUserProfile] = useState('');
   const [apiStatus, setApiStatus] = useState<SystemStatus | null>(null);
+  const [sessions, setSessions] = useState<SessionMeta[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string>(getSessionId());
 
   useEffect(() => {
     fetchStatus().then(setApiStatus).catch(() => {});
   }, []);
 
-  const sessionId = getSessionId();
+  const refreshSessions = () => {
+    fetchSessions().then(setSessions).catch(() => {});
+  };
+
+  useEffect(() => {
+    refreshSessions();
+  }, []);
+
+  const sessionId = currentSessionId;
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +78,7 @@ export default function App() {
     });
 
     setIsProcessing(false);
+    refreshSessions();
   };
 
   const handleClear = async () => {
@@ -82,6 +93,42 @@ export default function App() {
       },
     ]);
     setIsDevOpen(false);
+    refreshSessions();
+  };
+
+  const handleNewSession = () => {
+    const id = newSessionId();
+    setCurrentSessionId(id);
+    setMessages([
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: t.chat.welcome,
+        timestamp: Date.now(),
+      },
+    ]);
+  };
+
+  const handleSwitchSession = async (sid: string) => {
+    if (sid === currentSessionId) return;
+    setSessionId(sid);
+    setCurrentSessionId(sid);
+    const rawMessages = await fetchSessionMessages(sid);
+    const reconstructed: Message[] = [
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: t.chat.welcome,
+        timestamp: Date.now(),
+      },
+      ...rawMessages.map((m, i) => ({
+        id: `hist-${i}`,
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+        timestamp: Date.now() - (rawMessages.length - i) * 1000,
+      })),
+    ];
+    setMessages(reconstructed);
   };
 
   const toggleLang = () => setLang((prev) => (prev === 'en' ? 'zh' : 'en'));
@@ -128,7 +175,7 @@ export default function App() {
             {/* History */}
             <section>
               <div
-                className={`flex items-center space-x-3 mb-6 px-1 ${!isSidebarOpen ? 'justify-center' : ''}`}
+                className={`flex items-center space-x-3 mb-4 px-1 ${!isSidebarOpen ? 'justify-center' : ''}`}
               >
                 {isSidebarOpen ? (
                   <>
@@ -136,6 +183,12 @@ export default function App() {
                       {t.sidebar.history}
                     </h3>
                     <div className="flex-1 h-[1px] bg-slate-400/20" />
+                    <button
+                      onClick={handleNewSession}
+                      className="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition-colors shrink-0"
+                    >
+                      + 新对话
+                    </button>
                   </>
                 ) : (
                   <div className="relative group">
@@ -147,28 +200,36 @@ export default function App() {
                   </div>
                 )}
               </div>
-              {isSidebarOpen && messages.filter((m) => m.role === 'user').length > 0 && (
+              {isSidebarOpen && (
                 <div className="space-y-2">
-                  {messages
-                    .filter((m) => m.role === 'user')
-                    .slice(-3)
-                    .reverse()
-                    .map((m) => (
-                      <div
-                        key={m.id}
-                        className="p-3 rounded-xl hover:bg-white/30 cursor-default transition-all border border-transparent hover:border-white/40"
+                  {sessions.length === 0 ? (
+                    <p className="text-[11px] text-slate-400 px-1 font-medium">暂无历史记录</p>
+                  ) : (
+                    sessions.slice(0, 8).map((s) => (
+                      <button
+                        key={s.session_id}
+                        onClick={() => handleSwitchSession(s.session_id)}
+                        className={`w-full text-left p-3 rounded-xl transition-all border ${
+                          s.session_id === currentSessionId
+                            ? 'bg-white/50 border-white/60 shadow-sm'
+                            : 'border-transparent hover:bg-white/30 hover:border-white/40'
+                        }`}
                       >
                         <p className="text-xs text-slate-700 line-clamp-1 font-semibold">
-                          {m.content}
+                          {s.preview || '(空对话)'}
                         </p>
-                        <span className="text-[9px] text-slate-500 uppercase tracking-wider mt-1 block font-bold">
-                          {new Date(m.timestamp).toLocaleTimeString('zh-CN', {
+                        <span className="text-[9px] text-slate-500 mt-1 block font-bold">
+                          {new Date(s.last_modified * 1000).toLocaleDateString('zh-CN', {
+                            month: 'short',
+                            day: 'numeric',
                             hour: '2-digit',
                             minute: '2-digit',
                           })}
+                          {' · '}{s.message_count} 条消息
                         </span>
-                      </div>
-                    ))}
+                      </button>
+                    ))
+                  )}
                 </div>
               )}
             </section>
