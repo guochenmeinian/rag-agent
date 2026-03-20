@@ -30,13 +30,39 @@ export interface ToolResultItem {
   }
 }
 
+export interface ToolBatchSummary {
+  tool_names: string[]
+  success_count: number
+  error_count: number
+  error_types: Record<string, number>
+  total_latency_ms: number
+}
+
+export interface TraceSummary {
+  iterations: number
+  tool_call_batches: number
+  tool_call_count: number
+  tools_used: string[]
+  tool_success_count: number
+  tool_error_count: number
+  tool_error_types: Record<string, number>
+  tool_latency_ms: number
+  grep_rag_fallback_used: boolean
+  force_direct_used: boolean
+  usage: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+}
+
 export type StreamEvent =
-  | { type: 'rewriting' }
+  | { type: 'rewriting'; stage?: string }
   | { type: 'clarify'; message: string }
-  | { type: 'refined'; query: string }
-  | { type: 'tool_calling'; calls: ToolCall[] }
-  | { type: 'tool_done'; results: ToolResultItem[] }
-  | { type: 'done'; answer: string; tool_results: ToolResultItem[] | null }
+  | { type: 'refined'; query: string; rewriter_skipped?: boolean }
+  | { type: 'tool_calling'; calls: ToolCall[]; iteration?: number; batch_size?: number; tool_names?: string[] }
+  | { type: 'tool_done'; results: ToolResultItem[]; iteration?: number; summary?: ToolBatchSummary }
+  | { type: 'done'; answer: string; tool_results: ToolResultItem[] | null; usage?: TraceSummary['usage']; trace_summary?: TraceSummary }
   | { type: 'error'; message: string }
 
 export type TracedEvent = StreamEvent & { ts: number }
@@ -46,6 +72,7 @@ export interface Trace {
   refined_query: string
   elapsed: number
   events: TracedEvent[]
+  summary?: TraceSummary
 }
 
 export interface ChatMessage {

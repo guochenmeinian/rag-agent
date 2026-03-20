@@ -270,6 +270,59 @@ body { font-family: var(--font); font-size: 14px; color: var(--text); background
 .trace-turn-time { font-size: 11px; color: var(--text3); font-family: var(--mono); flex-shrink: 0; }
 .trace-body { border-top: 1px solid var(--border); padding: 8px 12px; background: var(--bg2); }
 .trace-refined { font-size: 11px; color: var(--text3); font-style: italic; margin-bottom: 6px; }
+.trace-summary-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.trace-summary-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.trace-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.mini-stat {
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg2);
+  padding: 6px 7px;
+}
+.mini-stat-label {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+.mini-stat-value {
+  font-size: 12px;
+  color: var(--text);
+  font-family: var(--mono);
+}
+.mini-stat-ok {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+.mini-stat-warn {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.trace-summary-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--text2);
+}
 .tl-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 12px; color: var(--text2); }
 .tl-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .tl-dot-tool { background: #60a5fa; }
@@ -280,6 +333,19 @@ body { font-family: var(--font); font-size: 14px; color: var(--text); background
 .tl-label { flex: 1; }
 .tl-time { font-size: 11px; color: var(--text3); font-family: var(--mono); }
 .tl-pills { padding-left: 14px; display: flex; flex-wrap: wrap; gap: 3px; margin: 2px 0; }
+.trace-summary-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 14px;
+  margin: 2px 0 6px;
+}
+.trace-inline-note {
+  padding-left: 14px;
+  margin: 2px 0 4px;
+  font-size: 11px;
+  color: var(--text3);
+}
 
 /* ── Tool result detail ── */
 .tool-result-box { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; margin: 4px 0; }

@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react'
-import type { ChatMessage, TracedEvent, Trace, ToolCall, ToolResultItem, SystemStatus, MemoryState } from '../types'
+import type {
+  ChatMessage,
+  TracedEvent,
+  Trace,
+  ToolCall,
+  ToolResultItem,
+  ToolBatchSummary,
+  TraceSummary,
+  SystemStatus,
+  MemoryState,
+} from '../types'
 import { fetchStatus, fetchMemory } from '../api'
 
 interface Props {
@@ -41,6 +51,59 @@ function ToolResultBox({ r }: { r: ToolResultItem }) {
       {open && (
         <div className="tool-result-body">{r.result?.content ?? ''}</div>
       )}
+    </div>
+  )
+}
+
+function MiniStat({ label, value, tone = 'neutral' }: { label: string; value: string; tone?: 'neutral' | 'ok' | 'warn' }) {
+  return (
+    <div className={`mini-stat mini-stat-${tone}`}>
+      <div className="mini-stat-label">{label}</div>
+      <div className="mini-stat-value">{value}</div>
+    </div>
+  )
+}
+
+function ToolBatchSummaryRow({ summary }: { summary: ToolBatchSummary }) {
+  const errorTypes = Object.entries(summary.error_types)
+    .map(([k, v]) => `${k}×${v}`)
+    .join(' · ')
+
+  return (
+    <div className="trace-summary-inline">
+      <MiniStat label="成功" value={String(summary.success_count)} tone="ok" />
+      <MiniStat label="失败" value={String(summary.error_count)} tone={summary.error_count > 0 ? 'warn' : 'neutral'} />
+      <MiniStat label="耗时" value={`${summary.total_latency_ms}ms`} />
+      {errorTypes && <div className="trace-inline-note">错误类型：{errorTypes}</div>}
+    </div>
+  )
+}
+
+function TraceSummaryCard({ summary }: { summary: TraceSummary }) {
+  const errorTypes = Object.entries(summary.tool_error_types)
+    .map(([k, v]) => `${k}×${v}`)
+    .join(' · ')
+
+  return (
+    <div className="trace-summary-card">
+      <div className="trace-summary-title">本轮摘要</div>
+      <div className="trace-summary-grid">
+        <MiniStat label="批次" value={String(summary.tool_call_batches)} />
+        <MiniStat label="调用数" value={String(summary.tool_call_count)} />
+        <MiniStat label="成功" value={String(summary.tool_success_count)} tone="ok" />
+        <MiniStat label="失败" value={String(summary.tool_error_count)} tone={summary.tool_error_count > 0 ? 'warn' : 'neutral'} />
+        <MiniStat label="工具耗时" value={`${summary.tool_latency_ms}ms`} />
+        <MiniStat label="总 Tokens" value={String(summary.usage.total_tokens)} />
+      </div>
+      <div className="trace-summary-lines">
+        <div>工具：{summary.tools_used.length > 0 ? summary.tools_used.join(' · ') : '无'}</div>
+        <div>Fallback：{summary.grep_rag_fallback_used ? 'grep -> rag' : '未触发'}</div>
+        <div>Force Direct：{summary.force_direct_used ? '已触发' : '未触发'}</div>
+        {errorTypes && <div>错误类型：{errorTypes}</div>}
+        <div>
+          Tokens：P {summary.usage.prompt_tokens} / C {summary.usage.completion_tokens} / T {summary.usage.total_tokens}
+        </div>
+      </div>
     </div>
   )
 }
@@ -88,10 +151,13 @@ function TraceEvent({ ev }: { ev: TracedEvent }) {
         <div className="tl-row">
           <div className="tl-dot tl-dot-tool" />
           <span className="tl-label">
-            🔧 工具调用 ({calls.length}个{calls.length > 1 ? '并行' : ''})
+            🔧 工具调用 ({ev.batch_size ?? calls.length}个{calls.length > 1 ? '并行' : ''})
           </span>
           <span className="tl-time">{ts}s</span>
         </div>
+        {typeof ev.iteration === 'number' && (
+          <div className="trace-inline-note">第 {ev.iteration + 1} 轮 · {ev.tool_names?.join(' · ') || '工具调用'}</div>
+        )}
         <div className="tl-pills">
           {calls.map((c, i) => {
             if (c.name === 'rag_search')
@@ -113,6 +179,7 @@ function TraceEvent({ ev }: { ev: TracedEvent }) {
           <span className="tl-label">📦 返回结果 ({ev.results.length} 条)</span>
           <span className="tl-time">{ts}s</span>
         </div>
+        {ev.summary && <ToolBatchSummaryRow summary={ev.summary} />}
         {ev.results.map((r, i) => <ToolResultBox key={i} r={r} />)}
       </>
     )
@@ -153,6 +220,7 @@ function TraceTurn({ trace, turnNum }: { trace: Trace; turnNum: number }) {
       </div>
       {open && (
         <div className="trace-body">
+          {trace.summary && <TraceSummaryCard summary={trace.summary} />}
           {trace.events.map((ev, i) => <TraceEvent key={i} ev={ev} />)}
         </div>
       )}

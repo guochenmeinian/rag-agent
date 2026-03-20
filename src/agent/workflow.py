@@ -31,6 +31,59 @@ def _answer_indicates_no_data(answer: str) -> bool:
     return any(p in answer for p in _NO_DATA_PATTERNS)
 
 
+def _tool_names(tool_results: list[dict]) -> list[str]:
+    names: list[str] = []
+    for item in tool_results:
+        name = item.get("name", "")
+        if name and name not in names:
+            names.append(name)
+    return names
+
+
+def _summarize_tool_results(tool_results: list[dict]) -> dict:
+    success_count = 0
+    error_count = 0
+    total_latency_ms = 0
+    error_types: dict[str, int] = {}
+
+    for item in tool_results:
+        result = item.get("result")
+        if result is None:
+            continue
+        total_latency_ms += getattr(result, "latency_ms", 0)
+        if getattr(result, "success", False):
+            success_count += 1
+            continue
+        error_count += 1
+        error_type = getattr(result, "error_type", None) or "unknown"
+        error_types[error_type] = error_types.get(error_type, 0) + 1
+
+    return {
+        "tool_names": _tool_names(tool_results),
+        "success_count": success_count,
+        "error_count": error_count,
+        "error_types": error_types,
+        "total_latency_ms": total_latency_ms,
+    }
+
+
+def _build_trace_summary(state: AgentState, usage: dict[str, int]) -> dict:
+    tool_summary = _summarize_tool_results(state.tool_results)
+    return {
+        "iterations": state.iteration,
+        "tool_call_batches": state.tool_call_batches,
+        "tool_call_count": state.tool_call_count,
+        "tools_used": tool_summary["tool_names"],
+        "tool_success_count": tool_summary["success_count"],
+        "tool_error_count": tool_summary["error_count"],
+        "tool_error_types": tool_summary["error_types"],
+        "tool_latency_ms": tool_summary["total_latency_ms"],
+        "grep_rag_fallback_used": state.grep_rag_fallback_done,
+        "force_direct_used": state.force_direct_used,
+        "usage": dict(usage),
+    }
+
+
 class AgentWorkflow:
     """Main orchestrator.
 
@@ -105,15 +158,21 @@ class AgentWorkflow:
             {"type": "tool_calling", "calls": [{"name": str, "query": str, ...}]}
             {"type": "tool_done",    "results": list[dict]}
             {"type": "done",         "answer": str, "tool_results": list[dict] | None}
+
+        Existing event types stay unchanged; extra telemetry fields are additive.
         """
         self.memory.add_message("user", user_input)
         context_prompt = self.memory.format_for_prompt()
 
         if "rewriter" in self.disabled:
             refined_query = user_input
-            yield {"type": "refined", "query": refined_query, "rewriter_skipped": True}
+            yield {
+                "type": "refined",
+                "query": refined_query,
+                "rewriter_skipped": True,
+            }
         else:
-            yield {"type": "rewriting"}
+            yield {"type": "rewriting", "stage": "rewriter"}
             rewrite_result = self.rewriter.rewrite(user_input, context_prompt)
 
             # Short-circuit: rewriter decided to clarify/reject
@@ -121,8 +180,18 @@ class AgentWorkflow:
                 msg = rewrite_result.content
                 self.memory.add_message("assistant", msg)
                 self._persist()
+                usage: dict[str, int] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
                 yield {"type": "clarify", "message": msg}
-                yield {"type": "done", "answer": msg, "tool_results": None}
+                yield {
+                    "type": "done",
+                    "answer": msg,
+                    "tool_results": None,
+                    "usage": usage,
+                    "trace_summary": _build_trace_summary(
+                        AgentState(user_input=user_input),
+                        usage,
+                    ),
+                }
                 return
 
             refined_query = rewrite_result.content
@@ -143,15 +212,25 @@ class AgentWorkflow:
                     {"id": b.id, "name": b.name, "input": b.input}
                     for b in response.tool_use_blocks
                 ]
+                state.tool_call_batches += 1
+                state.tool_call_count += len(calls)
                 yield {
                     "type": "tool_calling",
+                    "iteration": state.iteration,
+                    "batch_size": len(calls),
+                    "tool_names": [c["name"] for c in calls],
                     "calls": [{"name": c["name"], **c["input"]} for c in calls],
                 }
 
                 messages.append(response.raw_content)
                 tool_results = self.registry.run_parallel(calls)
                 state.tool_results.extend(tool_results)
-                yield {"type": "tool_done", "results": tool_results}
+                yield {
+                    "type": "tool_done",
+                    "iteration": state.iteration,
+                    "results": tool_results,
+                    "summary": _summarize_tool_results(tool_results),
+                }
 
                 for r in tool_results:
                     messages.append({
@@ -194,11 +273,13 @@ class AgentWorkflow:
                 "answer": state.answer,
                 "tool_results": state.tool_results or None,
                 "usage": dict(_usage),
+                "trace_summary": _build_trace_summary(state, _usage),
             }
             return
 
         # Max iterations reached: force a direct answer if we only did tool calls
         if not state.answer:
+            state.force_direct_used = True
             final = self.executor.run(messages, extra_system=context_prompt, force_direct=True)
             state.answer = final.answer
             for k in _usage:
@@ -212,6 +293,7 @@ class AgentWorkflow:
             "answer": state.answer,
             "tool_results": state.tool_results or None,
             "usage": dict(_usage),
+            "trace_summary": _build_trace_summary(state, _usage),
         }
 
     # ------------------------------------------------------------------

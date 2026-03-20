@@ -1,0 +1,306 @@
+{
+  "version": "2.0",
+  "description": "NIO benchmark",
+  "cases": [
+    {
+      "id": "rt_tool_cls_rag_001",
+      "layer_targets": [
+        "router"
+      ],
+      "category": "rt_tool_cls_rag",
+      "notes": "用户询问的换电兼容性需要通过工具获取具体信息。",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "上海95后程序员，预算32万，极客属性看重续航快充OTA",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "请问ET7和EC7这两款车型在换电兼容性方面表现如何，以及目前换电站的密度是否能够满足日常使用需求？",
+      "router_gt": {
+        "expected_calls": [
+          {
+            "name": "rag_search",
+            "car_model": "ET7",
+            "query_keywords": [
+              "换电兼容性"
+            ]
+          },
+          {
+            "name": "rag_search",
+            "car_model": "EC7",
+            "query_keywords": [
+              "换电兼容性"
+            ]
+          }
+        ],
+        "expected_tools": [
+          "rag_search"
+        ],
+        "forbidden_tools": [
+          "web_search"
+        ],
+        "no_tool_needed": false,
+        "tool_params": {},
+        "min_calls": 2,
+        "max_calls": 2,
+        "must_be_parallel": false
+      }
+    },
+    {
+      "id": "rt_tool_cls_rag_002",
+      "layer_targets": [
+        "router"
+      ],
+      "category": "rt_tool_cls_rag",
+      "notes": "用户询问的细节超出了给定的车型规格参考，需要工具来获取。",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "北京科技公司采购5辆公务用车，只要结论",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "请问ET9和ET5T车型在电机布局、功率与加速性能方面有哪些区别？",
+      "router_gt": {
+        "expected_calls": [
+          {
+            "name": "rag_search",
+            "car_model": "ET9",
+            "query_keywords": [
+              "电机布局",
+              "功率",
+              "加速性能"
+            ]
+          },
+          {
+            "name": "rag_search",
+            "car_model": "ET5T",
+            "query_keywords": [
+              "电机布局",
+              "功率",
+              "加速性能"
+            ]
+          }
+        ],
+        "expected_tools": [
+          "rag_search"
+        ],
+        "forbidden_tools": [
+          "grep_search",
+          "web_search"
+        ],
+        "no_tool_needed": false,
+        "tool_params": {},
+        "min_calls": 2,
+        "max_calls": 2,
+        "must_be_parallel": false
+      }
+    },
+    {
+      "id": "rt_parameter_003",
+      "layer_targets": [
+        "router"
+      ],
+      "category": "rt_parameter",
+      "notes": "...",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "郑州城郊每天通勤60km，无私人桩只能快充换电，预算27万",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "我想知道ET7这个车它的颜色选择有什么那些外观可以选配大概交付周期有多久",
+      "router_gt": {
+        "expected_calls": [
+          {
+            "name": "rag_search",
+            "car_model": "ET7",
+            "query_keywords": [
+              "颜色选择",
+              "外观选配",
+              "交付周期"
+            ]
+          }
+        ],
+        "expected_tools": [
+          "rag_search"
+        ],
+        "forbidden_tools": [],
+        "no_tool_needed": false,
+        "tool_params": {},
+        "min_calls": 1,
+        "max_calls": 1,
+        "must_be_parallel": false
+      }
+    },
+    {
+      "id": "rt_parameter_004",
+      "layer_targets": [
+        "router"
+      ],
+      "category": "rt_parameter",
+      "notes": "...",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "深圳环保主义者30岁，主动选纯电，关心碳排放电池回收",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "那个EC6冬天续航损耗多少啊，有啥热管理系统能优化不？",
+      "router_gt": {
+        "expected_calls": [
+          {
+            "name": "rag_search",
+            "car_model": "EC6",
+            "query_keywords": [
+              "冬季续航损耗"
+            ]
+          },
+          {
+            "name": "rag_search",
+            "car_model": "EC6",
+            "query_keywords": [
+              "热管理系统"
+            ]
+          }
+        ],
+        "expected_tools": [
+          "rag_search"
+        ],
+        "forbidden_tools": [],
+        "no_tool_needed": false,
+        "tool_params": {},
+        "min_calls": 2,
+        "max_calls": 2,
+        "must_be_parallel": false
+      }
+    },
+    {
+      "id": "rt_multi_query_parallel_005",
+      "layer_targets": [
+        "router"
+      ],
+      "category": "rt_multi_query_parallel",
+      "notes": "用户询问ES6和ES8的快充功率和续航表现，适合家用的选择需要考虑家庭情况。",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "北京已婚两孩，预算45万，家庭首选大空间",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "那个请问一下ES6还有ES8快充功率都是一样的吗对比一下续航表现哪个更适合家用",
+      "router_gt": {
+        "expected_calls": [
+          {
+            "name": "rag_search",
+            "car_model": "ES6",
+            "query_keywords": [
+              "快充功率",
+              "续航表现"
+            ]
+          },
+          {
+            "name": "rag_search",
+            "car_model": "ES8",
+            "query_keywords": [
+              "快充功率",
+              "续航表现"
+            ]
+          }
+        ],
+        "expected_tools": [
+          "rag_search"
+        ],
+        "forbidden_tools": [],
+        "no_tool_needed": false,
+        "tool_params": {},
+        "min_calls": 2,
+        "max_calls": 2,
+        "must_be_parallel": true
+      }
+    },
+    {
+      "id": "rt_multi_query_parallel_006",
+      "layer_targets": [
+        "router"
+      ],
+      "category": "rt_multi_query_parallel",
+      "notes": "用户询问两款车型的底盘调节对比，需要分别查询EC7和ET5的底盘信息。",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "郑州城郊每天通勤60km，无私人桩只能快充换电，预算27万",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7、ET5底盘调节对比",
+      "router_gt": {
+        "expected_calls": [
+          {
+            "name": "rag_search",
+            "car_model": "EC7",
+            "query_keywords": [
+              "底盘调节"
+            ]
+          },
+          {
+            "name": "rag_search",
+            "car_model": "ET5",
+            "query_keywords": [
+              "底盘调节"
+            ]
+          }
+        ],
+        "expected_tools": [
+          "rag_search"
+        ],
+        "forbidden_tools": [],
+        "no_tool_needed": false,
+        "tool_params": {},
+        "min_calls": 2,
+        "max_calls": 2,
+        "must_be_parallel": true
+      }
+    }
+  ]
+}

@@ -25,6 +25,7 @@
 - **两种检索互补**：`rag_search` 做语义检索适合概念/推荐；`grep_search` 做精确关键词匹配适合轴距/续航等具体参数
 - **context_prompt 注入 system**：记忆上下文追加到 Executor system message 而非 user message，避免与当前问题混用
 - **max iterations 保底**：若全部轮次都是 tool call，用 `force_direct=True` 再调一次 Executor 强制产出直接回答
+- **流式 trace 摘要**：`run_stream()` 在保留原有事件类型的前提下，为 `tool_calling` / `tool_done` / `done` 追加批次、工具名、错误类型、总耗时、token usage 等观测字段，便于 UI 与 benchmark 做归因
 
 ## 目录结构
 
@@ -34,13 +35,13 @@ rag-agent/
 │   ├── config.py               配置（API key、模型、路径均可 .env 覆盖）
 │   ├── main.py                 命令行 REPL
 │   ├── api.py                  FastAPI 服务
-│   ├── frontend.py             Streamlit UI（旧版实现，仍可运行）
 │   ├── cache_cli.py            ingest 缓存管理工具
 │   ├── agent/
 │   │   ├── workflow.py         主编排器（run / run_stream）
-│   │   ├── planner.py          QueryRewriter（Qwen）
+│   │   ├── rewriter.py         QueryRewriter（Qwen）
 │   │   ├── executor.py         AgentExecutor（GPT-4o / 可换）
 │   │   ├── memory.py           ConversationMemory：facts + 滑动窗口
+│   │   ├── contracts.py        Rewrite / Executor contract
 │   │   └── state.py            AgentState 数据类
 │   ├── prompts/
 │   │   ├── rewriter.py         Rewriter system prompt（改写规则 + few-shot）
@@ -66,7 +67,8 @@ rag-agent/
 │   └── tests/
 │       ├── eval_runner.py      端到端评估（tool recall/precision/keyword hit）
 │       └── benchmark_tool_selection.py
-├── frontend/                   React + Vite 前端
+├── frontend/                   React + Vite 前端（构建后输出到 src/static）
+├── nio-intelligent-consultant/ 早期独立前端样例，非当前主链路
 ├── data/                       NIO 车型 PDF（EC6.pdf, ET5.pdf …）
 ├── .env                        API key 与模型配置
 └── run.sh                      setup / serve 脚本
@@ -83,12 +85,11 @@ cp .env.example .env
 source .venv/bin/activate
 
 # 3. 启动
-./run.sh serve                                              # 后端 FastAPI（uvicorn）→ http://localhost:8000
-cd frontend && npm install && npm run dev                  # 前端 React + Vite
-PYTHONPATH=src .venv/bin/python src/main.py --session demo  # 命令行 REPL
+./run.sh serve                                              # 先构建 React 前端，再启动 FastAPI → http://localhost:8000
 
-# 旧版前端（可选）
-cd src && streamlit run frontend.py
+# 前端单独开发（可选）
+cd frontend && npm run dev
+PYTHONPATH=src .venv/bin/python src/main.py --session demo  # 命令行 REPL
 ```
 
 ## 模型配置

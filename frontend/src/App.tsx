@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { ChatMessage, ToolCall, Trace, TracedEvent } from './types'
+import type { ChatMessage, ToolCall, Trace, TracedEvent, TraceSummary } from './types'
 import { openChatStream, clearSession } from './api'
 import Sidebar from './components/Sidebar'
 import ChatArea from './components/ChatArea'
@@ -45,6 +45,7 @@ export default function App() {
     const toolCalls: ToolCall[] = []
     const events: TracedEvent[] = []
     let refinedQuery = text
+    let traceSummary: TraceSummary | undefined
 
     openChatStream(
       text,
@@ -82,11 +83,13 @@ export default function App() {
             break
           case 'done': {
             const answer = (ev as Record<string, unknown>).answer as string ?? ''
+            traceSummary = (ev as Record<string, unknown>).trace_summary as TraceSummary | undefined
             const trace: Trace = {
               original_query: text,
               refined_query: refinedQuery,
               elapsed: (Date.now() - t0) / 1000,
               events: [...events],
+              summary: traceSummary,
             }
             upd({ content: answer, tool_calls: [...toolCalls], trace, streaming: false })
             setStatusText('')

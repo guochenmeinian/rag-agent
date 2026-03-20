@@ -9,8 +9,8 @@ PIP_BIN="$VENV_DIR/bin/pip"
 usage() {
   cat <<'EOF'
 Usage:
-  ./run.sh setup   # create .venv and install pinned deps
-  ./run.sh serve   # start FastAPI server at http://localhost:8000
+  ./run.sh setup   # create .venv, install Python deps, install frontend deps
+  ./run.sh serve   # build frontend, then start FastAPI at http://localhost:8000
   ./run.sh test    # run src/tests/test_generator.py (full RAG E2E)
   ./run.sh test-milvus  # run src/tests/test_milvus.py
   ./run.sh doctor  # re-sign binary libs on macOS
@@ -54,6 +54,15 @@ install_deps() {
   ensure_venv
   "$PYTHON_BIN" -m pip install --upgrade pip
   "$PIP_BIN" install -r "$ROOT_DIR/requirements.txt"
+  install_frontend_deps
+}
+
+install_frontend_deps() {
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "[setup] npm not found; skipping frontend dependency install"
+    return 0
+  fi
+  (cd "$ROOT_DIR/frontend" && npm install)
 }
 
 fix_macos_signatures() {
@@ -119,8 +128,22 @@ run_test_milvus() {
 
 run_serve() {
   set_common_env
+  build_frontend
   # --loop asyncio: nest_asyncio 不兼容 uvloop，用标准 asyncio
   "$VENV_DIR/bin/uvicorn" api:app --reload --port 8000 --app-dir "$ROOT_DIR/src" --loop asyncio
+}
+
+build_frontend() {
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "ERROR: npm is required to build the React frontend before serving."
+    exit 1
+  fi
+  if [[ ! -d "$ROOT_DIR/frontend/node_modules" ]]; then
+    echo "[serve] frontend/node_modules missing; running npm install..."
+    install_frontend_deps
+  fi
+  echo "[serve] building frontend..."
+  (cd "$ROOT_DIR/frontend" && npm run build)
 }
 
 main() {
