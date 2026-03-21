@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronDown, ChevronRight } from 'lucide-react';
-import { Message, SystemStatus, MemoryState, TracedEvent, ToolResultItem } from '../types';
+import { Message, SystemStatus, MemoryState, TracedEvent, ToolResultItem, TraceSummary } from '../types';
 import { fetchStatus, fetchMemory, clearSession } from '../lib/api';
 
 type DevTab = 'trace' | 'memory' | 'system';
@@ -92,13 +92,15 @@ function TraceEventRow({ ev }: { ev: TracedEvent }) {
 
   if (ev.type === 'tool_calling') {
     const calls = ev.calls ?? [];
+    const batchSize = ev.batch_size ?? calls.length;
+    const iterLabel = ev.iteration !== undefined ? ` · 第${ev.iteration + 1}轮` : '';
     return (
       <div className="py-2">
         <div className="flex items-start gap-3">
           {dot('bg-violet-400')}
           <div className="flex-1">
             <span className="text-sm text-slate-600 font-medium">
-              工具调用 · {calls.length} 个{calls.length > 1 ? '并行' : ''}
+              工具调用 · {batchSize} 个{batchSize > 1 ? '并行' : ''}{iterLabel}
             </span>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {calls.map((c: any, i: number) => {
@@ -118,12 +120,17 @@ function TraceEventRow({ ev }: { ev: TracedEvent }) {
 
   if (ev.type === 'tool_done') {
     const results: ToolResultItem[] = ev.results ?? [];
+    const s = ev.summary;
+    const errLabel = s && s.error_count > 0 ? ` · ${s.error_count} 个失败` : '';
     return (
       <div className="py-2">
         <div className="flex items-start gap-3">
           {dot('bg-violet-400')}
           <div className="flex-1">
-            <span className="text-sm text-slate-600 font-medium">返回结果 · {results.length} 条</span>
+            <span className="text-sm text-slate-600 font-medium">
+              返回结果 · {results.length} 条
+              {errLabel && <span className="text-red-500 ml-1">⚠️{errLabel}</span>}
+            </span>
             {results.map((r, i) => <ToolResultBox key={i} r={r as ToolResultItem} />)}
           </div>
           <span className="text-xs text-slate-400 flex-shrink-0">{ts}s</span>
@@ -151,6 +158,24 @@ function TraceEventRow({ ev }: { ev: TracedEvent }) {
   return null;
 }
 
+function TraceSummaryBar({ s }: { s: TraceSummary }) {
+  const flags = [
+    s.grep_rag_fallback_used && '检索回退',
+    s.force_direct_used && '强制回答',
+  ].filter(Boolean).join(' · ');
+
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-1 px-1 py-2 mb-2 text-[11px] text-slate-400 border-b border-slate-50">
+      <span>🔁 {s.tool_call_batches} 批 · {s.tool_call_count} 次调用</span>
+      {s.tool_error_count > 0 && (
+        <span className="text-red-400">⚠️ {s.tool_error_count} 个工具失败</span>
+      )}
+      <span>🪙 {s.usage.total_tokens} tokens</span>
+      {flags && <span className="text-amber-500">{flags}</span>}
+    </div>
+  );
+}
+
 function TraceTurn({ trace, turnNum }: { trace: any; turnNum: number }) {
   const [open, setOpen] = useState(turnNum === 0);
   return (
@@ -174,6 +199,7 @@ function TraceTurn({ trace, turnNum }: { trace: any; turnNum: number }) {
       </button>
       {open && (
         <div className="px-5 py-3 divide-y divide-slate-50 border-t border-slate-100">
+          {trace.trace_summary && <TraceSummaryBar s={trace.trace_summary} />}
           {trace.events.map((ev: TracedEvent, i: number) => (
             <TraceEventRow key={i} ev={ev} />
           ))}

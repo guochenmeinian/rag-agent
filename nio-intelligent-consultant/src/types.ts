@@ -35,6 +35,28 @@ export interface Vehicle {
 
 // ── Dev / Trace types ──────────────────────────────────────────────────────
 
+export interface ToolDoneSummary {
+  tool_names: string[];
+  success_count: number;
+  error_count: number;
+  error_types: Record<string, number>;
+  total_latency_ms: number;
+}
+
+export interface TraceSummary {
+  iterations: number;
+  tool_call_batches: number;
+  tool_call_count: number;
+  tools_used: string[];
+  tool_success_count: number;
+  tool_error_count: number;
+  tool_error_types: Record<string, number>;
+  tool_latency_ms: number;
+  grep_rag_fallback_used: boolean;
+  force_direct_used: boolean;
+  usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+}
+
 export interface ToolResultMeta {
   car_model?: string;
   query?: string;
@@ -68,6 +90,7 @@ export interface Trace {
   refined_query: string;
   elapsed: number;
   events: TracedEvent[];
+  trace_summary?: TraceSummary;
 }
 
 export interface SystemStatus {

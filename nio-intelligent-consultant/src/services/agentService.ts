@@ -1,4 +1,4 @@
-import { Message, ToolCall, Trace, TracedEvent } from "../types";
+import { Message, ToolCall, Trace, TracedEvent, TraceSummary } from "../types";
 
 const SESSION_ID_KEY = "nio_session_id";
 
@@ -159,6 +159,7 @@ export const processChat = async (
             refined_query: refinedQuery,
             elapsed: (Date.now() - t0) / 1000,
             events: [...events],
+            trace_summary: ev.trace_summary as TraceSummary | undefined,
           };
           updateAssistant((msg) => ({
             ...msg,

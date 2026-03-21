@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Car, Github, ArrowRight, Menu, Globe, History, LayoutGrid, Terminal } from 'lucide-react';
+import { Car, Github, ArrowRight, Menu, Globe, History, LayoutGrid, Terminal, X } from 'lucide-react';
 import { Message, Vehicle, SystemStatus } from './types';
 import { ChatBubble } from './components/ChatBubble';
 import { VehicleCard } from './components/VehicleCard';
@@ -206,28 +206,44 @@ export default function App() {
                     <p className="text-[11px] text-slate-400 px-1 font-medium">暂无历史记录</p>
                   ) : (
                     sessions.slice(0, 8).map((s) => (
-                      <button
+                      <div
                         key={s.session_id}
-                        onClick={() => handleSwitchSession(s.session_id)}
-                        className={`w-full text-left p-3 rounded-xl transition-all border ${
+                        className={`group relative rounded-xl transition-all border ${
                           s.session_id === currentSessionId
                             ? 'bg-white/50 border-white/60 shadow-sm'
                             : 'border-transparent hover:bg-white/30 hover:border-white/40'
                         }`}
                       >
-                        <p className="text-xs text-slate-700 line-clamp-1 font-semibold">
-                          {s.preview || '(空对话)'}
-                        </p>
-                        <span className="text-[9px] text-slate-500 mt-1 block font-bold">
-                          {new Date(s.last_modified * 1000).toLocaleDateString('zh-CN', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                          {' · '}{s.message_count} 条消息
-                        </span>
-                      </button>
+                        <button
+                          onClick={() => handleSwitchSession(s.session_id)}
+                          className="w-full text-left p-3 pr-8"
+                        >
+                          <p className="text-xs text-slate-700 line-clamp-1 font-semibold">
+                            {s.preview || '(空对话)'}
+                          </p>
+                          <span className="text-[9px] text-slate-500 mt-1 block font-bold">
+                            {new Date(s.last_modified * 1000).toLocaleDateString('zh-CN', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                            {' · '}{s.message_count} 条消息
+                          </span>
+                        </button>
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await clearSession(s.session_id);
+                            if (s.session_id === currentSessionId) handleNewSession();
+                            refreshSessions();
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-red-100 text-slate-400 hover:text-red-500 transition-all"
+                          title="删除对话"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
                     ))
                   )}
                 </div>

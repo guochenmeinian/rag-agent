@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { ChatMessage, TracedEvent, Trace, ToolCall, ToolResultItem, SystemStatus, MemoryState } from '../types'
+import type { ChatMessage, TracedEvent, Trace, ToolCall, ToolResultItem, SystemStatus, MemoryState, TraceSummary } from '../types'
 import { fetchStatus, fetchMemory } from '../api'
 
 interface Props {
@@ -83,12 +83,14 @@ function TraceEvent({ ev }: { ev: TracedEvent }) {
 
   if (ev.type === 'tool_calling') {
     const calls: ToolCall[] = ev.calls
+    const batchSize = ev.batch_size ?? calls.length
+    const iterLabel = ev.iteration !== undefined ? ` · 第${ev.iteration + 1}轮` : ''
     return (
       <>
         <div className="tl-row">
           <div className="tl-dot tl-dot-tool" />
           <span className="tl-label">
-            🔧 工具调用 ({calls.length}个{calls.length > 1 ? '并行' : ''})
+            🔧 工具调用 ({batchSize}个{batchSize > 1 ? '并行' : ''}{iterLabel})
           </span>
           <span className="tl-time">{ts}s</span>
         </div>
@@ -106,11 +108,15 @@ function TraceEvent({ ev }: { ev: TracedEvent }) {
   }
 
   if (ev.type === 'tool_done') {
+    const s = ev.summary
+    const errLabel = s && s.error_count > 0
+      ? ` · ⚠️ ${s.error_count}个失败`
+      : ''
     return (
       <>
         <div className="tl-row">
           <div className="tl-dot tl-dot-tool" />
-          <span className="tl-label">📦 返回结果 ({ev.results.length} 条)</span>
+          <span className="tl-label">📦 返回结果 ({ev.results.length} 条{errLabel})</span>
           <span className="tl-time">{ts}s</span>
         </div>
         {ev.results.map((r, i) => <ToolResultBox key={i} r={r} />)}
@@ -141,6 +147,25 @@ function TraceEvent({ ev }: { ev: TracedEvent }) {
   return null
 }
 
+function TraceSummaryBlock({ s }: { s: TraceSummary }) {
+  const tokens = s.usage.total_tokens
+  const flags = [
+    s.grep_rag_fallback_used && '回退',
+    s.force_direct_used && '强制回答',
+  ].filter(Boolean).join(' · ')
+
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, padding: '4px 0 6px 0', fontSize: 11, color: 'var(--text3)' }}>
+      <span>🔁 {s.tool_call_batches}批 · {s.tool_call_count}次调用</span>
+      {s.tool_error_count > 0 && (
+        <span style={{ color: '#dc2626' }}>⚠️ {s.tool_error_count}个工具失败</span>
+      )}
+      <span>🪙 {tokens} tokens</span>
+      {flags && <span style={{ color: '#d97706' }}>{flags}</span>}
+    </div>
+  )
+}
+
 function TraceTurn({ trace, turnNum }: { trace: Trace; turnNum: number }) {
   const [open, setOpen] = useState(turnNum === 0)
   return (
@@ -153,6 +178,7 @@ function TraceTurn({ trace, turnNum }: { trace: Trace; turnNum: number }) {
       </div>
       {open && (
         <div className="trace-body">
+          {trace.trace_summary && <TraceSummaryBlock s={trace.trace_summary} />}
           {trace.events.map((ev, i) => <TraceEvent key={i} ev={ev} />)}
         </div>
       )}
