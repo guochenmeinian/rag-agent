@@ -102,7 +102,8 @@ class IngestManager:
                             pdf_files: list[str],
                             col_name: str,
                             collection_exists: bool,
-                            collection_count: int = 0) -> IngestStatus:
+                            collection_count: int = 0,
+                            pipeline_flags: dict | None = None) -> IngestStatus:
         """
         检查是否需要重新 ingest
 
@@ -143,8 +144,15 @@ class IngestManager:
             if fname not in current_fnames
         ]
 
+        # 检查 pipeline 配置是否变化（如 contextual_retrieval 开关）
+        pipeline_changed = False
+        if pipeline_flags:
+            cached_flags = self._manifest.get(col_name, {}).get("pipeline_flags", {})
+            if cached_flags != pipeline_flags:
+                pipeline_changed = True
+
         # 决定是否跳过
-        if collection_exists and collection_count > 0 and not changed_files and not deleted_files:
+        if collection_exists and collection_count > 0 and not changed_files and not deleted_files and not pipeline_changed:
             return IngestStatus(
                 skip=True,
                 reason=f"collection exists with {collection_count} chunks, no file changes detected",
@@ -158,6 +166,8 @@ class IngestManager:
             reason_parts.append(f"{len(changed_files)} file(s) changed/added")
         if deleted_files:
             reason_parts.append(f"{len(deleted_files)} file(s) deleted")
+        if pipeline_changed:
+            reason_parts.append(f"pipeline config changed {self._manifest.get(col_name, {}).get('pipeline_flags', {})} -> {pipeline_flags}")
 
         return IngestStatus(
             skip=False,
@@ -167,13 +177,14 @@ class IngestManager:
             unchanged_files=unchanged_files,
         )
     
-    def mark_ingested_files(self, col_name: str, file_paths: list[str]):
+    def mark_ingested_files(self, col_name: str, file_paths: list[str], pipeline_flags: dict | None = None):
         """
-        标记该 collection 已完成 ingest，记录实际处理的文件指纹
+        标记该 collection 已完成 ingest，记录实际处理的文件指纹和 pipeline 配置
 
         Args:
             col_name: Milvus collection 名称
             file_paths: 实际 ingest 的文件路径列表
+            pipeline_flags: ingest 时的 pipeline 配置（如 contextual_retrieval=True）
 
         在 ingest 完成后调用
         """
@@ -184,6 +195,7 @@ class IngestManager:
 
         self._manifest[col_name] = {
             "files": files,
+            "pipeline_flags": pipeline_flags or {},
             "last_ingested": self._get_timestamp(),
         }
         self._save_manifest()

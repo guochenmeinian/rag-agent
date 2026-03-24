@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Car, Github, ArrowRight, Menu, Globe, History, LayoutGrid, Terminal } from 'lucide-react';
-import { Message, Vehicle, SystemStatus } from './types';
+import { Message, Vehicle, SystemStatus, ToolCall } from './types';
 import { ChatBubble } from './components/ChatBubble';
 import { VehicleCard } from './components/VehicleCard';
 import { VehicleDetail } from './components/VehicleDetail';
@@ -11,21 +11,43 @@ import { processChat, getSessionId, setSessionId, newSessionId } from './service
 import { clearSession, fetchStatus, fetchSessions, fetchSessionMessages, SessionMeta } from './lib/api';
 import { Language, translations } from './lib/translations';
 
+function toolCallsFromTrace(trace: any): ToolCall[] | undefined {
+  const calls: ToolCall[] = (trace?.events ?? [])
+    .filter((ev: any) => ev.type === 'tool_calling')
+    .flatMap((ev: any) => (ev.calls ?? []).map((c: any) => ({
+      name: c.name,
+      args: c,
+      status: 'success' as const,
+    })));
+  return calls.length > 0 ? calls : undefined;
+}
+
+function messagesFromBackend(
+  raw: { role: string; content: string; trace?: any }[],
+  welcome: string,
+): Message[] {
+  return [
+    { id: 'welcome', role: 'assistant', content: welcome, timestamp: Date.now() },
+    ...raw.map((m, i) => ({
+      id: `hist-${i}`,
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+      timestamp: Date.now() - (raw.length - i) * 1000,
+      ...(m.trace ? { trace: m.trace, toolCalls: toolCallsFromTrace(m.trace) } : {}),
+    })),
+  ];
+}
+
 export default function App() {
   const [lang, setLang] = useState<Language>('zh');
   const t = translations[lang];
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    { id: 'welcome', role: 'assistant', content: translations['zh'].chat.welcome, timestamp: Date.now() },
+  ]);
 
   useEffect(() => {
-    setMessages([
-      {
-        id: 'welcome',
-        role: 'assistant',
-        content: t.chat.welcome,
-        timestamp: Date.now(),
-      },
-    ]);
+    setMessages([{ id: 'welcome', role: 'assistant', content: t.chat.welcome, timestamp: Date.now() }]);
   }, [lang]);
 
   const [input, setInput] = useState('');
@@ -37,6 +59,7 @@ export default function App() {
   const [apiStatus, setApiStatus] = useState<SystemStatus | null>(null);
   const [sessions, setSessions] = useState<SessionMeta[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>(getSessionId());
+  const sessionId = currentSessionId;
 
   useEffect(() => {
     fetchStatus().then(setApiStatus).catch(() => {});
@@ -50,7 +73,14 @@ export default function App() {
     refreshSessions();
   }, []);
 
-  const sessionId = currentSessionId;
+  // Load current session messages from backend on initial mount
+  useEffect(() => {
+    const sid = getSessionId();
+    if (!sid) return;
+    fetchSessionMessages(sid).then((raw) => {
+      if (raw.length > 0) setMessages(messagesFromBackend(raw, t.chat.welcome));
+    }).catch(() => {});
+  }, []);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -73,9 +103,7 @@ export default function App() {
     setInput('');
     setIsProcessing(true);
 
-    await processChat(updatedMessages, (newMessages) => setMessages(newMessages), {
-      userProfile,
-    });
+    await processChat(updatedMessages, (newMessages) => setMessages(newMessages), { userProfile });
 
     setIsProcessing(false);
     refreshSessions();
@@ -109,26 +137,23 @@ export default function App() {
     ]);
   };
 
+  const handleDeleteSession = async (e: React.MouseEvent, sid: string) => {
+    e.stopPropagation();
+    await clearSession(sid);
+    if (sid === currentSessionId) {
+      const id = newSessionId();
+      setCurrentSessionId(id);
+      setMessages([{ id: 'welcome', role: 'assistant', content: t.chat.welcome, timestamp: Date.now() }]);
+    }
+    refreshSessions();
+  };
+
   const handleSwitchSession = async (sid: string) => {
     if (sid === currentSessionId) return;
     setSessionId(sid);
     setCurrentSessionId(sid);
-    const rawMessages = await fetchSessionMessages(sid);
-    const reconstructed: Message[] = [
-      {
-        id: 'welcome',
-        role: 'assistant',
-        content: t.chat.welcome,
-        timestamp: Date.now(),
-      },
-      ...rawMessages.map((m, i) => ({
-        id: `hist-${i}`,
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-        timestamp: Date.now() - (rawMessages.length - i) * 1000,
-      })),
-    ];
-    setMessages(reconstructed);
+    const raw = await fetchSessionMessages(sid);
+    setMessages(messagesFromBackend(raw, t.chat.welcome));
   };
 
   const toggleLang = () => setLang((prev) => (prev === 'en' ? 'zh' : 'en'));
@@ -206,16 +231,16 @@ export default function App() {
                     <p className="text-[11px] text-slate-400 px-1 font-medium">暂无历史记录</p>
                   ) : (
                     sessions.slice(0, 8).map((s) => (
-                      <button
+                      <div
                         key={s.session_id}
-                        onClick={() => handleSwitchSession(s.session_id)}
-                        className={`w-full text-left p-3 rounded-xl transition-all border ${
+                        className={`relative group w-full text-left p-3 rounded-xl transition-all border cursor-pointer ${
                           s.session_id === currentSessionId
                             ? 'bg-white/50 border-white/60 shadow-sm'
                             : 'border-transparent hover:bg-white/30 hover:border-white/40'
                         }`}
+                        onClick={() => handleSwitchSession(s.session_id)}
                       >
-                        <p className="text-xs text-slate-700 line-clamp-1 font-semibold">
+                        <p className="text-xs text-slate-700 line-clamp-1 font-semibold pr-5">
                           {s.preview || '(空对话)'}
                         </p>
                         <span className="text-[9px] text-slate-500 mt-1 block font-bold">
@@ -227,7 +252,14 @@ export default function App() {
                           })}
                           {' · '}{s.message_count} 条消息
                         </span>
-                      </button>
+                        <button
+                          onClick={(e) => handleDeleteSession(e, s.session_id)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-red-100 text-slate-400 hover:text-red-500 transition-all"
+                          title="删除"
+                        >
+                          ×
+                        </button>
+                      </div>
                     ))
                   )}
                 </div>

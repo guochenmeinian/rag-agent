@@ -57,7 +57,7 @@ function ToolResultBox({ r }: { r: ToolResultItem }) {
 }
 
 function TraceEventRow({ ev }: { ev: TracedEvent }) {
-  const ts = ev.ts.toFixed(2);
+  const ts = (ev.ts ?? 0).toFixed(2);
 
   const dot = (color: string) => (
     <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-0.5 ${color}`} />

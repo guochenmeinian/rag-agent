@@ -270,6 +270,15 @@ if "stats" not in st.session_state:
 if "_loaded_session" not in st.session_state:
     st.session_state._loaded_session = None
 
+# 页面刷新后从 URL query param 恢复 session_id；若无则自动生成，确保对话始终持久化
+if "session_id" not in st.session_state:
+    _sid_from_url = st.query_params.get("sid", "").strip()
+    if _sid_from_url:
+        st.session_state.session_id = _sid_from_url
+    else:
+        import uuid as _uuid
+        st.session_state.session_id = _uuid.uuid4().hex[:12]
+
 # Restore chat history when the user sets (or changes) their session_id
 _current_sid = st.session_state.get("session_id", "").strip()
 if _current_sid and st.session_state._loaded_session != _current_sid:
@@ -712,7 +721,7 @@ with st.sidebar:
     st.markdown('<div class="section-label">会话</div>', unsafe_allow_html=True)
     st.text_input(
         "Session ID",
-        placeholder="留空则不持久化",
+        placeholder="自动生成（可自定义）",
         label_visibility="collapsed",
         key="session_id",
     )
@@ -923,5 +932,9 @@ if prompt := st.chat_input("问我关于Nio汽车的任何问题…"):
             for m in st.session_state.messages
         ]
         _wf.memory.save(_wf.session_path)
+        # 把 session_id 写入 URL，刷新后自动恢复
+        _sid = st.session_state.get("session_id", "").strip()
+        if _sid:
+            st.query_params["sid"] = _sid
 
     st.rerun()

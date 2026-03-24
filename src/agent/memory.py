@@ -80,6 +80,14 @@ class ConversationMemory:
     def add_message(self, role: str, content: str):
         """Add a message to the sliding window (no LLM call here)."""
         self.recent_messages.append({"role": role, "content": content})
+        self.ui_messages.append({"role": role, "content": content})
+
+    def attach_trace_to_last_assistant(self, trace: dict):
+        """Attach trace data to the most recent assistant ui_message."""
+        for msg in reversed(self.ui_messages):
+            if msg["role"] == "assistant":
+                msg["trace"] = trace
+                break
 
     def update_facts(self, user_input: str, assistant_answer: str):
         """Extract/update facts from the just-completed turn. Called once per accepted answer."""
@@ -130,7 +138,8 @@ class ConversationMemory:
         self.global_user_info.budget = ""
         self.global_user_info.family = ""
         self.global_user_info.preferences = ""
-        found_models: set[str] = set(self.global_user_info.focus_models)
+        self.global_user_info.focus_models = []
+        found_models: set[str] = set()
 
         for fact in self.facts:
             if fact.startswith("【脉络】"):
@@ -150,8 +159,7 @@ class ConversationMemory:
                 if model in fact:
                     found_models.add(model)
 
-        if found_models:
-            self.global_user_info.focus_models = sorted(found_models)
+        self.global_user_info.focus_models = sorted(found_models)
 
     def format_for_prompt(self) -> str:
         """Serialize memory into context for rewriter and executor."""

@@ -1,34 +1,51 @@
+from __future__ import annotations
+
 from pymilvus import (
     AnnSearchRequest,
     WeightedRanker,
 )
 
+def _output_fields(col) -> list[str]:
+    """Return output fields to request; include parent_text if schema has it."""
+    field_names = {f.name for f in col.schema.fields}
+    return ["text", "parent_text"] if "parent_text" in field_names else ["text"]
+
+
+def _hit_to_tuple(hit, fields: list[str]) -> tuple[str, str, float]:
+    """Return (text, parent_text, score); falls back parent→text for old schemas."""
+    text = hit.get("text") or ""
+    parent = hit.get("parent_text") if "parent_text" in fields else None
+    return (text, parent or text, hit.score)
+
+
 def dense_search(col, query_dense_embedding, limit=5):
+    fields = _output_fields(col)
     search_params = {"metric_type": "IP", "params": {}}
     res = col.search(
         [query_dense_embedding],
         anns_field="dense_vector",
         limit=limit,
-        output_fields=["text"],
+        output_fields=fields,
         param=search_params,
     )[0]
-    return [(hit.get("text"), hit.score) for hit in res]
+    return [_hit_to_tuple(hit, fields) for hit in res]
+
 
 def sparse_search(col, query_sparse_embedding, limit=5):
-    search_params = {
-        "metric_type": "IP",
-        "params": {},
-    }
+    fields = _output_fields(col)
+    search_params = {"metric_type": "IP", "params": {}}
     res = col.search(
         [query_sparse_embedding],
         anns_field="sparse_vector",
         limit=limit,
-        output_fields=["text"],
+        output_fields=fields,
         param=search_params,
     )[0]
-    return [(hit.get("text"), hit.score) for hit in res]
+    return [_hit_to_tuple(hit, fields) for hit in res]
+
 
 def hybrid_search(col, query_dense_embedding, query_sparse_embedding, sparse_weight=1.0, dense_weight=0.7, limit=5):
+    fields = _output_fields(col)
     dense_search_params = {"metric_type": "IP", "params": {}}
     dense_req = AnnSearchRequest(
         [query_dense_embedding], "dense_vector", dense_search_params, limit=limit
@@ -39,6 +56,31 @@ def hybrid_search(col, query_dense_embedding, query_sparse_embedding, sparse_wei
     )
     rerank = WeightedRanker(sparse_weight, dense_weight)
     res = col.hybrid_search(
-        [sparse_req, dense_req], rerank=rerank, limit=limit, output_fields=["text"]
+        [sparse_req, dense_req], rerank=rerank, limit=limit, output_fields=fields
     )[0]
-    return [(hit.get("text"), hit.score) for hit in res]
+    return [_hit_to_tuple(hit, fields) for hit in res]
+
+
+def rerank_candidates(
+    query: str,
+    candidates: list[tuple[str, str, float]],
+    reranker,
+    top_k: int = 5,
+) -> list[tuple[str, str, float]]:
+    """Re-score candidates with a cross-encoder and return top_k results.
+
+    Args:
+        query:      The user query string.
+        candidates: List of (text, parent_text, bi-encoder-score) from hybrid_search.
+        reranker:   A FlagReranker instance (cross-encoder).
+        top_k:      How many to return after reranking.
+    """
+    if not candidates:
+        return []
+    # Rerank on small chunks (text) for precision; parent_text is passed through
+    pairs = [[query, text] for text, parent, _ in candidates]
+    scores = reranker.compute_score(pairs, normalize=True)
+    if not isinstance(scores, list):
+        scores = [scores]
+    ranked = sorted(zip(candidates, scores), key=lambda x: x[1], reverse=True)
+    return [(text, parent, float(score)) for (text, parent, _), score in ranked[:top_k]]

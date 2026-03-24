@@ -1,0 +1,1218 @@
+{
+  "summary": {
+    "n_total": 25,
+    "n_run": 25,
+    "n_error": 0,
+    "answer": {
+      "n": 20,
+      "match_avg": 0.9,
+      "match_full": 0.0,
+      "hallucination_clean": 0.7,
+      "clarification_acc": 0.8,
+      "key_facts_coverage_avg": 0.267
+    },
+    "latency": {
+      "p50": 10.61,
+      "p95": 15.87
+    },
+    "cost": {
+      "total_prompt_tokens": 190918,
+      "total_completion_tokens": 4086,
+      "total_tokens": 195004
+    }
+  },
+  "results": [
+    {
+      "id": "ans_rag_critical_001",
+      "category": "ans_rag_critical",
+      "input": "EC7的75kWh版本，选20寸轮圈和21寸轮圈，整备质量分别是多少千克？",
+      "latency_s": 7.44,
+      "usage": {
+        "prompt_tokens": 7077,
+        "completion_tokens": 140,
+        "total_tokens": 7217
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "2399kg",
+                "2420kg",
+                "20寸",
+                "21寸"
+              ],
+              "coverage": 0.2
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: '2399kg', '2420kg', '75kWh', '20寸', and '21寸'. There are no significant errors or omissions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a concrete and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "对于 EC7 的 75kWh 版本：\n\n- 选装 20 寸轮圈时，整备质量为 2399 千克。\n- 选装 21 寸轮圈时，整备质量为 2420 千克。"
+    },
+    {
+      "id": "ans_rag_critical_002",
+      "category": "ans_rag_critical",
+      "input": "EC7的150kWh超长续航版，CLTC工况下能跑多少公里？百公里能耗是多少？",
+      "latency_s": 13.68,
+      "usage": {
+        "prompt_tokens": 15058,
+        "completion_tokens": 158,
+        "total_tokens": 15216
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "940km",
+                "175Wh/km",
+                "2448kg"
+              ],
+              "coverage": 0.25
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the key fact '940km' and mentions the '150kWh' version, but it lacks the '175Wh/km' energy consumption and '2448kg' weight information, making it incomplete."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER omits the specific energy consumption figure of 175Wh/km, which is available in the ground truth."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system hedges by stating it cannot provide specific data on energy consumption, which is not necessary for the query about range."
+            }
+          }
+        }
+      },
+      "answer": "根据最新的网络信息，Nio EC7 的 150kWh 超长续航版在 CLTC 工况下的续航里程为 940 公里。关于百公里能耗的具体数据未能获取到。"
+    },
+    {
+      "id": "ans_rag_critical_003",
+      "category": "ans_rag_critical",
+      "input": "ET9的车身长宽高和轴距各是多少？它是几座的车？",
+      "latency_s": 6.04,
+      "usage": {
+        "prompt_tokens": 4940,
+        "completion_tokens": 117,
+        "total_tokens": 5057
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "5325mm",
+                "2017mm",
+                "1621mm",
+                "3250mm",
+                "220km/h"
+              ],
+              "coverage": 0.167
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes all the key dimensions and seating capacity, but it omits the maximum speed of 220km/h, which is a key fact."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the Nio ET9's dimensions and seating capacity."
+            }
+          }
+        }
+      },
+      "answer": "Nio ET9 的车身尺寸和座位数如下：\n\n- 车身长度：5325 mm\n- 车身宽度（无外后视镜）：2017 mm\n- 车身高度：1621 mm\n- 轴距：3250 mm\n- 座位数：4座\n\n如果有其他问题或需要更多信息，请随时告诉我！"
+    },
+    {
+      "id": "ans_rag_critical_004",
+      "category": "ans_rag_critical",
+      "input": "ET9的高压动力电池参数是什么？电池包重多少千克？里面有多少个单体电芯？",
+      "latency_s": 5.07,
+      "usage": {
+        "prompt_tokens": 5024,
+        "completion_tokens": 67,
+        "total_tokens": 5091
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "102kWh",
+                "三元锂离子电池",
+                "204个",
+                "545kg",
+                "2062x1500x124.8mm",
+                "763V"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as '204个' and '545kg', but it is missing other critical details like '102kWh', '三元锂离子电池', '2062x1500x124.8mm', and '763V'. Therefore, it is partially correct."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information from the GROUND TRUTH without introducing any forbidden content or fabricated facts."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9 的高压动力电池参数如下：\n- 电池包内单体数量：204 个\n- 电池包重量：545 千克"
+    },
+    {
+      "id": "ans_rag_critical_005",
+      "category": "ans_rag_critical",
+      "input": "ET9的车载冰箱温度可以调到多少度？有哪些智能预设模式？",
+      "latency_s": 10.02,
+      "usage": {
+        "prompt_tokens": 5807,
+        "completion_tokens": 93,
+        "total_tokens": 5900
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "-2~55℃",
+                "6种智能模式",
+                "20km"
+              ],
+              "coverage": 0.5
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the temperature range '-2℃到55℃' and mentions '6种智能预设模式' including '冰镇模式', '香槟模式', and '红酒模式'. However, it misses the key fact about the '20km' condition for the off-vehicle operation."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information in the ground truth without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer about the temperature range and modes of the ET9 car refrigerator."
+            }
+          }
+        }
+      },
+      "answer": "ET9的车载冰箱温度调节范围为-2℃到55℃。它支持6种智能预设模式，分别是冰镇模式、果蔬模式、香槟模式、红酒模式、常温模式和暖饮模式。"
+    },
+    {
+      "id": "ans_rag_critical_006",
+      "category": "ans_rag_critical",
+      "input": "ET5和ET5T在75kWh配置下，整备质量分别是多少？两者相差多少千克？",
+      "latency_s": 14.33,
+      "usage": {
+        "prompt_tokens": 18091,
+        "completion_tokens": 266,
+        "total_tokens": 18357
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "2165kg",
+                "2205kg",
+                "40kg"
+              ],
+              "coverage": 0.5
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the key facts about the curb weights (2165kg and 2205kg) and the difference (40kg) for the ET5 and ET5T models with the 75kWh configuration. However, it lacks information about the full load weights (2690kg for ET5 and 2730kg for ET5T) and the reason for the weight difference (ET5T being a travel version with additional features like a luggage rack)."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "根据检索结果：\n\n- ET5 在 75kWh 配置下的整备质量为 2165 千克。\n- ET5T 在 75kWh 配置下的整备质量为 2205 千克。\n\n两者的整备质量相差 40 千克。"
+    },
+    {
+      "id": "ans_rag_critical_007",
+      "category": "ans_rag_critical",
+      "input": "ES8的前备箱容积是多少升？最多能放多重的东西？",
+      "latency_s": 8.72,
+      "usage": {
+        "prompt_tokens": 7000,
+        "completion_tokens": 120,
+        "total_tokens": 7120
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "230L",
+                "50kg",
+                "547L",
+                "75kg"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER only mentions the front trunk volume (230L) and lacks information on the maximum load (50kg) for the front trunk, as well as both the volume (547L) and maximum load (75kg) for the rear trunk."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER omits the maximum load capacity of the front trunk, which is 50kg according to the ground truth, and incorrectly states that this information is unavailable."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system hedges by stating it cannot provide information on the maximum load capacity, which is not necessary if the main query was about the trunk volume."
+            }
+          }
+        }
+      },
+      "answer": "根据最新的网络信息，蔚来全新ES8的前备箱容积为230升。关于最大承重的数据，未能获取到具体信息。"
+    },
+    {
+      "id": "ans_rag_critical_008",
+      "category": "ans_rag_critical",
+      "input": "ET9的前备箱能放多少东西？最大承载重量是多少？",
+      "latency_s": 7.36,
+      "usage": {
+        "prompt_tokens": 6948,
+        "completion_tokens": 104,
+        "total_tokens": 7052
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "105L",
+                "30kg",
+                "544L"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly identifies the front trunk volume as 105L, but it fails to mention the maximum load capacity of 30kg for the front trunk and the rear trunk volume of 544L, which are key facts."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The system answer omits the maximum load capacity of the front trunk, which is 30kg according to the ground truth. This omission could lead to misunderstanding."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system hedges by stating it could not obtain information about the maximum load capacity, which is not necessary if the query was only about the trunk volume."
+            }
+          }
+        }
+      },
+      "answer": "根据网络搜索结果，Nio ET9 的前备箱容积为 105 升。关于最大承载重量的信息未能获取到。"
+    },
+    {
+      "id": "ans_rag_critical_009",
+      "category": "ans_rag_critical",
+      "input": "ES6和EC6的后备箱容积分别是多少？后排座椅放倒后最大容积是多少？",
+      "latency_s": 12.94,
+      "usage": {
+        "prompt_tokens": 6929,
+        "completion_tokens": 249,
+        "total_tokens": 7178
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "542L",
+                "1430L",
+                "505L",
+                "1402L"
+              ],
+              "coverage": 0.333
+            },
+            "llm": {
+              "score": 2,
+              "reason": "All key facts are present and correct, with no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth data without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific data, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES6 和 EC6 的后备箱容积及后排座椅放倒后的最大容积如下：\n\n- **ES6**\n  - 后备箱容积：542 升\n  - 后备箱容积（含隐藏式储物格）：631 升\n  - 后排座椅放倒后的最大容积：1430 升\n\n- **EC6**\n  - 后备箱容积：505 升\n  - 后备箱容积（含隐藏式储物格）：594 升\n  - 后排座椅放倒后的最大容积：1402 升\n\n这两款车型在后排座椅放倒后的最大容积上，ES6 略大于 EC6。"
+    },
+    {
+      "id": "ans_rag_critical_010",
+      "category": "ans_rag_critical",
+      "input": "ET7的150kWh超长续航版，CLTC工况续航能跑多少公里？能耗是多少？",
+      "latency_s": 15.93,
+      "usage": {
+        "prompt_tokens": 15151,
+        "completion_tokens": 161,
+        "total_tokens": 15312
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "1050km",
+                "163Wh/km"
+              ],
+              "coverage": 0.5
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly mentions the 150kWh battery and the 1050km range, but it incorrectly states the energy consumption as 14.1 kWh/100km instead of 163Wh/km. This is a significant error in the energy consumption figure."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER provides an energy consumption of 14.1 kWh/100km, which contradicts the ground truth of 163 Wh/km (or 16.3 kWh/100km)."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio ET7 搭载 150kWh 超长续航版电池的 CLTC 工况续航里程为 1050 公里。其能耗表现为每 100 公里约 14.1 kWh。"
+    },
+    {
+      "id": "ans_rag_critical_011",
+      "category": "ans_rag_critical",
+      "input": "EC7的前后电机类型和峰值参数是什么？前后驱动电机型号分别是什么？",
+      "latency_s": 12.97,
+      "usage": {
+        "prompt_tokens": 7805,
+        "completion_tokens": 243,
+        "total_tokens": 8048
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "180kW",
+                "300kW",
+                "350N·m",
+                "500N·m",
+                "前永磁同步",
+                "后异步"
+              ],
+              "coverage": 0.25
+            },
+            "llm": {
+              "score": 2,
+              "reason": "All key facts are present and correct, with no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer with detailed parameters of the EC7's motor configuration without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC7的电机参数如下：\n\n- **前电机类型**：交流永磁同步电机\n- **后电机类型**：交流异步电机\n\n- **前驱动电机型号**：TZ180S001\n- **后驱动电机型号**：YS300S002\n\n- **前驱动电机峰值功率/转速/转矩**：180 kW / 16000 r/min / 350 N·m\n- **后驱动电机峰值功率/转速/转矩**：300 kW / 15000 r/min / 500 N·m\n\n这些参数展示了EC7在电机配置上的具体细节。"
+    },
+    {
+      "id": "ans_rag_critical_012",
+      "category": "ans_rag_critical",
+      "input": "ET9的线控转向系统出现故障时会怎么处理？系统会如何限速？",
+      "latency_s": 10.56,
+      "usage": {
+        "prompt_tokens": 5689,
+        "completion_tokens": 293,
+        "total_tokens": 5982
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "80km/h",
+                "10km/h",
+                "三级"
+              ],
+              "coverage": 0.5
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER accurately describes the three levels of handling for the ET9's steer-by-wire system failure, including all key facts such as '20小时', '80km/h', '10分钟', '10km/h', and '三级'. It also correctly advises immediate parking and contacting the service center, aligning with the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information from the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging, detailing the steps to take based on the severity of the steering system failure."
+            }
+          }
+        }
+      },
+      "answer": "当ET9的线控转向系统出现故障时，系统会根据故障的严重程度采取不同的处理措施：\n\n1. **转向能力正常**：如果天际屏点亮黄色故障指示灯，并提示“转向系统异常，请尽快维修车辆”，请立即安全停车，并联系蔚来汽车服务中心。系统将在故障发生后20小时自动将车速限制至80公里/小时。\n\n2. **转向能力部分失效**：如果天际屏点亮红色故障警告灯，并提示“转向系统故障，请立刻靠边停车”，请立即安全停车，并联系蔚来汽车服务中心。系统将在故障发生后自动限速至80公里/小时，并在10分钟后进一步降至10公里/小时。\n\n3. **转向能力完全失效**：如果天际屏点亮红色故障警告灯，并提示“转向系统失效，请立"
+    },
+    {
+      "id": "ans_rag_critical_013",
+      "category": "ans_rag_critical",
+      "input": "ET5T能不能拖车？最大牵引质量是多少？和ES6相比谁的拖车能力更强？",
+      "latency_s": 13.51,
+      "usage": {
+        "prompt_tokens": 6704,
+        "completion_tokens": 185,
+        "total_tokens": 6889
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "1400kg",
+                "1200kg",
+                "ECE R55",
+                "75kg",
+                "C6驾驶证"
+              ],
+              "coverage": 0.286
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as the towing capacities of ET5T and ES6 (1400kg and 1200kg respectively), and mentions the electric tow hook's maximum load (75kg). However, it omits the ECE R55 standard, the requirement for a C6 driving license, and the tire pressure specification. Therefore, it is partially correct but incomplete."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident comparison of the towing capacities of ET5T and ES6 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET5T和ES6的拖车能力对比如下：\n\n- **ET5T**：\n  - 最大牵引质量：1400 千克\n  - 电动拖钩最大承载质量：75 千克\n\n- **ES6**：\n  - 最大牵引质量：1200 千克\n  - 电动拖钩最大承载质量：75 千克\n\n从最大牵引质量来看，ET5T的拖车能力更强，可以拖动更重的负载。"
+    },
+    {
+      "id": "ans_rag_critical_014",
+      "category": "ans_rag_critical",
+      "input": "ES8选22寸轮毂和21寸轮毂，CLTC续航里程分别是多少？差距大吗？",
+      "latency_s": 12.72,
+      "usage": {
+        "prompt_tokens": 6337,
+        "completion_tokens": 149,
+        "total_tokens": 6486
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "635km",
+                "412km",
+                "223km",
+                "265/45 R21",
+                "265/40 R22",
+                "102kWh"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the key facts about the range differences (635km, 412km, 223km) and mentions the wheel sizes (21寸, 22寸), but it does not specify the tire specifications (265/45 R21, 265/40 R22) or the battery capacity (102kWh)."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth information without introducing any fabricated facts."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the CLTC range for different wheel sizes."
+            }
+          }
+        }
+      },
+      "answer": "Nio ES8 选装不同尺寸轮毂时的 CLTC 续航里程如下：\n\n- 21寸轮毂：635公里\n- 22寸轮毂：412公里\n\n两者之间的续航差距为223公里，21寸轮毂的续航里程更长。"
+    },
+    {
+      "id": "ans_rag_critical_015",
+      "category": "ans_rag_critical",
+      "input": "EC7后备箱能放多少东西？后排座椅放倒后最大有多少升？后备箱最大承载重量是多少？",
+      "latency_s": 10.61,
+      "usage": {
+        "prompt_tokens": 10491,
+        "completion_tokens": 197,
+        "total_tokens": 10688
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "442L",
+                "532L",
+                "1449L",
+                "75千克"
+              ],
+              "coverage": 0.2
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: '442L', '532L', '1449L', '75千克', and 'EC7'. There are no significant errors or omissions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC7 的后备箱常规容积为 442 升，包含隐藏式储物格时为 532 升。后排座椅放倒后的最大容积为 1449 升。后备箱的最大承载重量为 75 千克。"
+    },
+    {
+      "id": "ans_rag_critical_016",
+      "category": "ans_rag_critical",
+      "input": "ET9的整备质量和满载质量分别是多少千克？和ES8相比哪个更重？",
+      "latency_s": 6.41,
+      "usage": {
+        "prompt_tokens": 5923,
+        "completion_tokens": 170,
+        "total_tokens": 6093
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "2700kg",
+                "3100kg",
+                "2630kg",
+                "3250kg",
+                "NAL7003BSEVD1"
+              ],
+              "coverage": 0.286
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts such as the weights for ET9 and ES8, but it omits the vehicle model number 'NAL7003BSEVD1' and the ground clearance comparison."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific data on the weights of ET9 and ES8, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9和ES8的整备质量和满载质量如下：\n\n- **ET9**\n  - 整备质量：2700 千克\n  - 满载质量：3100 千克\n\n- **ES8**\n  - 整备质量：2630 千克\n  - 满载质量：3250 千克\n\n比较两款车的整备质量，ET9 更重；而在满载质量方面，ES8 更重。"
+    },
+    {
+      "id": "ans_rag_critical_017",
+      "category": "ans_rag_critical",
+      "input": "EC7和ES6的空调制冷剂型号一样吗？分别用的是什么型号的制冷剂？",
+      "latency_s": 13.05,
+      "usage": {
+        "prompt_tokens": 6087,
+        "completion_tokens": 216,
+        "total_tokens": 6303
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "两种"
+              ],
+              "coverage": 0.833
+            },
+            "llm": {
+              "score": 2,
+              "reason": "All key facts are present and correct. The SYSTEM ANSWER accurately describes the refrigerants used by EC7 and ES6, including the types (R1234yf and R-134a), the quantities (1000g and 1000±20g), and the need to check the refrigerant label for ES6. It also correctly notes that ES6 supports two types of refrigerants."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "found": [
+                "相同"
+              ]
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer regarding the refrigerant models for EC7 and ES6, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC7和ES6的空调制冷剂型号如下：\n\n- **EC7**：使用 R1234yf（四氟丙烯）制冷剂，容量为 1000g。\n- **ES6**：使用 R-1234yf（四氟丙烯）制冷剂，容量为 1000±20g。此外，ES6 也可能使用 R-134a（四氟乙烷）制冷剂，但需要在添加前核对空调制冷剂标签以确保型号一致。\n\n因此，EC7和ES6的主要制冷剂型号是相同的，但ES6可能会有不同的型号选择。"
+    },
+    {
+      "id": "ans_rag_critical_018",
+      "category": "ans_rag_critical",
+      "input": "ET7的车身尺寸是多少？它的离地间隙和EC7相比哪个更低？",
+      "latency_s": 6.17,
+      "usage": {
+        "prompt_tokens": 7415,
+        "completion_tokens": 197,
+        "total_tokens": 7612
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "5101mm",
+                "1987mm",
+                "1509mm",
+                "3060mm",
+                "128mm",
+                "162mm",
+                "ET7更低"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: the dimensions of the ET7 (5101mm, 1987mm, 1509mm), the wheelbase (3060mm is implied by context), the ground clearance of ET7 (128mm) and EC7 (162mm), and the fact that ET7 has a lower ground clearance than EC7. No significant errors are present."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific measurements and a comparison, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7 的车身尺寸为：\n- 长：5101 毫米\n- 宽（无外后视镜）：1987 毫米\n- 高：1509 毫米\n\n离地间隙对比：\n- ET7 的离地间隙为 128 毫米\n- EC7 的离地间隙为 162 毫米\n\n因此，ET7 的离地间隙比 EC7 更低。"
+    },
+    {
+      "id": "ans_rag_critical_019",
+      "category": "ans_rag_critical",
+      "input": "EC7的75kWh电池分几种类型？化学体系有什么区别？CLTC续航一样吗？",
+      "latency_s": 11.62,
+      "usage": {
+        "prompt_tokens": 5455,
+        "completion_tokens": 150,
+        "total_tokens": 5605
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "类型A",
+                "类型B",
+                "三元锂离子/磷酸铁锂",
+                "455km",
+                "490km"
+              ],
+              "coverage": 0.286
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER misses most key facts and contains factual errors. It incorrectly states the battery types and does not mention the specific range figures (455km and 490km) or the specific tire options. It also fails to mention the mixed chemistry of 类型B."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The answer incorrectly states that the two types of 75kWh batteries are '三元锂离子电池' and '磷酸铁锂电池', whereas the ground truth specifies that they are '三元锂离子电池' and '三元锂离子/磷酸铁锂混合电池'. Additionally, the answer does not mention the specific range values provided in the ground truth."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system over-hedges by stating that the specific CLTC range is not provided, despite giving information about the battery types."
+            }
+          }
+        }
+      },
+      "answer": "蔚来EC7搭载的75kWh电池包有两种类型：三元锂离子电池和磷酸铁锂电池。它们的化学体系分别为三元锂离子和磷酸铁锂。关于CLTC续航里程，由于不同电池类型和其他因素（如驾驶习惯、道路状况等）可能影响续航，因此具体的CLTC续航里程可能会有所不同，但具体数值未在检索结果中提供。"
+    },
+    {
+      "id": "ans_rag_critical_020",
+      "category": "ans_rag_critical",
+      "input": "ET5T旅行版的后备箱比ET5标准版大多少？两者后排座椅放倒后分别有多少升？",
+      "latency_s": 15.87,
+      "usage": {
+        "prompt_tokens": 7217,
+        "completion_tokens": 224,
+        "total_tokens": 7441
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "450L",
+                "386L",
+                "1300L",
+                "1135L",
+                "64L",
+                "165L"
+              ],
+              "coverage": 0.25
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: '450L', '386L', '1300L', '1135L', '64L', '165L', 'ET5T', and 'ET5'. There are no significant errors or omissions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth data without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and concrete comparison of the trunk capacities of the ET5T旅行版 and ET5标准版 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET5T旅行版和ET5标准版的后备箱容积对比如下：\n\n- **ET5 标准版**：\n  - 后备箱容积：386升\n  - 后排座椅放倒后：1135升\n\n- **ET5T 旅行版**：\n  - 后备箱容积：450升\n  - 后排座椅放倒后：1300升\n\n**对比结果**：\n- 后备箱容积：ET5T旅行版比ET5标准版大64升。\n- 后排座椅放倒后：ET5T旅行版比ET5标准版大165升。"
+    },
+    {
+      "id": "ret_rag_critical_001",
+      "category": "ret_rag_critical",
+      "input": "ET9电池包重量和尺寸",
+      "latency_s": 12.81,
+      "usage": {
+        "prompt_tokens": 7207,
+        "completion_tokens": 102,
+        "total_tokens": 7309
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_002",
+      "category": "ret_rag_critical",
+      "input": "ES8 22寸轮毂续航多少",
+      "latency_s": 8.98,
+      "usage": {
+        "prompt_tokens": 7409,
+        "completion_tokens": 94,
+        "total_tokens": 7503
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_003",
+      "category": "ret_rag_critical",
+      "input": "EC7拖车最大承重多少",
+      "latency_s": 4.39,
+      "usage": {
+        "prompt_tokens": 4220,
+        "completion_tokens": 51,
+        "total_tokens": 4271
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_004",
+      "category": "ret_rag_critical",
+      "input": "ET9线控转向故障怎么处理",
+      "latency_s": 11.17,
+      "usage": {
+        "prompt_tokens": 5645,
+        "completion_tokens": 283,
+        "total_tokens": 5928
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_005",
+      "category": "ret_rag_critical",
+      "input": "EC7 150kWh电池是什么类型的？多重？",
+      "latency_s": 5.53,
+      "usage": {
+        "prompt_tokens": 5289,
+        "completion_tokens": 57,
+        "total_tokens": 5346
+      },
+      "metrics": {},
+      "detail": {}
+    }
+  ]
+}

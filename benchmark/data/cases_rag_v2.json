@@ -1,0 +1,3302 @@
+{
+  "version": "2.0",
+  "description": "RAG-critical benchmark cases — 扩充版。原始25个spec参数类题目 + 58个新增题目（操作流程、功能行为、安全限制、跨车型对比、故障处理、配置约束）。所有答案来自NIO用户手册原文。",
+  "cases": [
+    {
+      "id": "ans_rag_critical_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "EC7各电池版本的精确整备质量因轮圈不同而差异细微，GPT-4o无法知道75kWh+20寸轮圈与21寸轮圈之间的具体差值",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的75kWh版本，选20寸轮圈和21寸轮圈，整备质量分别是多少千克？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7 75kWh（类型B）版本：选配20寸轮圈时整备质量为2399kg，选配21寸轮圈时整备质量为2420kg，两者相差21kg。（注：75kWh类型A版本仅提供21寸，整备质量为2420kg；75kWh类型B版本20寸整备质量为2399kg，21寸为2420kg。）",
+        "key_facts": [
+          "2399kg",
+          "2420kg",
+          "75kWh",
+          "20寸",
+          "21寸"
+        ],
+        "forbidden_content": [
+          "2350kg",
+          "2380kg",
+          "2400kg",
+          "2410kg",
+          "约2.4吨"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "EC7 150kWh超长续航版本的精确CLTC续航里程，以及对应能耗，GPT-4o不熟悉150kWh换电版的具体参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的150kWh超长续航版，CLTC工况下能跑多少公里？百公里能耗是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册规格参数，EC7 150kWh版本配备255/50 R20轮胎（滚阻6.0）时，CLTC工况续航里程为940km，百公里能耗为175Wh/km。整备质量为2448kg（20寸轮圈）。",
+        "key_facts": [
+          "940km",
+          "175Wh/km",
+          "150kWh",
+          "2448kg"
+        ],
+        "forbidden_content": [
+          "1000km",
+          "850km",
+          "900km",
+          "160Wh/km",
+          "180Wh/km"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET9整车尺寸及4座设定，GPT-4o可能混淆ET9与ES8的座位数或尺寸，且ET9轴距3250mm是非常具体的数字",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的车身长宽高和轴距各是多少？它是几座的车？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9整车参数如下：长5325mm、宽2017mm（不含外后视镜）、高1621mm、轴距3250mm。ET9为4座设定（行政旗舰轿车），前轮距1731mm，后轮距1758mm，离地间隙200mm，最高车速220km/h。",
+        "key_facts": [
+          "5325mm",
+          "2017mm",
+          "1621mm",
+          "3250mm",
+          "4座",
+          "220km/h"
+        ],
+        "forbidden_content": [
+          "5座",
+          "3060mm",
+          "3100mm",
+          "5100mm",
+          "5200mm",
+          "200km/h"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET9电池包精确参数：102kWh三元锂，电池包尺寸2062x1500x124.8mm，重量545kg，单体数量204个，GPT-4o不会知道这些内部参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的高压动力电池参数是什么？电池包重多少千克？里面有多少个单体电芯？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9配备102kWh三元锂离子电池，单体额定电压3.74V，单体额定容量132Ah。电池包系统额定电压763V，额定容量134.1Ah。电池包长×宽×高为2062×1500×124.8mm，包含204个单体电芯，电池包重量545kg。",
+        "key_facts": [
+          "102kWh",
+          "三元锂离子电池",
+          "204个",
+          "545kg",
+          "2062x1500x124.8mm",
+          "763V"
+        ],
+        "forbidden_content": [
+          "磷酸铁锂",
+          "150kWh",
+          "100kWh",
+          "192个",
+          "384个",
+          "500kg",
+          "600kg"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET9车载冰箱温度范围及智能模式数量，这是ET9独有的精细配置，GPT-4o不会知道具体温度范围和模式名称",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的车载冰箱温度可以调到多少度？有哪些智能预设模式？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9车载冰箱温度调节范围为-2℃至55℃。冰箱提供6种智能模式：冰镇模式、果蔬模式、香槟模式、红酒模式、常温模式和暖饮模式。此外还支持离车冰箱保持开启功能，车辆续航高于20km时冰箱将在离车后持续工作。",
+        "key_facts": [
+          "-2~55℃",
+          "6种智能模式",
+          "冰镇模式",
+          "香槟模式",
+          "红酒模式",
+          "20km"
+        ],
+        "forbidden_content": [
+          "-10℃",
+          "-5℃",
+          "4种模式",
+          "5种模式",
+          "0℃"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET5T与ET5在整备质量上的差异，两车底盘相同但ET5T为旅行版，质量更重，GPT-4o容易混淆两者具体重量",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5和ET5T在75kWh配置下，整备质量分别是多少？两者相差多少千克？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册质量参数：ET5 75kWh版本（19寸轮圈）整备质量为2165kg；ET5T 75kWh版本（19寸轮圈）整备质量为2205kg。两者相差40kg，ET5T因旅行版车身（行李架等）更重。两车满载质量分别为：ET5为2690kg，ET5T为2730kg。",
+        "key_facts": [
+          "2165kg",
+          "2205kg",
+          "40kg",
+          "ET5T",
+          "ET5",
+          "75kWh"
+        ],
+        "forbidden_content": [
+          "2100kg",
+          "2200kg",
+          "2250kg",
+          "20kg",
+          "30kg",
+          "50kg"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_007",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ES8的前备箱容积（230L）和最大承载质量（50kg），与其他车型不同，GPT-4o不会知道这个精确数字",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8的前备箱容积是多少升？最多能放多重的东西？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES8前备箱储物容积为230L，前备箱最大承载质量为50kg，超载可能导致结构变形或部件损坏。后备箱（含隐藏式储物格）最大容积为547L，后备箱最大承载重量为75kg。",
+        "key_facts": [
+          "230L",
+          "50kg",
+          "547L",
+          "75kg"
+        ],
+        "forbidden_content": [
+          "100L",
+          "150L",
+          "200L",
+          "30kg",
+          "75kg（前备箱）",
+          "300L"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_008",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET9前备箱容积105L，最大承载30kg，与ES8前备箱不同，且ET9前备箱更小，GPT-4o可能错误回答",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的前备箱能放多少东西？最大承载重量是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9前备箱储物容积为105L，前备箱最大承载质量为30kg，超载可能导致结构变形或部件损坏。ET9后备箱（含隐藏式储物格）容积为544L，后备箱最大承载重量为75kg。",
+        "key_facts": [
+          "105L",
+          "30kg",
+          "544L"
+        ],
+        "forbidden_content": [
+          "230L",
+          "50kg",
+          "100L",
+          "150L",
+          "60kg",
+          "75kg（前备箱）"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_009",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ES6与EC6的后备箱容积对比：ES6为542L（座椅竖立）/1430L（放倒），EC6为505L/1402L，两者相差明显，GPT-4o会混淆",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6和EC6的后备箱容积分别是多少？后排座椅放倒后最大容积是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册储物参数：ES6后备箱储物容积542L（含隐藏式储物格631L），后排座椅放倒后最大1430L；EC6后备箱储物容积505L（含隐藏式储物格594L），后排座椅放倒后最大1402L。ES6（SUV）比EC6（轿跑SUV）后备箱更大，两者标准容积相差37L。",
+        "key_facts": [
+          "542L",
+          "1430L",
+          "505L",
+          "1402L",
+          "ES6",
+          "EC6"
+        ],
+        "forbidden_content": [
+          "600L",
+          "500L",
+          "1500L",
+          "1200L",
+          "相同",
+          "1450L"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_010",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET7 150kWh版本的CLTC续航（1050km）和精确的能耗（163Wh/km），以及轮胎型号（245/45 R20普利司通），GPT-4o不会知道这种精细数据",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7的150kWh超长续航版，CLTC工况续航能跑多少公里？能耗是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册动力性参数，ET7 150kWh版本配备245/45 R20（普利司通，轮胎滚阻5.4）轮胎时，CLTC工况续航里程为1050km，百公里能耗为163Wh/km。ET7 150kWh版本整备质量（20寸轮圈）为2434kg，最高车速200km/h。",
+        "key_facts": [
+          "1050km",
+          "163Wh/km",
+          "150kWh",
+          "ET7"
+        ],
+        "forbidden_content": [
+          "1200km",
+          "900km",
+          "1000km",
+          "180Wh/km",
+          "150Wh/km"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_011",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "EC7的电机参数：前永磁同步（180kW峰值/350N·m）+后异步（300kW峰值/500N·m），型号TZ180S001/YS300S002，GPT-4o不会知道型号",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的前后电机类型和峰值参数是什么？前后驱动电机型号分别是什么？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册电机参数，EC7采用前永磁同步+后异步的双电机布局：前电机为交流永磁同步电机，型号TZ180S001，峰值功率180kW，峰值转矩350N·m；后电机为交流异步电机，型号YS300S002，峰值功率300kW，峰值转矩500N·m。系统总峰值功率480kW。",
+        "key_facts": [
+          "TZ180S001",
+          "YS300S002",
+          "180kW",
+          "300kW",
+          "350N·m",
+          "500N·m",
+          "前永磁同步",
+          "后异步"
+        ],
+        "forbidden_content": [
+          "前异步后永磁",
+          "250kW",
+          "200kW",
+          "400N·m",
+          "TZ300",
+          "YS180"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_012",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET9线控转向故障分级处理，具体时间（20小时/10分钟）和限速（80/10km/h）是独特的技术细节，GPT-4o不会知道",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的线控转向系统出现故障时会怎么处理？系统会如何限速？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9线控转向故障分三级处理：①转向能力正常但亮黄色故障灯：系统将在故障发生后20小时自动限速至80km/h；②转向能力部分失效亮红色警告灯：系统立即限速至80km/h，并在10分钟后进一步降至10km/h；③转向能力完全失效：系统自动介入减速，直接限速至10km/h。三种情况均需立即停车并联系蔚来服务中心。",
+        "key_facts": [
+          "20小时",
+          "80km/h",
+          "10分钟",
+          "10km/h",
+          "三级",
+          "线控转向"
+        ],
+        "forbidden_content": [
+          "5小时",
+          "60km/h",
+          "30分钟",
+          "20km/h",
+          "立即限速"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_013",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET5T拖挂能力（最大牵引质量1400kg），而ES6/EC6仅为1200kg，对比数字是RAG才能得到的精确信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5T能不能拖车？最大牵引质量是多少？和ES6相比谁的拖车能力更强？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET5T支持外挂拖车，配备ECE R55标准球形联轴器（球头直径50mm）电动拖钩，最大牵引质量为1400kg，电动拖钩最大垂直承载质量为75kg。ES6的最大牵引质量为1200kg。因此ET5T的拖车能力更强，比ES6多200kg。拖挂时需持C6驾驶证，车辆总质量不超过4500kg，胎压保持在2.9bar。",
+        "key_facts": [
+          "1400kg",
+          "1200kg",
+          "ET5T",
+          "ES6",
+          "ECE R55",
+          "75kg",
+          "C6驾驶证"
+        ],
+        "forbidden_content": [
+          "相同",
+          "1500kg",
+          "1000kg",
+          "2000kg",
+          "不支持拖车"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_014",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ES8唯一电池版本102kWh（三元锂）的CLTC续航因轮胎不同有显著差异：265/45 R21为635km，265/40 R22仅412km，GPT-4o可能只知道635km",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8选22寸轮毂和21寸轮毂，CLTC续航里程分别是多少？差距大吗？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册动力性参数，ES8（102kWh）配备265/45 R21轮胎时CLTC续航为635km；配备265/40 R22轮胎时CLTC续航仅为412km，两者相差223km，差距非常显著。ES8仅有102kWh一种电池版本，百公里能耗在21寸时为166Wh/km。整备质量2630kg，满载质量3250kg，最高车速220km/h。",
+        "key_facts": [
+          "635km",
+          "412km",
+          "223km",
+          "265/45 R21",
+          "265/40 R22",
+          "102kWh"
+        ],
+        "forbidden_content": [
+          "580km",
+          "450km",
+          "100kWh",
+          "75kWh",
+          "差距不大",
+          "600km"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_015",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "EC7后备箱容积对比：标准442L、含隐藏储物格532L、后排放倒1449L；且EC7的EC7后备箱最大承载75kg这是精确信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7后备箱能放多少东西？后排座椅放倒后最大有多少升？后备箱最大承载重量是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7后备箱储物容积为442L，含隐藏式储物格后为532L，后排座椅完全放倒后最大储物容积达1449L。后备箱最大承载重量为75千克，超载可能造成后备箱损坏。载荷固定扣环最大承重为300kg。",
+        "key_facts": [
+          "442L",
+          "532L",
+          "1449L",
+          "75千克",
+          "EC7"
+        ],
+        "forbidden_content": [
+          "500L",
+          "600L",
+          "1500L",
+          "1200L",
+          "100kg",
+          "50kg"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_016",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET9的整备质量2700kg及满载质量3100kg，相比ES8（2630/3250）和ET7（2349/2900）有独特差异，车辆型号NAL7003BSEVD1也是RAG特有信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的整备质量和满载质量分别是多少千克？和ES8相比哪个更重？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册质量参数，ET9整备质量为2700kg，满载质量为3100kg，车辆型号为NAL7003BSEVD1。ES8整备质量为2630kg，满载质量为3250kg。ET9整备质量更重（重70kg），但ES8满载质量更高（多150kg），因为ES8是6/7座SUV，载员更多。ET9离地间隙200mm也高于ES8的165mm。",
+        "key_facts": [
+          "2700kg",
+          "3100kg",
+          "ET9",
+          "2630kg",
+          "3250kg",
+          "ES8",
+          "NAL7003BSEVD1"
+        ],
+        "forbidden_content": [
+          "2500kg",
+          "2800kg",
+          "3000kg",
+          "相同",
+          "ET9更轻"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_017",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "EC7用R1234yf（四氟丙烯）1000g；ES6同时支持R-1234yf和R-134a两种制冷剂（用量1000±20g），需核对车辆标签确认具体型号，切勿混用。EC7与ES6制冷剂不完全相同。",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7和ES6的空调制冷剂型号一样吗？分别用的是什么型号的制冷剂？",
+      "answer_gt": {
+        "ground_truth": "两车制冷剂不同。EC7使用R1234yf（四氟丙烯），用量为1000g。ES6同时支持两种制冷剂：R-1234yf（四氟丙烯）和R-134a（四氟乙烷），用量均为1000±20g；具体型号需核对车辆空调制冷剂标签，切勿混用不同型号制冷剂。",
+        "key_facts": [
+          "R1234yf",
+          "R-134a",
+          "EC7",
+          "ES6",
+          "1000g",
+          "两种"
+        ],
+        "forbidden_content": [
+          "相同",
+          "都用R-134a",
+          "都用R1234yf",
+          "R410a",
+          "R32"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_018",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET7的车身尺寸和离地间隙（128mm），比EC7（162mm）低很多，且ET7接近角在整备和满载状态下不同，GPT-4o不会知道这些精确差异",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7的车身尺寸是多少？它的离地间隙和EC7相比哪个更低？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7整车参数：长5101mm、宽1987mm（不含外后视镜）、高1509mm、轴距3060mm，离地间隙128mm。EC7离地间隙为162mm。ET7离地间隙比EC7低34mm，EC7更适合通过性要求高的场景。ET7接近角在整备状态为14°（满载13°），离去角整备17°（满载16°）。",
+        "key_facts": [
+          "5101mm",
+          "1987mm",
+          "1509mm",
+          "3060mm",
+          "128mm",
+          "162mm",
+          "ET7更低"
+        ],
+        "forbidden_content": [
+          "135mm",
+          "150mm",
+          "相同",
+          "ET7更高",
+          "3100mm",
+          "5000mm"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_019",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "EC7的75kWh电池分类型A（三元锂离子电池）和类型B（三元锂离子/磷酸铁锂混合电池）两种化学体系；两者CLTC续航不完全相同：类型A仅有R21轮胎选项（455km），类型B有R20（490km）和R21（455km）两种轮胎，最高可达490km。",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的75kWh电池分几种类型？化学体系有什么区别？CLTC续航一样吗？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7的75kWh电池分两种类型，化学体系不同：75kWh类型A为三元锂离子电池；75kWh类型B为三元锂离子/磷酸铁锂混合电池，单体额定电压3.73/3.2V。续航方面，两者在相同轮胎（265/45 R21，滚阻7.4）下续航相同均为455km；但类型B额外提供255/50 R20（滚阻6.0）轮胎选项，续航可达490km，而类型A没有该选项。",
+        "key_facts": [
+          "类型A",
+          "类型B",
+          "三元锂离子",
+          "三元锂离子/磷酸铁锂",
+          "455km",
+          "490km",
+          "75kWh"
+        ],
+        "forbidden_content": [
+          "只有一种",
+          "全部三元锂",
+          "全部磷酸铁锂",
+          "续航完全相同",
+          "500km",
+          "520km"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_020",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_rag_critical",
+      "notes": "ET5T与ET5后备箱容积对比：ET5T（旅行版）后备箱更大（450L vs 386L），放倒后1300L vs 1135L，这是典型的跨型号对比RAG题",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5T旅行版的后备箱比ET5标准版大多少？两者后排座椅放倒后分别有多少升？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册储物参数，ET5T后备箱储物容积为450L（含隐藏储物格492L），后排座椅放倒后最大1300L；ET5后备箱储物容积为386L（含隐藏储物格394L），后排座椅放倒后最大1135L。ET5T比ET5标准后备箱大64L，放倒后多165L。两车后备箱最大承载重量均为75kg。",
+        "key_facts": [
+          "450L",
+          "386L",
+          "1300L",
+          "1135L",
+          "64L",
+          "165L",
+          "ET5T",
+          "ET5"
+        ],
+        "forbidden_content": [
+          "相同",
+          "ET5T小",
+          "1400L",
+          "1500L",
+          "500L",
+          "400L"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ret_rag_critical_001",
+      "layer_targets": [
+        "retrieval"
+      ],
+      "category": "ret_rag_critical",
+      "notes": "检索ET9电池包物理参数，需要找到电池包系统尺寸和重量",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9电池包重量和尺寸",
+      "retrieval_gt": {
+        "query_intent": "ET9高压动力电池包系统物理参数：重量、长宽高尺寸、单体数量",
+        "expected_facts": [
+          "ET9",
+          "102kWh",
+          "545kg",
+          "2062x1500x124.8mm",
+          "204个单体",
+          "三元锂离子电池"
+        ],
+        "eval_at_k": [
+          5
+        ]
+      }
+    },
+    {
+      "id": "ret_rag_critical_002",
+      "layer_targets": [
+        "retrieval"
+      ],
+      "category": "ret_rag_critical",
+      "notes": "检索ES8与21寸/22寸轮胎的续航差异，需要找到动力性参数表",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8 22寸轮毂续航多少",
+      "retrieval_gt": {
+        "query_intent": "ES8配备22寸轮胎（265/40 R22）时的CLTC工况续航里程",
+        "expected_facts": [
+          "ES8",
+          "265/40 R22",
+          "412km",
+          "102kWh",
+          "动力性参数"
+        ],
+        "eval_at_k": [
+          5
+        ]
+      }
+    },
+    {
+      "id": "ret_rag_critical_003",
+      "layer_targets": [
+        "retrieval"
+      ],
+      "category": "ret_rag_critical",
+      "notes": "检索EC7拖车能力和拖钩规格，需要找到储物与装载章节中的外挂拖车内容",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7拖车最大承重多少",
+      "retrieval_gt": {
+        "query_intent": "EC7外挂拖车最大牵引质量及电动拖钩承载规格",
+        "expected_facts": [
+          "EC7",
+          "2000kg",
+          "最大牵引质量",
+          "电动拖钩",
+          "100kg",
+          "ECE R55"
+        ],
+        "eval_at_k": [
+          5
+        ]
+      }
+    },
+    {
+      "id": "ret_rag_critical_004",
+      "layer_targets": [
+        "retrieval"
+      ],
+      "category": "ret_rag_critical",
+      "notes": "检索ET9线控转向故障分级限速机制，需要精确找到三种故障场景的具体处置时间",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9线控转向故障怎么处理",
+      "retrieval_gt": {
+        "query_intent": "ET9线控转向系统故障的分级应对方案，包括限速时间和车速限制数值",
+        "expected_facts": [
+          "ET9",
+          "线控转向",
+          "20小时",
+          "80km/h",
+          "10分钟",
+          "10km/h",
+          "三级故障"
+        ],
+        "eval_at_k": [
+          5
+        ]
+      }
+    },
+    {
+      "id": "ret_rag_critical_005",
+      "layer_targets": [
+        "retrieval"
+      ],
+      "category": "ret_rag_critical",
+      "notes": "检索EC7 150kWh电池的化学类型和电池包规格，需要找到高压动力电池参数表",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7 150kWh电池是什么类型的？多重？",
+      "retrieval_gt": {
+        "query_intent": "EC7 150kWh高压动力电池化学类型、电池包重量及单体数量",
+        "expected_facts": [
+          "EC7",
+          "150kWh",
+          "三元锂离子电池",
+          "575kg",
+          "384个单体",
+          "高压动力电池参数"
+        ],
+        "eval_at_k": [
+          5
+        ]
+      }
+    },
+    {
+      "id": "ans_proc_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_proc",
+      "notes": "EC6电动尾翼自动模式下的精确车速阈值（60/130/10 km/h）是NIO专有参数，GPT-4o无法知道具体切换速度",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6的电动尾翼自动模式下，各个挡位在什么车速时切换？怎么在中控屏上设置？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC6电动尾翼可在中控屏下方控制栏进入设置页面，点击驾驶>电动尾翼进行调节。自动模式下：车速上升时，当车速超过60公里/小时，尾翼自动切换到减阻挡；当车速超过130公里/小时，尾翼自动切换到极速挡。车速下降时，当车速降至130公里/小时，尾翼自动切换到减阻挡；当车速降至10公里/小时，尾翼自动收回。",
+        "key_facts": [
+          "中控屏下方控制栏进入设置页面，点击驾驶>电动尾翼",
+          "车速超过60公里/小时切换到减阻挡",
+          "车速超过130公里/小时切换到极速挡",
+          "车速降至10公里/小时尾翼自动收回"
+        ],
+        "forbidden_content": [
+          "车速超过80公里/小时切换到减阻挡",
+          "车速超过120公里/小时切换到极速挡",
+          "车速超过170公里/小时切换到极速挡"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_proc_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_proc",
+      "notes": "EC7矩阵远光控制的精确操作路径（灯光>外部灯光>大灯和矩阵远光控制）以及灯光拨杆的具体操作方式是NIO专有UI路径",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的矩阵远光控制功能怎么开启？开启后怎么用灯光拨杆手动退出？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7矩阵远光控制的开启路径为：在中控屏下方控制栏进入设置页面，点击灯光>外部灯光>大灯，选择开启自动车灯；再点击灯光>外部灯光>矩阵远光控制，打开功能开关。打开开关后，每次车辆启动时若近光灯自动点亮，则默认进入矩阵远光控制功能。向前推动灯光拨杆并保持超过1秒，将手动退出矩阵远光控制功能，车辆进入近光照明状态。退出后，向前轻推一次灯光拨杆，可再次进入该功能。",
+        "key_facts": [
+          "灯光>外部灯光>大灯，选择开启自动车灯",
+          "灯光>外部灯光>矩阵远光控制，打开开关",
+          "向前推动灯光拨杆并保持超过1秒退出",
+          "退出后向前轻推一次可再次进入"
+        ],
+        "forbidden_content": [
+          "长按方向盘按键退出",
+          "在仪表屏上设置",
+          "灯光>矩阵远光直接打开"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_proc_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_proc",
+      "notes": "ET9悬架调节的具体挡位数值（最高抬升约40毫米、最低降低约50毫米）和限速值（35km/h、5km/h）是ET9专有参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的悬架高度有几个挡位？最高和最低挡分别比标准挡高低多少毫米？各有什么速度限制？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9悬架高度有4个挡位：标准（常规行驶挡位，舒适等驾驶模式下默认选择）、低（常规行驶挡位，运动等驾驶模式下默认选择）、最高（非常规行驶挡位，悬架高度较标准挡位抬升约40毫米，限速35公里/小时）、最低（非常规行驶挡位，悬架高度较标准挡位降低约50毫米，当车速超过5公里/小时将自动退出）。激活非常规行驶挡位后，可长按方向盘右侧中键快速退出当前悬架高度设置。",
+        "key_facts": [
+          "4个挡位：标准、低、最高、最低",
+          "最高挡抬升约40毫米，限速35公里/小时",
+          "最低挡降低约50毫米，车速超过5公里/小时自动退出",
+          "长按方向盘右侧中键快速退出非常规挡位"
+        ],
+        "forbidden_content": [
+          "抬升约30毫米",
+          "降低约40毫米",
+          "限速40公里/小时",
+          "限速20公里/小时"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_proc_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_proc",
+      "notes": "ET9应急解锁充电枪的3步具体操作顺序是NIO专有应急流程，GPT-4o不可能知道后备箱拉索解锁充电枪的具体步骤",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9充电完成后充电枪拔不出来怎么办？有几种应急解锁方法？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9全车解锁后仍无法拔出充电枪时，请按以下步骤依次尝试：1. 点击中控屏电池页面及蔚来APP再次停止充放电以解锁充电枪。2. 重新插紧充电枪确保充电枪解锁按钮弹起，再按住充电枪解锁按钮等待1到2秒钟后再尝试将充电枪拔下。3. 使用充电底座紧急解锁拉索解锁充电枪：打开后备箱对应盖板，拉动充电底座紧急解锁拉索，然后尝试拔下充电枪。如仍无法拔下充电枪，请立即停止充电并联系蔚来汽车服务中心。",
+        "key_facts": [
+          "3种方法依次尝试",
+          "中控屏电池页面或蔚来APP停止充放电",
+          "重新插紧充电枪后按住解锁按钮等待1到2秒",
+          "后备箱对应盖板内拉动充电底座紧急解锁拉索"
+        ],
+        "forbidden_content": [
+          "从车底拉应急拉索",
+          "长按充电口旁边的按钮5秒",
+          "在前备箱内找到解锁拉索"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_proc_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_proc",
+      "notes": "EC6遮光天幕的具体挡位设计（0-3挡）、操作路径、自动/手动模式是NIO专有设计细节",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6的遮光天幕怎么调节？有几个挡位？哪个挡位最亮哪个最暗？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC6遮光天幕通过改变天窗玻璃的遮光度来控制太阳光和辐射能量。天窗玻璃的遮光度分为4挡，其中0挡最亮、3挡最暗。操作路径为：在中控屏下方控制栏进入设置页面，点击常用>遮光天幕或者门窗锁>车窗>遮光天幕，开启自动或手动遮光控制。此外还可以通过中控屏的快捷界面或NOMI快速调节。自动模式下天窗玻璃将根据周围环境自动调节至适宜的遮光度；手动模式下可根据用车场景分挡位自由调节。",
+        "key_facts": [
+          "4挡，0挡最亮、3挡最暗",
+          "常用>遮光天幕或者门窗锁>车窗>遮光天幕",
+          "支持自动和手动两种控制模式",
+          "可通过NOMI快速调节"
+        ],
+        "forbidden_content": [
+          "5个挡位",
+          "1挡最亮4挡最暗",
+          "只能手动调节",
+          "通过方向盘按键调节"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_proc_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_proc",
+      "notes": "ET9弹跳脱困功能的操作路径、限速15km/h、运行1分钟自动退出等是ET9独有功能参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9陷车后怎么用弹跳脱困功能？有什么限制条件？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9弹跳脱困功能可在车辆陷车时使用。操作路径为：在中控屏下方控制栏进入设置页面，点击驾驶>弹跳脱困，开启或关闭该功能。功能开启后，车辆将通过悬架的上下交替运动产生垂直振动，从而增加车轮的附着力以帮助脱困。限速15公里/小时，且功能运行1分钟后将自动退出。",
+        "key_facts": [
+          "驾驶>弹跳脱困开启",
+          "通过悬架上下交替运动产生垂直振动",
+          "限速15公里/小时",
+          "运行1分钟后自动退出"
+        ],
+        "forbidden_content": [
+          "限速10公里/小时",
+          "运行30秒后自动退出",
+          "需要手动关闭"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_es6_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_es6",
+      "notes": "ES6拖挂能力的具体参数（最大牵引质量1200kg、拖钩承载75kg、拖挂胎压2.9bar）是ES6手册专有参数，GPT-4o无法得知准确数值",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6能拖挂拖车吗？最大能拖多重的车？拖挂时轮胎气压要调到多少？有什么驾照要求？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES6支持拖挂拖车。爱车电动拖钩的标准为ECE R55的球形联轴器，球头直径50mm。R19和R20轮胎的最大牵引质量为1200千克，电动拖钩最大承载质量为75千克。电动拖钩承载质量不得小于拖车总质量的4%。拖挂时车辆胎压要保持在2.9bar，允许的最大上坡坡度为12%（坡角约为7°）。驾驶员应持有C6驾驶证，且驾驶车辆的总质量（包含拖车质量）应小于4500kg。",
+        "key_facts": [
+          "最大牵引质量1200千克",
+          "电动拖钩最大承载质量75千克",
+          "拖挂胎压保持在2.9bar",
+          "驾驶员需持有C6驾驶证",
+          "驾驶车辆总质量应小于4500kg"
+        ],
+        "forbidden_content": [
+          "最大牵引质量2000千克",
+          "最大牵引质量1500千克",
+          "胎压2.5bar",
+          "C1驾照即可"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_es6_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_es6",
+      "notes": "ES6自动紧急制动对不同目标的精确工作速度范围（前向4-150/后向0-30、通用障碍物前向1-150/后向2-10）是NIO专有参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6的自动紧急制动（AEB）功能在什么车速范围内工作？前向和后向有什么区别？对行人和对障碍物的工作范围一样吗？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES6自动紧急制动功能分为前向和后向两种，功能默认开启。对于行人、骑行人和车辆：前向自动紧急制动工作的速度范围约4-150公里/小时，后向自动紧急制动工作的速度范围约0-30公里/小时。对于部分通用障碍物（如侧翻车辆、锥桶、交通警示物体）：前向自动紧急制动工作的速度范围约1-150公里/小时，后向自动紧急制动工作的速度范围约2-10公里/小时。前向自动紧急制动仅支持单次关闭，重新上电后会自动开启；后向自动紧急制动支持永久关闭，开关状态随账号记忆。",
+        "key_facts": [
+          "前向AEB对行人/骑行人/车辆速度范围约4-150公里/小时",
+          "后向AEB对行人/骑行人/车辆速度范围约0-30公里/小时",
+          "前向AEB对通用障碍物速度范围约1-150公里/小时",
+          "后向AEB对通用障碍物速度范围约2-10公里/小时",
+          "前向仅支持单次关闭，后向支持永久关闭"
+        ],
+        "forbidden_content": [
+          "前向AEB速度范围0-120公里/小时",
+          "后向AEB速度范围0-50公里/小时",
+          "对所有目标工作范围相同"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_es6_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_es6",
+      "notes": "ES6高速爆胎安全控制的精确工作条件（直线130km/h、弯道80km/h、侧向加速度0.5g）是ES6专有安全参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6在高速行驶中爆胎了车辆会怎么处理？这个功能有什么速度限制条件？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES6配备高速爆胎安全控制功能。当车辆高速行驶爆胎时，系统将迅速对车辆姿态变化做出反应，减小爆胎之后车辆产生的横摆以及可能的转向过度，尽可能让驾驶员控制住车辆来保证安全。功能工作条件：车辆直线行驶时最高时速不超过130km/h；车辆弯道行驶时最高不超过80km/h，侧向加速度低于0.5g；车辆各组件正常工作。触发时危险警告灯主动亮起，驾驶员应扶稳方向盘注意安全靠边停车。爆胎后请握紧方向盘，切勿猛打方向。",
+        "key_facts": [
+          "直线行驶最高时速不超过130km/h",
+          "弯道行驶最高不超过80km/h",
+          "侧向加速度低于0.5g",
+          "触发时危险警告灯主动亮起",
+          "减小横摆和转向过度"
+        ],
+        "forbidden_content": [
+          "直线最高时速120km/h",
+          "弯道最高60km/h",
+          "系统会自动刹停车辆",
+          "侧向加速度低于1g"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_es6_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_es6",
+      "notes": "ES6各驾驶模式的具体百公里加速时间（舒适7.9s、节能9.9s、运动5.9s、运动+4.5s）以及悬架和能量回收设定是ES6专有参数组合",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6有几种驾驶模式？运动+和节能模式的百公里加速分别是多少？不同模式的悬架软硬和能量回收等级有什么区别？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES6共有舒适、后排尊享、节能、运动、运动+、个性化六种基础驾驶模式。运动+模式百公里加速4.5秒，是动力最强的模式；节能模式百公里加速9.9秒，常规状态下由单电机驱动。各模式的悬架软硬设定为：舒适较软、后排尊享超软、节能较软、运动标准、运动+较硬。能量回收等级为：舒适低、后排尊享极低、节能标准、运动低、运动+低。个性化模式下所有设置项均支持自定义。",
+        "key_facts": [
+          "六种基础驾驶模式",
+          "运动+百公里加速4.5秒",
+          "节能百公里加速9.9秒",
+          "后排尊享悬架超软、能量回收极低",
+          "节能模式常规由单电机驱动"
+        ],
+        "forbidden_content": [
+          "运动+百公里加速3.8秒",
+          "五种驾驶模式",
+          "节能百公里加速8秒",
+          "运动+悬架超硬"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_es6_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_es6",
+      "notes": "ES6自动紧急避让的精确触发车速（80-150km/h）、车道宽度要求（>2.5m）及前后连环追尾场景的60km/h特殊阈值是ES6专有ADAS参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6有自动紧急避让功能吗？在什么车速下才能工作？对车道有什么要求？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES6配备自动紧急避让功能，默认关闭，需在中控屏辅助驾驶>安全守护>自动紧急避让Beta中开启。功能正常激活条件为：自车时速需满足80-150公里/小时；响应的目标对象为符合条件的行人、骑行人和车辆；车道宽度要大于2.5米且车道线清晰连续，具备可安全变道的相邻同向车道，且当前车道无实线限制。当系统判断仅靠刹车无法避免碰撞且相邻车道具备安全变道条件时，车辆将向相邻车道紧急转向。前后连环追尾场景下，自车时速不低于60公里/小时即可激活。触发时系统会同步鸣笛警示、亮起危险警告灯，同时施加小幅制动。",
+        "key_facts": [
+          "默认关闭需手动开启",
+          "自车时速需满足80-150公里/小时",
+          "车道宽度要大于2.5米且车道线清晰连续",
+          "前后连环追尾场景自车时速不低于60公里/小时即可",
+          "触发时鸣笛警示并亮起危险警告灯"
+        ],
+        "forbidden_content": [
+          "默认开启",
+          "车速60-120公里/小时工作",
+          "车道宽度大于3米",
+          "任何速度都可以工作"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_es6_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_es6",
+      "notes": "ES6充电枪拔不出来的具体应急步骤（重新插紧→全车上锁解锁→按住解锁按钮1-2秒等绿灯）是ES6专有流程，与ET7/ET9的步骤有所不同",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6充电完成后充电枪拔不出来应该怎么处理？具体操作步骤是什么？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ES6全车解锁后无法拔出充电枪时，请按如下步骤尝试：1. 重新插紧充电枪确保充电枪解锁按钮弹起。2. 重新进行全车上锁及解锁。3. 再按住充电枪解锁按钮等待1到2秒钟，待充电口指示灯变成绿色常亮后再将充电枪拔下。4. 如仍无法拔下充电枪，请立即停止充电并联系蔚来汽车服务中心。",
+        "key_facts": [
+          "重新插紧充电枪确保解锁按钮弹起",
+          "重新进行全车上锁及解锁",
+          "按住充电枪解锁按钮等待1到2秒钟",
+          "待充电口指示灯变成绿色常亮后拔下",
+          "如仍无法拔下联系蔚来汽车服务中心"
+        ],
+        "forbidden_content": [
+          "拉动后备箱紧急解锁拉索",
+          "在中控屏点击电池页面停止充电后直接拔",
+          "长按充电口盖按钮5秒"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_et7_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_et7",
+      "notes": "ET7拖挂能力参数（最大牵引质量2000kg、拖钩承载100kg、拖挂胎压2.8bar）与ES6不同，是ET7手册专有数据，GPT-4o无法准确区分",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7能拖挂拖车吗？最大牵引质量是多少？拖挂时轮胎气压和平时有什么不同？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7支持拖挂拖车。爱车电动拖钩标准为ECE R55的球形联轴器，球头直径50mm，电动拖钩设计支撑垂直载荷质量为100kg。R19、R20、R21轮胎的最大牵引质量为2000kg，电动拖钩最大承载质量为100kg。拖挂时车辆胎压要保持在2.8bar，允许的最大上坡坡度为12%（坡角约为7°）。拖挂时后轴承载的额外载荷不超过车辆最大允许总质量下的后轴轴荷的15%，在这些情况下车速不能超过100km/h，且后轮胎压必须至少比正常建议胎压高0.2bar。需在悬架高度为正常模式下完成拖车连接。",
+        "key_facts": [
+          "最大牵引质量2000kg",
+          "电动拖钩最大承载质量100kg",
+          "拖挂时胎压保持在2.8bar",
+          "需在悬架高度为正常模式下完成拖车连接",
+          "拖挂时车速不能超过100km/h"
+        ],
+        "forbidden_content": [
+          "最大牵引质量1200kg",
+          "电动拖钩最大承载质量75kg",
+          "胎压2.9bar",
+          "ET7不支持拖挂"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_et7_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_et7",
+      "notes": "ET7驾驶模式的具体百公里加速时间（运动+3.8s vs ES6的4.5s）和悬架高度/刚度设定是ET7专有参数组合",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7的运动+模式百公里加速需要多少秒？不同驾驶模式下悬架高度和悬架刚度的设定分别是什么？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7运动+模式百公里加速为3.8秒。各驾驶模式下的悬架设定如下：运动+模式悬架高度为低、悬架刚度较硬；运动模式悬架高度标准、刚度标准；舒适模式悬架高度标准、刚度较软；后排尊享模式悬架高度标准、刚度超软；节能模式悬架高度标准、刚度较软。各模式百公里加速分别为：运动+3.8秒、运动5.9秒、舒适7.9秒、后排尊享7.9秒、节能9.9秒。ET7还支持个性化模式，所有参数均可自定义。",
+        "key_facts": [
+          "运动+百公里加速3.8秒",
+          "运动+悬架高度低、刚度较硬",
+          "后排尊享悬架刚度超软",
+          "节能模式悬架高度标准、刚度较软",
+          "共六种驾驶模式含个性化"
+        ],
+        "forbidden_content": [
+          "运动+百公里加速4.5秒",
+          "运动+百公里加速3.2秒",
+          "运动+悬架高度标准",
+          "五种驾驶模式"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_et7_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_et7",
+      "notes": "ET7悬架主动控制包含舒适领航和智能辅助通过两个子功能，智能辅助通过的30km/h触发条件和地理定位记忆功能是ET7专有功能逻辑",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7的悬架主动控制有哪些子功能？智能辅助通过是怎么工作的？怎么触发辅助通过模式？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7悬架主动控制功能默认开启，包含舒适领航和智能辅助通过两个子功能。操作路径为中控屏下方控制栏进入设置页面，点击行车驻车>悬架主动控制。舒适领航功能开启时，车辆将通过采集路况信息，根据前方路面的起伏情况对车身进行提前控制与实时调整，当遇到颠簸路况还会在中控屏上显示颠簸指数（有效范围0-99）和到达该颠簸路况的距离。智能辅助通过功能开启时，系统可以通过记忆您手动进入辅助通过模式时的地理定位，当您再次以30公里/小时以下车速经过此地时，车辆将自动调节悬架至辅助通过的高度。辅助通过模式可通过按压中控台驾驶模式物理按键选择开启，车速超过30公里/小时或驾驶模式改变时将自动退出。",
+        "key_facts": [
+          "包含舒适领航和智能辅助通过两个子功能",
+          "舒适领航显示颠簸指数0-99",
+          "智能辅助通过记忆地理定位",
+          "再次以30公里/小时以下车速经过时自动调节悬架",
+          "辅助通过通过中控台驾驶模式物理按键开启"
+        ],
+        "forbidden_content": [
+          "只有舒适领航一个功能",
+          "50公里/小时以下自动触发",
+          "通过方向盘按键开启辅助通过",
+          "需要在中控屏手动每次选择"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_et7_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_et7",
+      "notes": "ET7紧急车道保持的三种触发场景（右侧路沿偏离、左侧迎面来车、左侧后方快速接近）和具体车速范围65-130km/h是ET7手册专有ADAS行为描述",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7的紧急车道保持功能在哪些场景下会触发？默认是开启的吗？触发时仪表屏会显示什么？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7紧急车道保持(ELK)功能默认关闭，需在中控屏辅助驾驶>安全守护>紧急车道保持中开启。车速处于约65-130公里/小时时，可能在以下三种紧急场景中触发：1. 未打转向灯，爱车向右侧路沿非意图性偏离本车道，此时中央车道线右侧显示为黄色。2. 未打转向灯，左侧车道有迎面来车，爱车向左非意图性偏离本车道，此时中央车道线左侧显示为红色。3. 左侧车道后方有车快速接近，爱车向左非意图性偏离本车道或主动变道，此时中央车道线左侧显示为红色。功能仅能提供一定的转向辅助，无法控制车辆速度。",
+        "key_facts": [
+          "默认关闭需手动开启",
+          "车速65-130公里/小时",
+          "三种场景：右侧路沿偏离、左侧迎面来车、左侧后方快速接近",
+          "右侧偏离时中央车道线右侧显示黄色",
+          "左侧风险时中央车道线左侧显示红色"
+        ],
+        "forbidden_content": [
+          "默认开启",
+          "车速40-120公里/小时",
+          "只有两种触发场景",
+          "触发时仪表屏显示蓝色警示"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_et7_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_et7",
+      "notes": "ET7后排行政屏的独立操控、跨屏交互、蓝牙耳机私享等是ET7独有配置，ES6/EC6不具备此功能",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7后排有行政屏吗？左右两块屏幕可以独立使用吗？支持什么功能？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7在前排座椅后方配备有两块行政屏用于办公或娱乐。左右两块行政屏可以被独立操控，独立运行应用；还可以分别连接蓝牙耳机，实现声音私享。这两块行政屏还支持与中控屏、后排中控屏、AR眼镜及移动设备等跨屏交互、跨屏同播共享、跨端投屏等。可从行政屏下方的控制栏依次进入设置中心、投屏控制、舒适面板（空调/座椅/环境）、音量（调节/静音/模式）、应用（列表/最近使用）和熄屏开关。行政屏车控功能包括：屏幕控制（手动调节屏幕角度或随动座椅位置）、座椅控制（前后排各向调节、一键尊享位置）、后排座椅舒适调节（通风/按摩/加热）、后排空调控制和环境调节（阅读灯/氛围灯/香氛/天幕）。",
+        "key_facts": [
+          "两块行政屏可独立操控、独立运行应用",
+          "可分别连接蓝牙耳机实现声音私享",
+          "支持与中控屏、后排中控屏、AR眼镜跨屏交互",
+          "支持跨屏同播共享和跨端投屏",
+          "包含屏幕控制、座椅控制、空调控制、环境调节等功能"
+        ],
+        "forbidden_content": [
+          "ET7没有行政屏",
+          "两块屏幕只能同步显示",
+          "不支持蓝牙耳机",
+          "只能播放视频不能控制车辆"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_et7_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_et7",
+      "notes": "ES6和ET7的拖挂参数差异（ES6: 1200kg/75kg/2.9bar vs ET7: 2000kg/100kg/2.8bar）是跨车型比较，GPT-4o无法知道准确对比数据",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7和ES6的拖挂能力哪个更强？最大牵引质量分别是多少？拖挂时的胎压要求有什么区别？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET7的拖挂能力明显强于ES6。ET7最大牵引质量为2000kg，电动拖钩最大承载质量为100kg，拖挂时胎压要求为2.8bar。ES6最大牵引质量为1200kg，电动拖钩最大承载质量为75kg，拖挂时胎压要求为2.9bar。两款车都需要C6驾照，驾驶车辆总质量（含拖车）均应小于4500kg，最大上坡坡度均为12%（坡角约7°）。此外，ET7拖挂时需在悬架高度为正常模式下完成拖车连接；若在非正常模式下进入拖挂模式，悬架高度会主动调节至正常模式。",
+        "key_facts": [
+          "ET7最大牵引质量2000kg，ES6为1200kg",
+          "ET7拖钩承载100kg，ES6为75kg",
+          "ET7拖挂胎压2.8bar，ES6为2.9bar",
+          "两车均需C6驾照",
+          "ET7需在悬架正常模式下完成拖车连接"
+        ],
+        "forbidden_content": [
+          "两款车拖挂能力相同",
+          "ES6拖挂能力更强",
+          "ET7最大牵引质量1500kg",
+          "ES6最大牵引质量2000kg"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "蔚来宠物托管模式的具体保护机制（温度异常时车窗下降三指宽度、续航低于10公里自动退出并开窗等）是NIO专有细节，GPT-4o无法准确回答",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "蔚来ET5的宠物托管模式具体有哪些保护措施？如果车辆出问题了怎么办？",
+      "answer_gt": {
+        "ground_truth": "ET5宠物托管模式开启后：空调进入自动模式（车内温度默认22℃，可手动调整），中控屏显示当前车内温度及相关提示；车窗、车外大灯等自动关闭；仪表屏和HUD亮度调至最低，中控屏亮度调至50%；后排门窗儿童锁开启；NOMI语音唤醒、门窗按键等功能被禁用；蔚来App部分远程车控功能被禁用。若车辆发生高压系统、空调系统、车内温度异常时，车辆将降低四门车窗约三指宽度，并通过蔚来App、短信及电话方式通知车主。每隔两小时通过蔚来App消息提示宠物在车内。若续航里程低于60公里且未充电时会消息提示；若续航里程低于10公里时，宠物托管将自动退出且四门车窗将自动开启约三指宽度。",
+        "key_facts": [
+          "空调默认22℃自动模式",
+          "后排门窗儿童锁开启",
+          "异常时四门车窗降低约三指宽度",
+          "通过蔚来App、短信及电话通知",
+          "续航低于10公里自动退出并开窗",
+          "每隔两小时App提醒宠物在车内"
+        ],
+        "forbidden_content": [
+          "空调默认25℃",
+          "车窗全部打开",
+          "续航低于20公里自动退出"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "EC6电动尾翼的减阻挡和极速挡功能区别、频繁操作保护机制（15次/150秒）是NIO专有设计参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6的电动尾翼有几种模式？减阻挡和极速挡有什么区别？有什么保护机制？",
+      "answer_gt": {
+        "ground_truth": "EC6电动尾翼有减阻挡、极速挡、自动和关闭四种模式。减阻挡：尾翼展开至低角度位置，以降低车辆的行驶风阻，提高续航里程。极速挡：尾翼展开至最高角度，以增加车辆行驶中受到的下压力，提高行驶稳定性。自动模式下：车速超过60公里/小时切换到减阻挡，超过130公里/小时切换到极速挡；车速降至130公里/小时切换到减阻挡，降至10公里/小时自动收回。电动尾翼具有频繁操作保护机制，当连续操作15次及以上时，调节功能将暂停，需等待150秒后恢复。还可开启锁车保持尾翼展开功能。进入拖挂模式后，尾翼将保持收回状态。",
+        "key_facts": [
+          "减阻挡降低风阻提高续航",
+          "极速挡增加下压力提高稳定性",
+          "连续操作15次以上暂停调节",
+          "需等待150秒后恢复",
+          "进入拖挂模式尾翼保持收回"
+        ],
+        "forbidden_content": [
+          "连续操作10次暂停",
+          "等待120秒恢复",
+          "减阻挡展开至最高角度"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ET9线控转向的后轮转向机制、故障分级响应（三级故障及对应限速策略）是ET9独有技术，GPT-4o无法准确描述",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的线控转向系统是怎么工作的？如果出现故障怎么处理？",
+      "answer_gt": {
+        "ground_truth": "ET9线控转向技术通过电信号传递转向指令至转向机构，取代了传统的机械连接，实现更精准、更快的响应。该系统集成了后轮转向功能：低速行驶（如泊车、掉头）时，后轮与前轮反向转动，减少转弯半径；中高速行驶时，后轮转向和底盘控制系统结合，提升行驶稳定性。故障分三级：1）转向正常但黄色故障灯亮，提示'转向系统异常，请尽快维修车辆'，20小时后自动限速至80公里/小时；2）转向部分失效，红色警告灯亮，提示'转向系统故障，请立刻靠边停车'，故障后立即限速80公里/小时，10分钟后降至10公里/小时；3）转向完全失效，红色警告灯亮，提示'转向系统失效，请立刻减速停车'，系统自动减速并限速至10公里/小时。",
+        "key_facts": [
+          "电信号取代机械连接",
+          "低速时后轮与前轮反向转动减少转弯半径",
+          "一级故障20小时后限速80公里/小时",
+          "二级故障10分钟后降至10公里/小时",
+          "三级故障系统自动减速限速10公里/小时"
+        ],
+        "forbidden_content": [
+          "线控转向有机械备份连接",
+          "故障后立即锁定方向盘",
+          "所有故障统一限速60公里/小时"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ES8后排娱乐屏的遥控器功能、防晕车模式、防磕碰提醒等是ES8专有配置，GPT-4o无法准确描述",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8的后排娱乐屏有什么功能？遥控器怎么用？有没有安全保护？",
+      "answer_gt": {
+        "ground_truth": "ES8后排娱乐屏支持视频播放、音乐播放、游戏、手机投屏等功能，可通过遥控器、触控屏幕、语音指令控制。遥控器包含触控板（中间滑动移动光标，边缘滑动滚动页面）、返回键、自定义键、开关键（展开/收起屏幕）、主页键和音量键。侧面有屏幕角度调节键。遥控器使用Type-C充电口充电，电量不足时娱乐屏右上角遥控器图标变为红色。安全方面：娱乐屏正面三个方向均设计有防夹功能；可开启二排娱乐屏防磕碰提醒（仅P挡下生效），当系统识别乘客头部距离屏幕过近时触发提醒。还有防晕车模式：开启后非P档时屏幕边缘显示圆点动效，随车辆运动姿态变化，减小感知冲突。锁车后娱乐屏自动收起。",
+        "key_facts": [
+          "支持视频、音乐、游戏、手机投屏",
+          "遥控器有触控板和Type-C充电口",
+          "正面三个方向有防夹功能",
+          "防磕碰提醒仅P挡下生效",
+          "防晕车模式显示圆点动效随车辆运动变化",
+          "锁车后娱乐屏自动收起"
+        ],
+        "forbidden_content": [
+          "遥控器使用红外遥控",
+          "遥控器使用Micro-USB充电",
+          "防磕碰提醒在所有挡位生效"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ET9悬架的弹跳脱困功能和香槟塔模式是ET9天行主动悬架独有功能，GPT-4o无法准确描述",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的天行主动悬架有哪些特殊功能？弹跳脱困是什么？",
+      "answer_gt": {
+        "ground_truth": "ET9天行主动悬架的特殊功能包括：1）弹跳脱困：悬架可以上下作动车身，增强轮胎抓地力，帮助车辆在松软路面（如沙漠、深雪等）中脱困。功能激活后最高时速限制为15公里/小时，运行1分钟后自动退出，切换驾驶模式或打开车门也会退出。2）云台防抖模式：在P挡时主动抑制因车内活动或外部力量引起的车身晃动。3）香槟塔模式：为天行全主动悬架能力展示模式，激活后最高时速限制为18公里/小时。4）舒适领航：采集路况信息提前控制车身，天际屏显示颠簸指数（0-99）。5）智能辅助通过：记忆悬架调节为最高位的位置，再次经过时自动调节。悬架高度挡位包括标准、低、最高（较标准抬升约40毫米，限速35公里/小时）和最低（较标准降低约50毫米，超过5公里/小时自动退出）。",
+        "key_facts": [
+          "弹跳脱困限速15公里/小时运行1分钟后自动退出",
+          "香槟塔模式限速18公里/小时",
+          "最高挡位较标准抬升约40毫米限速35公里/小时",
+          "最低挡位较标准降低约50毫米",
+          "舒适领航显示颠簸指数0-99"
+        ],
+        "forbidden_content": [
+          "弹跳脱困限速20公里/小时",
+          "最高挡位抬升30毫米",
+          "最低挡位降低40毫米"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ET9电动尾翼自动模式的车速阈值（80/10 km/h）与EC6（60/130/10）完全不同，是ET9专有参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的电动尾翼自动模式怎么工作？什么速度展开和收回？",
+      "answer_gt": {
+        "ground_truth": "ET9电动尾翼有展开、自动和关闭三种模式。自动模式下：当车速超过80公里/小时并保持稳定时，尾翼将自动展开；当车速低于10公里/小时并保持稳定时，尾翼将自动收回。电动尾翼具有频繁操作保护机制，连续操作15次及以上时，调节功能将暂停，需等待150秒后恢复。锁车后尾翼将自动收回。",
+        "key_facts": [
+          "自动模式车速超过80公里/小时展开",
+          "车速低于10公里/小时自动收回",
+          "有展开、自动和关闭三种模式",
+          "连续操作15次以上暂停需等150秒"
+        ],
+        "forbidden_content": [
+          "车速超过60公里/小时展开",
+          "车速超过120公里/小时展开",
+          "有减阻挡和极速挡"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_007",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ET9儿童遗留检测的具体行为（续航不足10公里时车窗下降12%、自动开空调等）是ET9专有功能细节",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9有儿童遗留检测功能吗？具体是怎么工作的？",
+      "answer_gt": {
+        "ground_truth": "ET9配备儿童遗留检测功能。当官方推荐的蓝牙儿童座椅与车辆连接后自动激活。锁车后系统自动开启检测：如果检测到车内存在单独遗留在儿童座椅的儿童，将立即触发声音及灯光提醒，并通过蔚来App消息等途径通知车主。若检测到车内温度过高或过低，将自动开启空调保持温度适宜。当车辆剩余续航里程不足10公里时，空调自动关闭，四门自动解锁，全车车窗下降约12%并通过蔚来App通知。该功能需车内摄像头检测识别，数据仅在本地处理并在每次检测后删除。宠物托管或离车不下电模式开启时，儿童遗留检测功能将被临时禁用。",
+        "key_facts": [
+          "需要官方蓝牙儿童座椅连接后自动激活",
+          "检测到温度异常自动开空调",
+          "续航不足10公里时车窗下降约12%",
+          "数据仅本地处理每次检测后删除",
+          "宠物托管模式下该功能被禁用"
+        ],
+        "forbidden_content": [
+          "所有蔚来车型都有儿童遗留检测",
+          "使用超声波传感器检测",
+          "车窗下降50%"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_008",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ES8守卫模式的三级守护（威胁接近/碰撞/盗窃）具体行为和激活条件是NIO专有设计",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8的守卫模式有几级守护？每级具体怎么反应？",
+      "answer_gt": {
+        "ground_truth": "ES8守卫模式有三级守护。一级守护（威胁接近）：摄像头感知到行人或车辆接近车身时，中控屏显示'守卫模式已激活'并触发循环视频录制。二级守护（受到碰撞）：传感器检测到异常震动时，中控屏显示提示，双闪持续闪烁8秒，持续鸣笛8秒，触发紧急视频录制，通过蔚来App和短信通知用户。三级守护（盗窃）：检测到车门被非法打开时，双闪持续闪烁5分钟，持续鸣笛30秒，触发紧急视频录制，通过App和短信通知用户。激活条件：续航里程大于40公里或处于充电状态，且车辆无系统故障和摄像头故障。续航低于40公里且不充电时无法激活或自动退出。",
+        "key_facts": [
+          "一级守护触发循环视频录制",
+          "二级守护双闪8秒鸣笛8秒",
+          "三级守护双闪5分钟鸣笛30秒",
+          "激活需续航大于40公里或充电中",
+          "通过蔚来App和短信通知"
+        ],
+        "forbidden_content": [
+          "二级守护鸣笛30秒",
+          "三级守护鸣笛5分钟",
+          "激活需续航大于50公里"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_009",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ES8后排控制屏的具体功能列表（冰箱控制、娱乐屏开合、观影模式等）是ES8专有配置",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8后排控制屏能控制哪些功能？",
+      "answer_gt": {
+        "ground_truth": "ES8后排控制屏包含以下车控功能：后排空调控制（开启/关闭、温度调节、风量调节、吹风模式等）；后排座椅舒适调节（位置、通风、按摩、加热等）；后排乘坐空间调节（通过调整主/副驾座椅位置扩展后排空间）；后排媒体控制（暂停/播放、上下首切换、播放进度、歌词查看等）；后排冰箱控制。在快捷控制页还可以点击娱乐屏开合控制娱乐屏展开和关闭，左滑可调节车内灯光、音场模式、顶棚遮阳帘控制、侧窗变色玻璃控制、场景模式选择（如观影模式）、后排娱乐媒体播放等，还可设置后排尊享。设置页面可调节亮度、屏保、熄屏、媒体音量、无线热点、自定义按键、车内220V供电等。",
+        "key_facts": [
+          "包含后排冰箱控制功能",
+          "可控制娱乐屏开合",
+          "有侧窗变色玻璃控制",
+          "有观影模式场景选择",
+          "可设置车内220V供电"
+        ],
+        "forbidden_content": [
+          "后排控制屏可以导航",
+          "后排控制屏可以拨打电话",
+          "所有蔚来车型都有后排冰箱"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_010",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ES8超级节能模式的退出条件（电量补能至超过50%自动退出）是NIO专有设计参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8的超级节能模式（ECO+）具体限制了哪些功能？什么时候会自动退出？",
+      "answer_gt": {
+        "ground_truth": "ES8超级节能（ECO+）模式通过禁用非驾驶必需的功能，最低限度满足驾驶需求，从而降低整车功耗，以达到节约电量的目的。模式开启后，部分驾驶、舒适、娱乐、制冷和制热等耗能较多的功能将被关闭或禁用，以提高车辆的续航里程。当车辆高压动力电池电量补能至超过50%后，车辆将自动退出超级节能模式。可在中控屏设置页面点击驾驶>超级节能开启或关闭。",
+        "key_facts": [
+          "禁用非驾驶必需功能以降低功耗",
+          "部分驾驶、舒适、娱乐、制冷制热功能被关闭",
+          "电量补能超过50%自动退出",
+          "在中控屏驾驶>超级节能设置"
+        ],
+        "forbidden_content": [
+          "电量超过80%自动退出",
+          "电量超过30%自动退出",
+          "仅关闭娱乐功能不影响空调"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_011",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ET7 iPhone数字钥匙使用UWB+NFC技术及具体支持机型是NIO专有配置信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7支持iPhone数字钥匙吗？用的什么技术？哪些手机可以用？",
+      "answer_gt": {
+        "ground_truth": "ET7支持iPhone数字钥匙，采用UWB+NFC技术，无需实体钥匙即可用iPhone或Apple Watch执行车辆解锁、上锁、启动等操作，还可将钥匙分享给家人朋友。支持iPhone 11及后续大部分机型（以苹果官方产品为准）、Apple Watch Series 6及后续机型。需将iPhone或Apple Watch系统更新至最新版本。添加到苹果钱包后，快捷模式会自动打开，无需解锁设备或使用面容ID、触控ID、密码即可使用钥匙。UWB是一种超宽带无线载波通信技术，拥有数据传输速率高、抗干扰能力强、功耗低等特点。",
+        "key_facts": [
+          "采用UWB+NFC技术",
+          "支持iPhone 11及后续大部分机型",
+          "支持Apple Watch Series 6及后续",
+          "添加到苹果钱包后快捷模式自动打开",
+          "可分享给家人朋友"
+        ],
+        "forbidden_content": [
+          "仅使用NFC技术",
+          "仅使用蓝牙技术",
+          "支持iPhone 8及以上"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_012",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_feat",
+      "notes": "ES6洗车模式的具体行为（关闭的功能列表、15公里/小时自动退出）是NIO专有设计",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6的洗车模式会关闭哪些功能？怎么退出？",
+      "answer_gt": {
+        "ground_truth": "ES6洗车模式开启后：车窗、外后视镜、尾门、充电口盖和天窗将被关闭；离车自动上锁、近车自动解锁、自动除雾功能将被禁用；充电口盖车外开启、门把手感应开启、门把手自动回收、自动雨刮感应、后备箱脚踢感应、守卫模式将被禁用；空调若开启将自动切换为内循环。退出洗车模式后部分功能自动恢复。当车速超过15公里/小时洗车模式将自动退出。在中控屏设置页面点击我的ES6>洗车模式开启。进入隧道式自动洗车机前请先切换至N挡再开启洗车模式。使用接触式洗车机前请勿开启雨刮维护模式。",
+        "key_facts": [
+          "天窗将被关闭",
+          "门把手感应开启被禁用",
+          "后备箱脚踢感应被禁用",
+          "空调自动切换为内循环",
+          "车速超过15公里/小时自动退出"
+        ],
+        "forbidden_content": [
+          "车速超过20公里/小时自动退出",
+          "车速超过10公里/小时自动退出",
+          "洗车模式不影响空调"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "ES6儿童安全座椅的具体安装限制（后排中间不推荐、副驾安全气囊打开时X级别限制）是精确安全数据",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6哪些座位可以安装儿童安全座椅？有什么限制？",
+      "answer_gt": {
+        "ground_truth": "ES6儿童安全座椅安装限制：后排中间座椅不建议安装儿童安全座椅。前排副驾安全气囊打开时，0组（小于10千克）、0+组（小于13千克）、I组（9-18千克）、II组（15-25千克）、III组（22-36千克）均不适用（标记X）。副驾安全气囊关闭时，0组和0+组适用通用类（U），I组适用通用类或前向通用类（U/UF），II组和III组仅适用前向通用类（UF）。后排外侧座椅：0组和0+组为U，I/II/III组为U/L。在前排副驾安装安全带式儿童座椅时需把副驾座椅调整至最高位置。身高1.5米以上的儿童可直接使用车辆安全带。",
+        "key_facts": [
+          "后排中间座椅不建议安装",
+          "副驾安全气囊打开时所有组别均不适用",
+          "副驾安全气囊关闭时0组和0+组为U级别",
+          "副驾安装时需将座椅调至最高位置",
+          "身高1.5米以上可直接使用安全带"
+        ],
+        "forbidden_content": [
+          "后排中间可以安装ISOFIX座椅",
+          "副驾安全气囊打开时可安装后向座椅",
+          "身高1.2米以上可使用安全带"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "EC6车顶行李架负载总重量75千克上限及行驶限速120公里/小时是精确安全参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6的车顶行李架最多能装多重？有什么行驶限制？",
+      "answer_gt": {
+        "ground_truth": "EC6车顶行李架及其负载总重量切勿超过75千克。安全警告包括：负载应均匀分布在车顶行李架上；定期检查行李架和负载是否牢固；装载重物时应避免剧烈加速、急刹和急转弯；当车顶承载载荷时车辆重心会发生变化，行驶速度切勿超过行李架说明书规定的速度，且不超过120公里/小时。行李架的安装和使用请严格按照车顶行李架自带的说明书进行。",
+        "key_facts": [
+          "负载总重量不超过75千克",
+          "行驶速度不超过120公里/小时",
+          "负载应均匀分布",
+          "避免剧烈加速急刹和急转弯"
+        ],
+        "forbidden_content": [
+          "负载不超过100千克",
+          "负载不超过50千克",
+          "行驶速度不超过100公里/小时"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "EC7充电安全的具体禁止事项（心脏起搏器远离、充电枪检查要求等）是精确安全规范",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7充电时有哪些安全注意事项？哪些人需要特别注意？",
+      "answer_gt": {
+        "ground_truth": "EC7充电安全注意事项：充电前需检查充电枪头及车辆充电口是否有变形、发黑、烧蚀，如发现异常请勿充电；检查是否有污物或异物保持接口清洁。禁止在易燃气体或液体的地方充电。禁止未成年人使用充电设备和靠近。禁止在充电设备破损、生锈、潮湿或有异物时充电。禁止私自修改或拆卸充电连接器。请勿在大雨及极端天气时露天充电。充电过程中请勿强行拔下充电枪，避免产生电弧。结束充电后请等待3秒钟再拔下充电枪。在进行快充作业时，体内植入心脏起搏器的用户需远离快充作业的车辆，避免电磁干扰影响医疗设备。充电时请勿使用高压冲洗装置对充电口部位冲洗。",
+        "key_facts": [
+          "检查充电枪头是否变形发黑烧蚀",
+          "禁止未成年人使用和靠近充电设备",
+          "心脏起搏器用户需远离快充车辆",
+          "结束充电后等待3秒再拔充电枪",
+          "充电过程中禁止强行拔枪避免电弧"
+        ],
+        "forbidden_content": [
+          "心脏起搏器用户可正常充电",
+          "结束充电后可立即拔枪",
+          "可以在雨中正常充电"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "EC7限速模式的精确参数范围（30-180公里/小时）和深踩突破机制是NIO专有安全设计",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的限速模式能设定多少范围？能不能突破限速？和辅助驾驶有冲突吗？",
+      "answer_gt": {
+        "ground_truth": "EC7限速模式速度限制设置范围为30-180公里/小时，车速达到设定值将不再上升。可通过深踩加速踏板或快速踩下加速踏板暂时突破限速模式限制，当车速低于设定值后限速模式将重新启用。辅助驾驶功能激活后限速模式会自动退出，且退出辅助驾驶功能后限速模式不会自动重新激活。辅助驾驶功能关闭后才能激活限速模式。在中控屏设置页面点击行车驻车>限速模式设定。",
+        "key_facts": [
+          "限速范围30-180公里/小时",
+          "深踩加速踏板可暂时突破限速",
+          "辅助驾驶激活后限速模式自动退出",
+          "退出辅助驾驶后限速不会自动重新激活",
+          "辅助驾驶关闭后才能激活限速模式"
+        ],
+        "forbidden_content": [
+          "限速范围20-200公里/小时",
+          "无法突破限速",
+          "限速模式和辅助驾驶可同时使用"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "ES6自动紧急制动对行人身高限制（100-200厘米）及通用障碍物工作速度范围是精确安全参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES6的自动紧急制动在什么速度范围下工作？对行人有什么识别限制？",
+      "answer_gt": {
+        "ground_truth": "ES6自动紧急制动工作速度范围：前向对行人、骑行人和车辆约4-150公里/小时；后向约0-30公里/小时。前向对通用障碍物（如侧翻车辆、锥桶、交通警示物体）约1-150公里/小时；后向约2-10公里/小时。行人识别限制：行人高于200厘米或矮于100厘米（尤其是儿童）可能无法识别；行人在夜间道路、隧道内等黑暗地方可能无法识别；行人蹲下、弯腰、躺下或倒立可能无法识别；行人突然窜出可能无法识别。前向自动紧急制动仅支持单次关闭，重新上电后自动开启；后向自动紧急制动支持永久关闭。",
+        "key_facts": [
+          "前向对行人工作速度约4-150公里/小时",
+          "后向对行人工作速度约0-30公里/小时",
+          "行人高于200厘米或矮于100厘米可能无法识别",
+          "前向仅支持单次关闭重新上电自动开启",
+          "后向支持永久关闭"
+        ],
+        "forbidden_content": [
+          "前向工作速度10-120公里/小时",
+          "行人高于180厘米无法识别",
+          "前向和后向都支持永久关闭"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "EC6拖挂停车坡度限制（12%/7°）和操作步骤是精确安全参数",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6拖挂拖车时有什么停车限制？在坡道上怎么停车？",
+      "answer_gt": {
+        "ground_truth": "EC6拖挂时建议不在坡度超过12%（坡角约为7°）的坡道上停车。如果必须在斜坡上停车，需在拖车车轮下方放置车轮楔块，步骤为：1.一人踩下制动踏板并保持；2.另一人将轮楔放置在车辆轮胎下坡侧车轮下方；3.当轮楔就位时松开制动踏板确保轮楔可承受车辆和拖车质量（未开启自动驻车功能）；4.将车辆挂入驻车挡，拖车接入停车制动。在任何情况下拖车过程中都不应退出拖挂模式。启用拖挂模式时部分辅助驾驶功能以及脚踢传感器、便利进出、超声波传感器功能可能不可用。",
+        "key_facts": [
+          "建议不在坡度超过12%（约7°）坡道停车",
+          "需在拖车车轮下方放置楔块",
+          "拖车过程中不应退出拖挂模式",
+          "拖挂时部分辅助驾驶功能不可用",
+          "脚踢传感器和便利进出功能不可用"
+        ],
+        "forbidden_content": [
+          "坡度不超过15%",
+          "坡度不超过10%",
+          "拖挂时所有辅助驾驶功能正常"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_007",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "EC7高压动力电池相关警告灯的具体含义和应对措施是精确安全信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的高压动力电池有哪些警告灯？分别代表什么意思？",
+      "answer_gt": {
+        "ground_truth": "EC7高压动力电池相关指示灯和警告灯包括：高压动力电池正常指示灯（表明当前工作正常）；高压动力电池电量不足指示灯（表明电量不足请及时充电）；高压动力电池切断警告灯（此时车辆未上高压电，如有需要请联系蔚来汽车服务中心）；低压蓄电池充电故障警告灯（此警告灯点亮请立即联系蔚来汽车服务中心）；高压动力电池故障警告灯（此警告灯点亮请立即停车并联系蔚来汽车服务中心）；高压动力电池温度过高警告灯（此警告灯点亮请立即停车并联系蔚来汽车服务中心）；冰雪路面指示灯（表明当前环境温度过低将可能影响高压动力电池性能）。",
+        "key_facts": [
+          "电池故障警告灯需立即停车联系服务中心",
+          "电池温度过高警告灯需立即停车联系服务中心",
+          "电池切断警告灯表示未上高压电",
+          "冰雪路面指示灯提示温度过低影响电池性能",
+          "低压蓄电池充电故障需立即联系服务中心"
+        ],
+        "forbidden_content": [
+          "电池故障警告灯可继续低速行驶",
+          "电池温度过高可继续行驶等待降温",
+          "低压蓄电池故障不影响行驶"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_008",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_safe",
+      "notes": "ET7车内应急开门的具体条件和注意事项（儿童锁限制、碰撞后自动解锁等）是精确安全信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7如果电子门锁失效了，车内怎么紧急开门？后排有儿童锁的话呢？",
+      "answer_gt": {
+        "ground_truth": "ET7全车上锁时如遇紧急情况（如内把手电子开关失效或车辆落入水中），拉动一次内把手机械开关即可打开对应侧车门。注意事项：12V蓄电池亏电时使用物理应急钥匙仅可解锁主驾车门，无法全车解锁，其余车门只能通过拉动内把手机械开关解锁并开门。使用内把手机械开关开门时车门可能无法执行降窗操作，有损坏车窗饰板的风险。开启车门儿童安全锁功能后，两侧后门均无法从内部打开，仅可在全车解锁后从车外打开。但发生重大事故导致安全气囊弹出时，后排车门儿童安全锁将会自动解锁。",
+        "key_facts": [
+          "拉动一次内把手机械开关即可开门",
+          "12V亏电时仅可解锁主驾车门",
+          "开启儿童锁后后门无法从内部打开",
+          "安全气囊弹出时儿童安全锁自动解锁",
+          "机械开门时车门可能无法降窗"
+        ],
+        "forbidden_content": [
+          "拉动两次才能打开",
+          "儿童锁开启后所有门都无法从内部打开",
+          "碰撞后儿童锁仍保持锁定"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "EC6和ET9电动尾翼的模式差异（EC6有减阻/极速/自动/关闭，ET9有展开/自动/关闭）和车速阈值差异需对比两个手册",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6和ET9的电动尾翼有什么不同？模式和自动展开速度一样吗？",
+      "answer_gt": {
+        "ground_truth": "EC6和ET9的电动尾翼存在明显差异。EC6有四种模式：减阻挡（低角度降风阻）、极速挡（最高角度增加下压力）、自动和关闭。EC6自动模式下车速超过60公里/小时切换减阻挡，超过130公里/小时切换极速挡，降至10公里/小时收回。ET9只有三种模式：展开、自动和关闭。ET9自动模式下车速超过80公里/小时展开，低于10公里/小时收回。EC6还支持锁车保持尾翼展开功能，且进入拖挂模式后尾翼保持收回。两者都有频繁操作保护机制（连续15次暂停，150秒恢复），锁车后都会自动收回。",
+        "key_facts": [
+          "EC6有减阻挡和极速挡而ET9没有",
+          "EC6自动展开速度60公里/小时ET9是80公里/小时",
+          "EC6极速挡切换速度130公里/小时",
+          "两者收回速度都是10公里/小时",
+          "两者都有15次/150秒保护机制"
+        ],
+        "forbidden_content": [
+          "EC6和ET9尾翼模式完全相同",
+          "ET9也有减阻挡和极速挡",
+          "两者自动展开速度相同"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "ET9和ES8整车参数差异（尺寸、座位数、离地间隙等）需查阅两个手册的规格表",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9和ES8哪个更大？座位数、尺寸和最高车速有什么区别？",
+      "answer_gt": {
+        "ground_truth": "ET9车身尺寸为5325x2017x1621mm，轴距3250mm，离地间隙200mm，座位数4座，最高车速220km/h，整备质量2700kg。ES8车身尺寸为5280x2010x1800mm，轴距3130mm，离地间隙165mm，座位数6/7座，最高车速220km/h，整备质量2630kg。ET9更长（5325 vs 5280）但更矮（1621 vs 1800），轴距更长（3250 vs 3130），离地间隙更高（200 vs 165mm），但座位数更少（4座 vs 6/7座）。两者最高车速相同为220km/h。ET9更重（2700 vs 2630kg）。",
+        "key_facts": [
+          "ET9长5325mm ES8长5280mm",
+          "ET9高1621mm ES8高1800mm",
+          "ET9座位4座ES8座位6/7座",
+          "ET9离地间隙200mm ES8为165mm",
+          "两者最高车速均为220km/h"
+        ],
+        "forbidden_content": [
+          "ET9是7座车",
+          "ES8比ET9更长",
+          "ET9最高车速250km/h"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "ET9和ES8驾驶模式中能量回收挡位设置差异（ET9运动模式转向手感为稳重得益于线控转向可变转向比）需对比两个手册",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9和ES8的驾驶模式有什么区别？悬架和转向设置一样吗？",
+      "answer_gt": {
+        "ground_truth": "ET9和ES8都有舒适、后排尊享、节能、运动、个性化五种基础驾驶模式，但参数设置有差异。ET9的悬架名为'天行主动悬架'，舒适模式下为较软，后排尊享为超软，运动为标准；ES8的悬架名为'悬架软硬'，舒适模式下为较软，后排尊享为超软，运动为标准。两者节能模式能量回收均为5挡，后排尊享均为0挡。ET9转向手感：舒适和后排尊享为标准，运动为稳重，且说明'得益于线控转向可变转向比，运动模式下的转向灵敏度更高'。ES8转向手感：舒适为轻松，后排尊享为标准，运动为稳重。ET9特有线控转向可变转向比功能是ES8所没有的。",
+        "key_facts": [
+          "两者都有五种基础驾驶模式",
+          "ET9悬架名为天行主动悬架",
+          "ET9有线控转向可变转向比ES8没有",
+          "ES8舒适模式转向手感为轻松ET9为标准",
+          "两者节能模式能量回收均为5挡"
+        ],
+        "forbidden_content": [
+          "ET9有六种驾驶模式",
+          "ES8也有线控转向",
+          "两者转向手感设置完全相同"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "EC6和EC7整车尺寸参数对比需查阅两个手册",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6和EC7尺寸差多少？轴距和离地间隙呢？",
+      "answer_gt": {
+        "ground_truth": "EC6车身尺寸为4849x1995x1697mm，轴距2915mm，离地间隙165mm，前轮距1711mm，后轮距1711mm。EC7车身尺寸为4968x1974x1714mm，轴距2960mm，离地间隙162mm，前轮距1668mm，后轮距1672mm。EC7比EC6长119mm（4968 vs 4849），但窄21mm（1974 vs 1995），高17mm（1714 vs 1697）。EC7轴距长45mm（2960 vs 2915）。EC6离地间隙略高（165 vs 162mm）。两者最高车速均为200km/h，座位数均为5座。",
+        "key_facts": [
+          "EC7比EC6长119mm",
+          "EC6比EC7宽21mm",
+          "EC7轴距比EC6长45mm",
+          "EC6离地间隙165mm EC7为162mm",
+          "两者最高车速均为200km/h座位数均5座"
+        ],
+        "forbidden_content": [
+          "EC6比EC7更长",
+          "两者轴距相同",
+          "EC7离地间隙比EC6高"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "ES8有后排娱乐屏和冰箱而EC7没有，需对比两个手册的后排配置",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ES8和EC7的后排配置有什么区别？哪个更豪华？",
+      "answer_gt": {
+        "ground_truth": "ES8后排配置明显更豪华。ES8后排配有：后排控制屏、后排冰箱、娱乐屏（支持视频、音乐、游戏、手机投屏，带遥控器和防夹功能）、座椅调节按键、车门控制按键。ES8后排控制屏功能包括后排空调控制、座椅舒适调节（位置、通风、按摩、加热）、乘坐空间调节、媒体控制、冰箱控制，还可控制侧窗变色玻璃和顶棚遮阳帘。EC7后排控制屏功能包括后排空调控制、座椅舒适调节（通风、按摩、加热）、乘坐空间调节（调整副驾座椅）、媒体控制。EC7没有后排冰箱、没有独立娱乐屏、没有侧窗变色玻璃控制。",
+        "key_facts": [
+          "ES8有后排娱乐屏EC7没有",
+          "ES8有后排冰箱EC7没有",
+          "ES8有侧窗变色玻璃控制",
+          "两者都有后排空调和座椅调节",
+          "ES8后排座椅可调位置EC7仅通风按摩加热"
+        ],
+        "forbidden_content": [
+          "EC7也有后排娱乐屏",
+          "EC7也有后排冰箱",
+          "两者后排配置相同"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "ET7和ET9离地间隙差异巨大（128 vs 200mm）以及ET9有4座而ET7有5座需对比规格表",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7和ET9哪个底盘更高？座位数一样吗？",
+      "answer_gt": {
+        "ground_truth": "ET9底盘明显更高。ET9离地间隙为200mm，ET7离地间隙仅128mm，ET9比ET7高72mm。座位数不同：ET9为4座，ET7为5座。ET9车身更大（5325x2017x1621mm vs 5101x1987x1509mm），轴距更长（3250 vs 3060mm）。ET9最高车速220km/h，ET7最高车速200km/h。ET9整备质量2700kg，ET7整备质量约2349-2379kg（因电池规格不同）。ET9接近角17°离去角22°，ET7接近角整备14°满载13°离去角整备17°满载16°。",
+        "key_facts": [
+          "ET9离地间隙200mm ET7仅128mm",
+          "ET9为4座ET7为5座",
+          "ET9最高车速220km/h ET7为200km/h",
+          "ET9轴距3250mm ET7为3060mm",
+          "ET7接近角整备14°满载13°"
+        ],
+        "forbidden_content": [
+          "ET7离地间隙比ET9高",
+          "两者都是5座",
+          "两者最高车速相同"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_007",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "ET9有线控转向和后轮转向功能而其他车型没有，需对比多个手册确认",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "蔚来哪些车型有线控转向？ET5和ET9的转向系统有什么不同？",
+      "answer_gt": {
+        "ground_truth": "在蔚来车型中，仅ET9配备线控转向系统。ET9线控转向通过电信号传递转向指令，取代传统机械连接，集成后轮转向功能（低速后轮与前轮反向转动减少转弯半径，中高速配合底盘控制提升稳定性），且车辆会根据车速自动调节转向比。ET5等其他车型使用传统机械转向系统，不具备线控转向和后轮转向功能。ET9驾驶模式中转向手感说明为'得益于线控转向可变转向比，运动模式下的转向灵敏度更高'。ET5和其他车型的驾驶模式中转向手感描述为'驾驶员转动方向盘所需的力度'，没有可变转向比功能。",
+        "key_facts": [
+          "仅ET9配备线控转向",
+          "ET9集成后轮转向功能",
+          "ET9根据车速自动调节转向比",
+          "ET5使用传统机械转向",
+          "ET9运动模式转向灵敏度因线控可变转向比更高"
+        ],
+        "forbidden_content": [
+          "ET7也有线控转向",
+          "ES8也有后轮转向",
+          "所有蔚来车型都有线控转向"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_008",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_comp",
+      "notes": "ET5T有赛道模式而ES6没有，需对比两个手册的目录确认",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5T和ES6的驾驶模式有什么不同？ET5T有赛道模式吗？",
+      "answer_gt": {
+        "ground_truth": "ET5T和ES6的驾驶模式存在差异。根据ET5T用户手册目录，ET5T具备赛道模式（列在驾驶模式之后的独立功能项）。ES6的行车与驻车章节中没有赛道模式功能。两者都有基础驾驶模式（舒适、节能、运动等）和场景辅助功能（雪地模式、湿地模式等）。ET5T的状态指示信息中列出了运动+模式，而ES6的驾驶模式也包含运动+模式。ET5T作为旅行车定位有赛道模式体现了其运动取向。",
+        "key_facts": [
+          "ET5T有赛道模式ES6没有",
+          "两者都有舒适节能运动等基础模式",
+          "两者都有雪地和湿地等场景辅助模式",
+          "两者都有运动+模式"
+        ],
+        "forbidden_content": [
+          "ES6也有赛道模式",
+          "ET5T没有赛道模式",
+          "所有蔚来车型都有赛道模式"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_fault_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_fault",
+      "notes": "ET9线控转向三级故障的具体系统响应和限速时间表是ET9专有故障处理信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9线控转向出现故障时，车辆分别会怎么处理？会限速吗？",
+      "answer_gt": {
+        "ground_truth": "ET9线控转向故障分三种情形：情形1：转向能力正常但天际屏点亮黄色故障指示灯，提示'转向系统异常，请尽快维修车辆'，需立即安全停车联系服务中心，系统在故障发生后20小时自动限速至80公里/小时。情形2：转向能力部分失效，天际屏点亮红色故障警告灯，提示'转向系统故障，请立刻靠边停车'，系统故障后立即限速至80公里/小时，10分钟后进一步降至10公里/小时。情形3：转向能力完全失效，天际屏点亮红色故障警告灯，提示'转向系统失效，请立刻减速停车'，系统将自动介入减速并限速至10公里/小时。当处于情形2或3时，挂入P挡后尝试再次换挡时系统将弹出提示窗口。",
+        "key_facts": [
+          "情形1黄灯20小时后限速80公里/小时",
+          "情形2红灯立即限速80后10分钟降至10",
+          "情形3红灯系统自动减速限至10公里/小时",
+          "情形2和3再次换挡时弹出提示窗口",
+          "三种情形都需联系蔚来服务中心"
+        ],
+        "forbidden_content": [
+          "所有故障统一限速60公里/小时",
+          "故障后车辆立即停止无法移动",
+          "故障后不会自动限速"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_fault_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_fault",
+      "notes": "EC7充电后无法拔下充电枪的具体步骤是NIO专有故障处理流程",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7充电后充电枪拔不下来怎么办？具体步骤是什么？",
+      "answer_gt": {
+        "ground_truth": "EC7充电后无法拔出充电枪时，请按如下步骤尝试：1.重新插紧充电枪确保充电枪解锁按钮弹起；2.重新进行全车上锁及解锁；3.再按住充电枪解锁按钮等待1到2秒钟，待充电口指示灯变成绿色常亮后再将充电枪拔下；4.如仍无法拔下充电枪，请立即停止充电并联系蔚来汽车服务中心。正常结束充电时需先按下充电枪解锁按键方可拔下。如需手动停止充电可在全车解锁后在中控屏设置页面点击电池停止充电，待充电口指示灯变成绿色常亮后再拔。插拔充电枪时请正对充电插座，若遇充电枪卡滞可尝试轻微上提充电枪。",
+        "key_facts": [
+          "第一步重新插紧充电枪确保解锁按钮弹起",
+          "第二步重新全车上锁及解锁",
+          "第三步按住解锁按钮等待1到2秒",
+          "等待充电口指示灯变绿色常亮再拔",
+          "仍无法拔下需联系蔚来服务中心"
+        ],
+        "forbidden_content": [
+          "直接用力拔出充电枪",
+          "按住充电枪按钮5秒以上",
+          "充电口指示灯变蓝色时拔枪"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_fault_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_fault",
+      "notes": "ET5方向盘双键重启的具体按键组合和等待时间是NIO专有故障处理信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET5中控屏死机了怎么重启？方向盘双键重启是按哪两个键？",
+      "answer_gt": {
+        "ground_truth": "ET5中控屏出现卡顿、无响应、黑屏或其他异常时可双键重启。操作方法：1.打开危险警告灯；2.车辆停至安全区域挂入P挡；3.同时按住方向盘左侧右键和右侧下键保持约8秒；4.等待约30秒后所有屏幕将重新点亮系统可恢复操作。若仍未恢复正常请联系蔚来汽车服务中心。注意：必须在驻车状态操作，严禁行驶中双键重启；重启过程中保持危险警告灯开启；不要在软件升级时操作；重启中看不到车辆状态、安全警告、环视影像、地图等信息。如果双键重启后仍未恢复可尝试锁车休眠。",
+        "key_facts": [
+          "同时按住方向盘左侧右键和右侧下键",
+          "保持约8秒",
+          "等待约30秒后屏幕重新点亮",
+          "必须挂P挡在驻车状态",
+          "严禁行驶中双键重启"
+        ],
+        "forbidden_content": [
+          "按住左侧左键和右侧上键",
+          "保持3秒即可",
+          "行驶中也可以双键重启"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_fault_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_fault",
+      "notes": "EC7 12V蓄电池亏电时跨接启动的具体连接顺序是NIO手册精确故障处理流程",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的12V蓄电池没电了，怎么跨接启动？电缆连接顺序是什么？",
+      "answer_gt": {
+        "ground_truth": "EC7跨接启动步骤：1.车辆为驻车状态，确保12V蓄电池电源关闭且与整车电气系统正确连接，打开后备箱饰盖找到亏电车辆A的12V蓄电池；2.将红色电缆一端连接到亏电车辆A的12V蓄电池正极（+）；3.将红色电缆另一端连接到供电车辆B的12V蓄电池正极（+）；4.将黑色电缆一端连接到供电车辆B的12V蓄电池负极（-）；5.将黑色电缆另一端连接到亏电车辆A的12V蓄电池良好接地点上；6.启动供电车辆几分钟后启动亏电车辆；7.按连接顺序逆序拆除跨接电缆。注意两车切勿相互接触，必须先接正极后接负极。",
+        "key_facts": [
+          "12V蓄电池位于后备箱",
+          "先连红色电缆到亏电车正极再到供电车正极",
+          "黑色电缆先连供电车负极再连亏电车接地点",
+          "按连接顺序逆序拆除",
+          "两车切勿相互接触"
+        ],
+        "forbidden_content": [
+          "12V蓄电池位于前舱",
+          "先连黑色电缆负极",
+          "黑色电缆连接亏电车负极"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_fault_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_fault",
+      "notes": "EC6电动尾翼位置异常的处理方法是NIO专有故障处理信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6的电动尾翼出了问题怎么办？中控屏弹出提示了怎么处理？",
+      "answer_gt": {
+        "ground_truth": "如果EC6电动尾翼出现位置异常，中控屏将弹出提示。处理方法：请将车辆停在安全区域并挂入P挡，按照提示进行功能重置。如果问题仍未解决，请联系蔚来汽车服务中心。安全注意：请勿在尾翼上放置重物以免损伤电机；关闭尾翼时请勿将身体任何部位放在尾翼区域以免发生意外夹伤。电动尾翼具有频繁操作保护机制，连续操作15次及以上时调节功能将暂停，需等待150秒后恢复。",
+        "key_facts": [
+          "停在安全区域挂P挡",
+          "按照中控屏提示进行功能重置",
+          "问题未解决联系蔚来服务中心",
+          "勿在尾翼上放置重物",
+          "连续操作15次暂停需等150秒"
+        ],
+        "forbidden_content": [
+          "可以手动掰回尾翼",
+          "可以继续行驶不影响安全",
+          "拔掉保险丝重置"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_fault_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_fault",
+      "notes": "ET7高压电路切断的具体位置和步骤是NIO专有紧急救援信息",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7发生事故后怎么切断高压电路？具体操作步骤是什么？",
+      "answer_gt": {
+        "ground_truth": "ET7切断高压电路需先断开紧急高压切断插头（位于前舱内左侧区域），然后再断开12V蓄电池负极（位于前舱靠近前挡风玻璃区域）。步骤：1.拉动两次乘客舱内前舱盖拉手以松开前舱盖；2.提起前舱盖；3.断开紧急高压切断插头后可切断高压供给回路，取下插头并妥善保管；4.断开12V蓄电池负极电缆，断开后需用保护层包裹以免误接触导通。操作时应由专业救援人员操作并佩戴防护装置：橡胶绝缘手套（可绝缘1000V以上电压）、护目镜、绝缘橡胶鞋、带绝缘保护套的工具。确保身上未携带金属制品以免电击伤害。",
+        "key_facts": [
+          "紧急高压切断插头位于前舱内左侧区域",
+          "12V蓄电池负极位于前舱靠近前挡风玻璃区域",
+          "先断高压切断插头再断12V负极",
+          "需绝缘手套可绝缘1000V以上",
+          "断开负极电缆后需用保护层包裹"
+        ],
+        "forbidden_content": [
+          "高压切断插头在后备箱",
+          "先断12V再断高压",
+          "不需要特殊防护装备"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_conf_001",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_conf",
+      "notes": "宠物托管与露营模式等不可同时开启，且开启后禁用守卫模式和远程车外实况等是NIO专有互斥设计",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "蔚来的宠物托管模式和其他场景模式可以同时用吗？会影响哪些功能？",
+      "answer_gt": {
+        "ground_truth": "蔚来宠物托管与离车不下电、露营模式等其它场景模式不可同时开启，它们是互斥关系。宠物托管开启后影响的功能包括：守卫模式和远程车外实况暂不可用（退出宠物托管并锁车后可重新启用）；车辆无法进行系统升级及换挡操作；NOMI语音唤醒和门窗按键等功能被禁用；蔚来App部分远程车控功能被禁用。同样，露营模式开启后空调自动除雾、离车自动上锁、近车自动解锁、守卫模式等功能也会暂时关闭。在ET9上，宠物托管或离车不下电模式开启时，儿童遗留检测功能也将被临时禁用。",
+        "key_facts": [
+          "宠物托管与离车不下电和露营模式互斥",
+          "开启后守卫模式和远程车外实况不可用",
+          "开启后无法系统升级和换挡",
+          "NOMI语音唤醒被禁用",
+          "ET9上宠物托管禁用儿童遗留检测"
+        ],
+        "forbidden_content": [
+          "宠物托管和露营模式可同时使用",
+          "守卫模式在宠物托管期间仍正常工作",
+          "宠物托管不影响系统升级"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_conf_002",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_conf",
+      "notes": "ET9悬架最高挡位限速35km/h且轻松进出功能在此时被禁用是NIO专有配置约束",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9悬架调到最高有什么限制？轻松进出功能还能用吗？",
+      "answer_gt": {
+        "ground_truth": "ET9悬架调至最高挡位时有以下限制：悬架高度较标准挡位抬升约40毫米，限速35公里/小时。当悬架高度设置为最高挡位时，轻松进出功能将被暂时禁用。最低挡位较标准降低约50毫米，当车速超过5公里/小时将自动退出。激活非常规行驶挡位后可长按方向盘右侧中键快速退出。车辆处于系统升级、换电、换胎模式等场景时悬架高度不可调节。在部分场景辅助模式（如雪地等）、悬架高度设置为低的情况下，悬架主动控制功能也无法被激活。",
+        "key_facts": [
+          "最高挡位限速35公里/小时",
+          "最高挡位时轻松进出功能被禁用",
+          "最高挡位抬升约40毫米",
+          "最低挡位超过5公里/小时自动退出",
+          "系统升级和换电时悬架不可调节"
+        ],
+        "forbidden_content": [
+          "最高挡位限速50公里/小时",
+          "最高挡位时轻松进出仍可用",
+          "最高挡位抬升60毫米"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_conf_003",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_conf",
+      "notes": "ET9儿童遗留检测需要官方蓝牙儿童座椅连接才能激活是NIO专有前置条件",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET9的儿童遗留检测需要满足什么条件才能使用？",
+      "answer_gt": {
+        "ground_truth": "ET9儿童遗留检测的前置条件：需要配备并正确安装官方推荐的蓝牙儿童座椅，且该座椅与车辆成功连接后功能才会自动激活。此外还需要：车辆处于网络良好的环境（否则可能无法及时发送通知提醒）。该功能在以下情况下不可用：宠物托管或离车不下电模式开启时被临时禁用。功能需要通过车内摄像头检测识别是否有儿童遗留，相关数据仅在车辆本地处理并在每次检测后进行数据删除。激活后可在中控屏设置页面点击安全隐私>安全>儿童遗留检测选择开启或关闭。",
+        "key_facts": [
+          "需要官方推荐的蓝牙儿童座椅",
+          "儿童座椅需与车辆蓝牙成功连接",
+          "需要网络良好环境",
+          "宠物托管或离车不下电时被禁用",
+          "使用车内摄像头检测数据本地处理后删除"
+        ],
+        "forbidden_content": [
+          "任何品牌儿童座椅都可以",
+          "不需要蓝牙连接自动工作",
+          "数据会上传到云端"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_conf_004",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_conf",
+      "notes": "EC6拖挂模式启用后对辅助驾驶和尾翼的影响是NIO专有配置约束",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC6开启拖挂模式后哪些功能会受影响？电动尾翼还能用吗？",
+      "answer_gt": {
+        "ground_truth": "EC6启用拖挂模式后受影响的功能包括：部分辅助驾驶功能不可用；脚踢传感器功能不可用；便利进出功能不可用；超声波传感器功能可能不可用。电动尾翼方面，进入拖挂模式后尾翼将保持收回状态。此外，电动拖钩装置时后部牵引钩将无法使用。拖挂模式的启用需要在P挡下操作，连接拖车电气连接时车辆会在确认后自动启用，断开连接时自动断开。在任何情况下拖车过程中都不应退出拖挂模式，否则可能造成严重伤害甚至死亡。",
+        "key_facts": [
+          "部分辅助驾驶功能不可用",
+          "脚踢传感器和便利进出不可用",
+          "电动尾翼保持收回状态",
+          "电动拖钩装置时后部牵引钩无法使用",
+          "拖车过程中不应退出拖挂模式"
+        ],
+        "forbidden_content": [
+          "拖挂模式不影响辅助驾驶",
+          "电动尾翼在拖挂时可正常使用",
+          "拖车时可以随时退出拖挂模式"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_conf_005",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_conf",
+      "notes": "ET7 NFC钥匙解锁后超过3分钟需重新放置才能启动是NIO专有时间限制",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "ET7用NFC卡片解锁后多久必须启动车辆？超时了怎么办？",
+      "answer_gt": {
+        "ground_truth": "ET7使用NFC卡片钥匙解锁车辆后，在3分钟内可以直接挂挡启动车辆；若等待时间超过3分钟，需将NFC卡片钥匙放置于主驾侧无线充电板上才可启动车辆。手机NFC钥匙也是同样的规则：解锁后3分钟内可直接启动，超过3分钟需将手机NFC钥匙放置于主驾侧无线充电板的NFC感应区域上才能启动。使用NFC功能解锁后仍可使用其他方式（如智能钥匙或物理应急钥匙）上锁车辆。车辆升级过程中无法使用NFC功能，建议随身携带智能钥匙。请勿将NFC卡片叠放在手机与无线充电面板之间。",
+        "key_facts": [
+          "3分钟内可直接挂挡启动",
+          "超过3分钟需放置在主驾侧无线充电板上",
+          "手机NFC钥匙同样规则",
+          "车辆升级期间NFC功能不可用",
+          "NFC卡片勿叠放在手机与充电面板之间"
+        ],
+        "forbidden_content": [
+          "5分钟内可直接启动",
+          "超时后需重新刷卡解锁",
+          "NFC钥匙不受时间限制"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    },
+    {
+      "id": "ans_conf_006",
+      "layer_targets": [
+        "answer"
+      ],
+      "category": "ans_conf",
+      "notes": "EC7低温充电预热的自动激活和退出条件（续航大于120公里、非ECO+等）是NIO专有配置约束",
+      "dimensions": {
+        "is_multi_turn": false,
+        "history_length": 0,
+        "has_coref": false,
+        "depends_on_memory": false,
+        "is_ambiguous": false,
+        "should_clarify": false
+      },
+      "context": {
+        "user_profile": "",
+        "memory_facts": [],
+        "conversation_history": []
+      },
+      "input": "EC7的低温充电预热功能需要什么条件才会自动激活？什么时候会退出？",
+      "answer_gt": {
+        "ground_truth": "EC7低温充电预热功能默认开启。处于导航状态下时满足以下条件自动激活：1.导航目的地或途经点为充电站或带有充电站的服务区；2.驾驶员处于就座状态；3.当前续航里程大于120公里；4.车辆未处于ECO+模式。自动退出预热的条件（开关保持开启）：连接充电枪；关闭导航或停止导航到充电站；当前续航里程不支持预热到目的地时仍剩余20公里；车辆进入ECO+模式。手动充电预热需环境温度低于20℃且续航大于10公里，手动开启后连接充电枪、低温充电预热开启、或电池已预热到设定温度并保持1小时时自动退出。",
+        "key_facts": [
+          "自动激活需导航到充电站",
+          "需续航里程大于120公里",
+          "需车辆不在ECO+模式",
+          "连接充电枪时自动退出预热",
+          "手动预热需环境温度低于20℃且续航大于10公里"
+        ],
+        "forbidden_content": [
+          "续航大于80公里就激活",
+          "不需要导航到充电站也会激活",
+          "手动预热需环境温度低于10℃"
+        ],
+        "should_clarify": false,
+        "is_safe": true
+      }
+    }
+  ]
+}

@@ -25,7 +25,8 @@ class MilvusVectorStore():
             FieldSchema(
                 name="pk", dtype=DataType.VARCHAR, is_primary=True, auto_id=True, max_length=100
             ),
-            FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=1024),
+            FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=2048),
+            FieldSchema(name="parent_text", dtype=DataType.VARCHAR, max_length=4096),
             FieldSchema(name="sparse_vector", dtype=DataType.SPARSE_FLOAT_VECTOR),
             FieldSchema(name="dense_vector", dtype=DataType.FLOAT_VECTOR, dim=self.dense_dim),
         ]
@@ -53,29 +54,32 @@ class MilvusVectorStore():
         return col
     
 
-    def insert(self, chunks, chunk_embeddings):
+    def insert(self, chunks, chunk_embeddings, parent_chunks=None):
         if not chunks or not chunk_embeddings:
             raise ValueError("Chunks and chunk_embeddings cannot be empty.")
-        
+
         if len(chunks) != len(chunk_embeddings["dense"]):
             raise ValueError("Length of chunks and chunk_embeddings must match.")
+
+        # parent_chunks falls back to chunks when not provided (old schema compat)
+        if parent_chunks is None:
+            parent_chunks = chunks
 
         sparse_embeddings = chunk_embeddings["sparse"]
 
         for i in range(0, len(chunks), 50):
             end = min(i + 50, len(chunks))
-            # pymilvus has edge cases with scipy sparse array batches (e.g. coo_array),
-            # so convert to one sparse row object per entity.
             sparse_batch = [self._sparse_row(sparse_embeddings, row_idx) for row_idx in range(i, end)]
             self.col.insert(
-                data = [
+                data=[
                     chunks[i:end],
+                    parent_chunks[i:end],
                     sparse_batch,
                     chunk_embeddings["dense"][i:end],
                 ],
-                fields=["text", "sparse_vector", "dense_vector"]
+                fields=["text", "parent_text", "sparse_vector", "dense_vector"]
             )
-    
+
         self.col.flush()
 
     @staticmethod

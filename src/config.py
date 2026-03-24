@@ -34,10 +34,16 @@ MEMORY_DIR = os.getenv("MEMORY_DIR", os.path.join(_PROJECT_ROOT, ".sessions"))
 MAX_ITERATIONS = int(os.getenv("MAX_ITERATIONS", "3"))
 
 # --- RAG / Storage ---
-MILVUS_URI = os.getenv("MILVUS_URI", os.path.join(_PROJECT_ROOT, "milvus.db"))
+MILVUS_URI = os.getenv("RAG_MILVUS_URI") or os.getenv("MILVUS_URI", os.path.join(_PROJECT_ROOT, "milvus.db"))
 GREP_INDEX_PATH = os.getenv("GREP_INDEX_PATH", os.path.join(_PROJECT_ROOT, "grep_index.db"))
 DATA_ROOT = os.getenv("DATA_ROOT", os.path.join(_PROJECT_ROOT, "data"))
 NIO_CAR_MODELS = [m.strip() for m in os.getenv("NIO_CAR_MODELS", "EC6,EC7,ES6,ES8,ET5,ET5T,ET7,ET9").split(",")]
+
+# --- Contextual Retrieval ---
+# Set CONTEXTUAL_RETRIEVAL=true to prepend LLM-generated summaries to chunks at ingest time.
+# Requires re-ingest (force=True) to take effect on existing collections.
+CONTEXTUAL_RETRIEVAL = os.getenv("CONTEXTUAL_RETRIEVAL", "true").lower() == "true"
+CONTEXTUAL_RETRIEVAL_MODEL = os.getenv("CONTEXTUAL_RETRIEVAL_MODEL", QWEN_MODEL)
 
 
 def get_executor_cfg() -> dict:

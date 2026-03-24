@@ -27,8 +27,8 @@ export async function fetchSessions(): Promise<SessionMeta[]> {
   return fetch('/api/sessions').then((r) => r.json());
 }
 
-export async function fetchSessionMessages(sessionId: string): Promise<{ role: string; content: string }[]> {
+export async function fetchSessionMessages(sessionId: string): Promise<{ role: string; content: string; trace?: any }[]> {
   return fetch(`/api/session/messages?session_id=${encodeURIComponent(sessionId)}`)
     .then((r) => r.json())
-    .then((d) => d.recent_messages ?? []);
+    .then((d) => d.ui_messages ?? d.recent_messages ?? []);
 }

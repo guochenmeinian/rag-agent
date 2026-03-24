@@ -5,7 +5,7 @@ Run:
     # or from project root:
     PYTHONPATH=src uvicorn src.api:app --reload --port 8000
 """
-import sys, os, json, threading, asyncio, dataclasses
+import sys, os, json, threading, asyncio, dataclasses, time
 from contextlib import asynccontextmanager
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from agent.workflow import AgentWorkflow
+from agent.memory import ConversationMemory
 from tools.registry import ToolRegistry
 from tools.web_search import WebSearchTool
 from tools.rag_search import RagSearchTool
@@ -107,6 +108,7 @@ def _get_or_create_workflow(session_id: str, user_profile: str) -> AgentWorkflow
         )
     elif user_profile:
         _workflows[session_id].memory.user_profile = user_profile
+        _workflows[session_id].memory.global_user_info.raw = user_profile
     return _workflows[session_id]
 
 
@@ -124,14 +126,28 @@ async def chat_stream(
     loop = asyncio.get_running_loop()
 
     def _run_sync():
+        collected: list[dict] = []
+        t0 = time.time()
         try:
             for ev in workflow.run_stream(q):
+                collected.append({**ev, "ts": time.time() - t0})
                 asyncio.run_coroutine_threadsafe(event_q.put(ev), loop).result()
         except Exception as e:
             asyncio.run_coroutine_threadsafe(
                 event_q.put({"type": "error", "message": str(e)}), loop
             ).result()
         finally:
+            done_ev = next((e for e in collected if e["type"] == "done"), None)
+            if done_ev:
+                refined_ev = next((e for e in collected if e["type"] == "refined"), None)
+                trace = {
+                    "original_query": q,
+                    "refined_query": refined_ev["query"] if refined_ev else q,
+                    "elapsed": time.time() - t0,
+                    "events": json.loads(json.dumps(collected, cls=_Encoder)),
+                }
+                workflow.memory.attach_trace_to_last_assistant(trace)
+                workflow._persist()
             asyncio.run_coroutine_threadsafe(event_q.put(None), loop).result()
 
     threading.Thread(target=_run_sync, daemon=True).start()
@@ -168,11 +184,21 @@ async def clear_session(req: ClearRequest):
 
 @app.get("/api/session/memory")
 async def get_memory(session_id: str = Query(default="")):
-    key = session_id.strip() or "__anon__"
-    wf = _workflows.get(key)
-    if not wf:
+    sid = session_id.strip()
+    mem: ConversationMemory | None = None
+
+    if sid:
+        wf = _workflows.get(sid)
+        if wf:
+            mem = wf.memory
+        else:
+            path = os.path.join(config.MEMORY_DIR, f"{sid}.json")
+            if os.path.exists(path):
+                mem = ConversationMemory.load(path)
+
+    if mem is None:
         return {"facts": [], "global_user_info": {}, "recent_messages": []}
-    mem = wf.memory
+
     return {
         "facts": mem.facts,
         "global_user_info": mem.global_user_info.to_dict(),
@@ -206,24 +232,30 @@ async def list_sessions():
 
 @app.get("/api/session/messages")
 async def get_session_messages(session_id: str = Query(default="")):
-    """Return recent messages for a session (from disk or in-memory workflow)."""
+    """Return ui_messages (with trace) for a session (from disk or in-memory workflow)."""
     sid = session_id.strip()
     if not sid:
-        return {"recent_messages": []}
+        return {"ui_messages": [], "recent_messages": []}
     # Prefer in-memory workflow (has latest state)
     wf = _workflows.get(sid)
     if wf:
-        return {"recent_messages": list(wf.memory.recent_messages)}
+        return {
+            "ui_messages": wf.memory.ui_messages,
+            "recent_messages": list(wf.memory.recent_messages),
+        }
     # Fall back to disk
     path = os.path.join(config.MEMORY_DIR, f"{sid}.json")
     if os.path.exists(path):
         try:
             with open(path) as f:
                 data = json.load(f)
-            return {"recent_messages": data.get("recent_messages", [])}
+            return {
+                "ui_messages": data.get("ui_messages", []),
+                "recent_messages": data.get("recent_messages", []),
+            }
         except Exception:
             pass
-    return {"recent_messages": []}
+    return {"ui_messages": [], "recent_messages": []}
 
 
 @app.get("/api/status")

@@ -8,7 +8,7 @@ REPO_ROOT      = BENCHMARK_ROOT.parent
 # ── Data ──────────────────────────────────────────────────────
 DATA_DIR     = BENCHMARK_ROOT / "data"
 CASES_FILE   = DATA_DIR / "cases2.json"
-RESULTS_DIR  = DATA_DIR / "results"
+RESULTS_DIR  = BENCHMARK_ROOT / "results"
 
 # ── Synthesis ─────────────────────────────────────────────────
 SYNTHESIS_DIR = BENCHMARK_ROOT / "synthesis"

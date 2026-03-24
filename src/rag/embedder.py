@@ -1,16 +1,22 @@
-# download bge model 
+# download bge model
 import os
 from pathlib import Path
 from modelscope import snapshot_download
 from pymilvus import model
+from FlagEmbedding import FlagReranker
 
 os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 
-def load_bge_m3_embedder():
+def _get_model_cache_dir() -> Path:
     project_root = Path(__file__).resolve().parents[2]
     default_cache_dir = project_root / ".cache" / "modelscope"
-    model_cache_dir = Path(os.getenv("RAG_MODEL_CACHE", str(default_cache_dir)))
-    model_cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir = Path(os.getenv("RAG_MODEL_CACHE", str(default_cache_dir)))
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    return cache_dir
+
+
+def load_bge_m3_embedder():
+    model_cache_dir = _get_model_cache_dir()
     local_model_dir = model_cache_dir / "BAAI" / "bge-m3"
 
     if local_model_dir.exists() and (local_model_dir / "config.json").exists():
@@ -22,9 +28,34 @@ def load_bge_m3_embedder():
     # BGEM3EmbeddingFunction: https://milvus.io/api-reference/pymilvus/v2.4.x/EmbeddingModels/BGEM3EmbeddingFunction/BGEM3EmbeddingFunction.md
     return model.hybrid.BGEM3EmbeddingFunction(
         model_dir,
-        use_fp16=False, 
+        use_fp16=False,
         device="cpu"
     )
+
+
+_reranker_instance: FlagReranker | None = None
+
+
+def load_bge_reranker() -> FlagReranker:
+    """Load BGE-Reranker-v2-m3 cross-encoder (singleton — loaded once, shared across all RAGContexts)."""
+    global _reranker_instance
+    if _reranker_instance is not None:
+        return _reranker_instance
+
+    model_cache_dir = _get_model_cache_dir()
+    local_model_dir = model_cache_dir / "BAAI" / "bge-reranker-v2-m3"
+
+    if local_model_dir.exists() and (local_model_dir / "config.json").exists():
+        model_dir = str(local_model_dir)
+    else:
+        model_dir = snapshot_download(
+            'BAAI/bge-reranker-v2-m3',
+            cache_dir=str(model_cache_dir),
+            revision='master',
+        )
+
+    _reranker_instance = FlagReranker(model_dir, use_fp16=False, device="cpu")
+    return _reranker_instance
 
 def embed_texts(chunks, embedder):
     if not chunks:

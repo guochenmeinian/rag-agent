@@ -13,7 +13,7 @@ python benchmark/run_benchmark.py --ids rw_standalone_coref_001,rw_entity_001
 python benchmark/run_benchmark.py --category rw_standalone_coref
 
 # Custom dataset / output
-python benchmark/run_benchmark.py --dataset benchmark/data/cases.json --out benchmark/data/results/run_01.json
+python benchmark/run_benchmark.py --dataset benchmark/data/cases.json --out benchmark/results/run_01.json
 
 # Dry-run: load cases, skip all LLM/workflow calls
 python benchmark/run_benchmark.py --dry-run

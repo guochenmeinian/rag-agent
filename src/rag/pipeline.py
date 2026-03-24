@@ -1,12 +1,17 @@
+import hashlib
+import json
 import os
+from pathlib import Path
 from typing import Any
 from dataclasses import dataclass
 
 import config
 from rag.chunker import chunk_text
 from rag.embedder import embed_query, embed_texts, load_bge_m3_embedder
+from rag.embedder import load_bge_reranker
 from rag.parser import build_llama_parser, parse_single_file
 from rag.retriever import hybrid_search
+from rag.retriever import rerank_candidates
 from storage.vector_store import MilvusVectorStore
 from storage.ingest_manager import IngestManager
 from storage.grep_index import GrepIndex
@@ -17,11 +22,12 @@ class RAGContext:
     embedder: Any
     col_name: str
     dense_dim: int
+    reranker: Any = None
 
 _PROBE_DIM = 1024  # BGE-M3 dense dim; used only to open existing collections
 
-# Global IngestManager instance (shared across all ingest calls)
-_ingest_manager: IngestManager | None = None
+# IngestManager cache keyed by URI hash — supports multiple URIs in the same process
+_ingest_managers: dict[str, IngestManager] = {}
 
 def _backfill_grep_if_missing(col_name: str, pdf_files: list, manager: IngestManager):
     """Skip 路径：若 grep 无该 col 数据，从 parse 缓存回填。"""
@@ -38,20 +44,133 @@ def _backfill_grep_if_missing(col_name: str, pdf_files: list, manager: IngestMan
             t = manager.get_or_parse(fp, lambda f: parse_single_file(f, parser), verbose=False)
             all_text.append(t)
         merged = "".join(all_text)
-        chunks = chunk_text(merged, max_chunk_size=600, hard_max_length=900)
-        if chunks:
-            gidx.insert_chunks(col_name, chunks)
-            print(f"[ingest] {col_name}: grep index backfilled from cache ({len(chunks)} chunks)")
+        chunk_pairs = chunk_text(merged, max_chunk_size=600, hard_max_length=1200)
+        parent_chunks = [p for _, p in chunk_pairs]
+        if parent_chunks:
+            gidx.insert_chunks(col_name, parent_chunks)
+            print(f"[ingest] {col_name}: grep index backfilled from cache ({len(parent_chunks)} chunks)")
     except Exception as e:
         print(f"[ingest] {col_name}: grep backfill skipped - {e}")
 
 
+def _generate_chunk_contexts(
+    chunks: list[str],
+    doc_text: str,
+    col_name: str,
+    cache_dir: str,
+    pipeline_flags: dict | None = None,
+) -> list[str]:
+    """Prepend LLM-generated context summaries to each chunk (Contextual Retrieval).
+
+    For each chunk, calls Qwen with the first ~1500 chars of the document plus the chunk
+    to generate a 1-2 sentence description. The description is prepended so that the
+    embedding captures both the chunk's position in the document and its content.
+
+    Results are cached by content hash + pipeline config — re-runs with unchanged
+    chunks and config are free.
+
+    Returns a list of strings: "<context description>\\n<original chunk>"
+    """
+    # Cache key: MD5 of chunk content + pipeline config that affects chunk shape
+    flags = pipeline_flags or {}
+    config_tag = f"v{flags.get('chunk_version', 1)}_hmax{flags.get('hard_max_length', 900)}"
+    content_hash = hashlib.md5("\n".join(chunks).encode()).hexdigest()[:12]
+    cache_path = os.path.join(cache_dir, f"{col_name}_ctx_{config_tag}_{content_hash}.json")
+
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, "r", encoding="utf-8") as f:
+                cached = json.load(f)
+            if len(cached) == len(chunks):
+                print(f"[ingest] {col_name}: loaded {len(chunks)} chunk contexts from cache")
+                return cached
+        except (json.JSONDecodeError, IOError):
+            pass
+
+    # Legacy fallback: check old-style cache (no config_tag in name)
+    import glob as _glob
+    legacy_pattern = os.path.join(cache_dir, f"{col_name}_ctx_*.json")
+    for legacy_path in _glob.glob(legacy_pattern):
+        # Skip new-style files (contain version tag)
+        fname = os.path.basename(legacy_path)
+        if f"_ctx_{config_tag}_" in fname:
+            continue
+        try:
+            with open(legacy_path, "r", encoding="utf-8") as f:
+                legacy = json.load(f)
+            # Accept if chunk count differs by at most 5
+            if abs(len(legacy) - len(chunks)) <= 5:
+                # Pad with raw chunks if legacy is shorter, truncate if longer
+                if len(legacy) < len(chunks):
+                    legacy = legacy + chunks[len(legacy):]
+                else:
+                    legacy = legacy[:len(chunks)]
+                print(f"[ingest] {col_name}: reused legacy context cache ({legacy_path}), adapted to {len(chunks)} chunks")
+                # Save as new-style cache for future runs
+                os.makedirs(cache_dir, exist_ok=True)
+                with open(cache_path, "w", encoding="utf-8") as f:
+                    json.dump(legacy, f, ensure_ascii=False, indent=2)
+                return legacy
+        except (json.JSONDecodeError, IOError):
+            continue
+
+    from agent.qwen_client import get_qwen_client
+    client = get_qwen_client()
+    model = getattr(config, "CONTEXTUAL_RETRIEVAL_MODEL", config.QWEN_MODEL)
+
+    doc_prefix = doc_text[:1500]
+    contextualized: list[str] = []
+    total = len(chunks)
+    print(f"[ingest] {col_name}: generating contexts for {total} chunks (model={model})...")
+
+    for i, chunk in enumerate(chunks):
+        prompt = (
+            f"<document_excerpt>\n{doc_prefix}\n</document_excerpt>\n\n"
+            f"以下是该文档中的一个片段：\n<chunk>\n{chunk}\n</chunk>\n\n"
+            "请用1-2句话描述这个片段的主要内容，包括涉及的车型和参数类别。直接输出描述，不加任何前缀。"
+        )
+        try:
+            resp = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=80,
+                temperature=0,
+                timeout=30,
+                extra_body={"enable_thinking": False},    
+            )
+            ctx_text = resp.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"\n  [ctx] chunk {i}: failed ({e}), skipping context")
+            ctx_text = ""
+
+        contextualized.append(f"{ctx_text}\n{chunk}" if ctx_text else chunk)
+
+        # 进度条
+        done = i + 1
+        bar_len = 30
+        filled = int(bar_len * done / total)
+        bar = "█" * filled + "░" * (bar_len - filled)
+        print(f"\r  [{bar}] {done}/{total}", end="", flush=True)
+
+    print()  # 换行
+
+    os.makedirs(cache_dir, exist_ok=True)
+    with open(cache_path, "w", encoding="utf-8") as f:
+        json.dump(contextualized, f, ensure_ascii=False, indent=2)
+    print(f"[ingest] {col_name}: context generation done, cached to {cache_path}")
+
+    return contextualized
+
+
 def get_ingest_manager() -> IngestManager:
-    """获取全局 IngestManager 实例"""
-    global _ingest_manager
-    if _ingest_manager is None:
-        _ingest_manager = IngestManager()
-    return _ingest_manager
+    """获取 IngestManager 实例，按 MILVUS_URI 缓存，URI 变化时自动新建"""
+    uri = config.MILVUS_URI
+    uri_tag = hashlib.md5(uri.encode()).hexdigest()[:8]
+    if uri_tag not in _ingest_managers:
+        project_root = Path(__file__).resolve().parents[2]
+        manifest_path = str(project_root / f".ingest_manifest_{uri_tag}.json")
+        _ingest_managers[uri_tag] = IngestManager(manifest_path=manifest_path)
+    return _ingest_managers[uri_tag]
 
 
 def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, file_filter=None, grep_path=None):
@@ -92,21 +211,28 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
     collection_count = probe.col.num_entities if collection_exists else 0
 
     # 检查是否需要 ingest
+    pipeline_flags = {
+        "contextual_retrieval": getattr(config, "CONTEXTUAL_RETRIEVAL", True),
+        "chunk_version": 3,        # v3 = table-to-text + heading injection + parent chunk
+        "hard_max_length": 1200,
+    }
     if not force:
         status = manager.check_ingest_status(
             pdf_files=pdf_files,
             col_name=col_name,
             collection_exists=collection_exists,
             collection_count=collection_count,
+            pipeline_flags=pipeline_flags,
         )
 
         if status.skip:
             embedder = load_bge_m3_embedder()
+            reranker = load_bge_reranker()
             actual_dim = probe.col.schema.fields[-1].params["dim"]
             print(f"[ingest] {col_name}: skipping - {status.reason}")
             # 若 grep 索引缺失，从 parse 缓存回填
             _backfill_grep_if_missing(col_name, pdf_files, manager)
-            return RAGContext(store=probe, embedder=embedder, col_name=col_name, dense_dim=actual_dim)
+            return RAGContext(store=probe, embedder=embedder, col_name=col_name, dense_dim=actual_dim, reranker=reranker)
 
 
         print(f"[ingest] {col_name}: need to ingest - {status.reason}")
@@ -127,17 +253,26 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
         )
         all_text.append(parsed_text)
 
-    # 3. Chunk
+    # 3. Chunk — returns (small_chunk, parent_chunk) tuples
     merged_text = "".join(all_text)
-    chunks = chunk_text(merged_text, max_chunk_size=600, hard_max_length=900)
-    if not chunks:
+    chunk_pairs = chunk_text(merged_text, max_chunk_size=600, hard_max_length=1200)
+    if not chunk_pairs:
         raise ValueError("No chunks generated from input documents")
 
-    print(f"[ingest] {col_name}: generated {len(chunks)} chunks")
+    small_chunks  = [s for s, _ in chunk_pairs]
+    parent_chunks = [p for _, p in chunk_pairs]
 
-    # 4. Embed
+    print(f"[ingest] {col_name}: generated {len(small_chunks)} chunks")
+
+    # 3b. Contextual Retrieval: prepend LLM-generated context to small chunks only
+    if getattr(config, "CONTEXTUAL_RETRIEVAL", True):
+        ctx_cache_dir = str(manager.cache_dir / "contexts")
+        small_chunks = _generate_chunk_contexts(small_chunks, merged_text, col_name, ctx_cache_dir, pipeline_flags)
+
+    # 4. Embed small chunks (contextualised or plain)
     embedder = load_bge_m3_embedder()
-    emb = embed_texts(chunks, embedder)
+    reranker = load_bge_reranker()
+    emb = embed_texts(small_chunks, embedder)
     dense_dim = emb["dense"][0].shape[0]
 
     # 5. 如果 collection 已存在但需要重建，先删除
@@ -145,23 +280,23 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
         print(f"[ingest] {col_name}: dropping existing collection")
         probe.col.drop()
 
-    # 6. 重新创建并插入
+    # 6. 重新创建并插入（同时存 small chunk 和 parent chunk）
     store = MilvusVectorStore(uri=uri, col_name=col_name, dense_dim=dense_dim)
-    store.insert(chunks, emb)
+    store.insert(small_chunks, emb, parent_chunks=parent_chunks)
 
-    print(f"[ingest] {col_name}: inserted {len(chunks)} chunks")
+    print(f"[ingest] {col_name}: inserted {len(small_chunks)} chunks")
 
-    # 6b. 写入 grep 全文索引（Claude 风格 keyword 检索）
+    # 6b. 写入 grep 全文索引（用 parent chunks，内容更完整）
     grep_path = grep_path or getattr(config, "GREP_INDEX_PATH", None)
     if grep_path:
         gidx = GrepIndex(grep_path)
-        gidx.insert_chunks(col_name, chunks)
+        gidx.insert_chunks(col_name, parent_chunks)
         print(f"[ingest] {col_name}: grep index updated")
 
     # 7. 更新 manifest（只记录实际处理的文件）
-    manager.mark_ingested_files(col_name, pdf_files)
+    manager.mark_ingested_files(col_name, pdf_files, pipeline_flags=pipeline_flags)
 
-    return RAGContext(store=store, embedder=embedder, col_name=col_name, dense_dim=dense_dim)
+    return RAGContext(store=store, embedder=embedder, col_name=col_name, dense_dim=dense_dim, reranker=reranker)
 
 
 def _get_sparse_row(sparse_matrix, idx: int):
@@ -173,16 +308,15 @@ def _get_sparse_row(sparse_matrix, idx: int):
     return sparse_matrix[idx]
 
 
-def retrieve(query, ctx, limit=5, search_limit=15, sparse_weight=0.5, dense_weight=1.0, score_threshold=0.35):
-    """Hybrid retrieval with two-stage candidate selection.
+def retrieve(query, ctx, limit=5, search_limit=10, sparse_weight=0.5, dense_weight=1.0, score_threshold=0.35):
+    """Hybrid retrieval (dense + sparse BM25) with score threshold filtering.
 
     Args:
-        limit:        Max chunks returned to caller (after filtering).
-        search_limit: Candidates fetched from Milvus before threshold filtering.
-                      Larger → higher recall at the cost of more computation.
-        sparse_weight: Weight for BM25 keyword matching (lower → less keyword bias).
-        dense_weight:  Weight for semantic dense embedding (higher → better concept recall).
-        score_threshold: Minimum score to keep a chunk. Lower → more permissive.
+        limit:           Max chunks returned to caller.
+        search_limit:    Candidates fetched from Milvus before threshold filtering.
+        sparse_weight:   Weight for BM25 keyword matching.
+        dense_weight:    Weight for semantic dense embedding.
+        score_threshold: Minimum hybrid score to keep a chunk.
     """
     query_emb = embed_query(query, ctx.embedder)
     dense = query_emb["dense"][0]
@@ -193,14 +327,19 @@ def retrieve(query, ctx, limit=5, search_limit=15, sparse_weight=0.5, dense_weig
         sparse,
         sparse_weight=sparse_weight,
         dense_weight=dense_weight,
-        limit=search_limit,  # fetch more candidates before filtering
+        limit=search_limit,
     )
     total_before_filter = len(raw)
-    if score_threshold > 0:
-        raw = [(t, s) for t, s in raw if s >= score_threshold]
-    # Keep only top-`limit` after filtering
-    raw = raw[:limit]
-    items = [{"text": t, "score": round(s, 4), "rank": i + 1} for i, (t, s) in enumerate(raw)]
+    if ctx.reranker is not None:
+        raw = rerank_candidates(query, raw, ctx.reranker, top_k=limit)
+    else:
+        if score_threshold > 0:
+            raw = [(t, p, s) for t, p, s in raw if s >= score_threshold]
+        raw = raw[:limit]
+
+    # text = parent chunk (full context for LLM); chunk = small chunk used for retrieval
+    items = [{"text": p, "chunk": t, "score": round(s, 4), "rank": i + 1}
+             for i, (t, p, s) in enumerate(raw)]
     for item in items:
         item["_total_before_filter"] = total_before_filter
         item["_score_threshold"] = score_threshold
