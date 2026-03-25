@@ -15,6 +15,7 @@ clarification  (0/1) — correct uncertainty / safety handling
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -29,13 +30,66 @@ from benchmark.eval.llm_judge import (
 
 
 # ─────────────────────────────────────────────────────────────
+# Normalization helpers
+# ─────────────────────────────────────────────────────────────
+
+# Chinese unit → SI abbreviation mappings, applied only when preceded by a digit.
+# Using lookbehind so "上升" stays "上升" but "542升" → "542L".
+_UNIT_PATTERNS = [
+    (r'(?<=\d)千克', 'kg'),
+    (r'(?<=\d)公斤', 'kg'),
+    (r'(?<=\d)毫米', 'mm'),
+    (r'(?<=\d)厘米', 'cm'),
+    (r'(?<=\d)公里', 'km'),
+    (r'(?<=\d)千米', 'km'),
+    (r'(?<=\d)升',   'L'),
+    (r'(?<=\d)千瓦', 'kW'),
+    (r'(?<=\d)瓦特', 'W'),
+    (r'(?<=\d)牛·米', 'N·m'),
+    (r'(?<=\d)牛米',  'N·m'),
+]
+
+
+def _normalize_for_match(text: str) -> str:
+    """Normalize text for key_fact substring matching.
+
+    Handles format variations between ground-truth key_facts (compact/abbreviated)
+    and system answers (verbose, Chinese units, spaces around numbers):
+
+    - Collapses spaces between a digit and the following unit character:
+        "2399 千克" → "2399千克",  "180 kW" → "180kW",  "20 寸" → "20寸"
+    - Maps Chinese unit words to SI abbreviations (digit-adjacent only):
+        "2399千克" → "2399kg",  "542升" → "542L",  "5325毫米" → "5325mm"
+    """
+    # Collapse digit + space(s) + non-digit char: "2399 千克" → "2399千克"
+    result = re.sub(r'(\d)\s+([^\d\s])', r'\1\2', text)
+    # Apply unit synonym replacements
+    for pattern, replacement in _UNIT_PATTERNS:
+        result = re.sub(pattern, replacement, result)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────
 # Hard checks
 # ─────────────────────────────────────────────────────────────
 
 def _check_key_facts(answer: str, key_facts: list[str]) -> dict:
     if not key_facts:
         return {"pass": True, "missing": [], "coverage": 1.0}
-    missing = [f for f in key_facts if f.lower() not in answer.lower()]
+
+    # Normalize first (unit substitutions may produce uppercase, e.g. 升→L),
+    # then lowercase for case-insensitive comparison.
+    norm_answer = _normalize_for_match(answer).lower()
+    answer_lower = answer.lower()
+    missing = []
+    for f in key_facts:
+        # Try exact (case-insensitive) match first, then normalized match
+        if f.lower() in answer_lower:
+            continue
+        if _normalize_for_match(f).lower() in norm_answer:
+            continue
+        missing.append(f)
+
     coverage = round((len(key_facts) - len(missing)) / len(key_facts), 3)
     return {"pass": len(missing) == 0, "missing": missing, "coverage": coverage}
 

@@ -8,8 +8,44 @@ def _is_divider_row(row: str) -> bool:
     return all(ch in '-|: ' for ch in row)
 
 
+def _parse_row_cells(row: str, n_cols: int) -> list[str]:
+    """Parse a Markdown table row into exactly n_cols cell values.
+
+    Preserves empty cells so column alignment is maintained — unlike a naive
+    ``row.split('|') if v.strip()`` which discards empty cells and causes
+    column shifting for grouped tables (where column 0 is blank on continuation
+    rows because it was merged with the row above in the original PDF).
+
+    If the row has fewer cells than n_cols the cells are right-aligned (empty
+    cells prepended) on the assumption that leading columns were merged/omitted.
+    """
+    raw = row.split('|')
+    # Strip leading/trailing empty strings introduced by the outer pipes
+    if raw and raw[0].strip() == '':
+        raw = raw[1:]
+    if raw and raw[-1].strip() == '':
+        raw = raw[:-1]
+
+    cells = [c.strip() for c in raw]
+
+    if len(cells) < n_cols:
+        # Right-align: prepend empty cells so existing values map to the
+        # rightmost columns.  This handles rows like "| tire | range | energy |"
+        # that should actually be "| (empty) | tire | range | energy |".
+        cells = [''] * (n_cols - len(cells)) + cells
+    else:
+        cells = cells[:n_cols]
+
+    return cells
+
+
 def _table_to_text(heading: str, header_line: str, data_rows: list[str]) -> list[str]:
     """Convert table data rows to natural language sentences for embedding.
+
+    Handles grouped (multi-row) tables where continuation rows have an empty
+    first cell because the value is inherited from the row above (fill-down).
+    Without fill-down, continuation rows get garbled sentences (e.g. a tire
+    spec appears in the battery-capacity column).
 
     Each data row becomes one sentence:
       "{heading}：{col1}为{val1}，{col2}为{val2}，..."
@@ -19,19 +55,29 @@ def _table_to_text(heading: str, header_line: str, data_rows: list[str]) -> list
     cols = _parse_table_cols(header_line)
     if not cols:
         return []
+    n_cols = len(cols)
 
     sentences = []
+    prev_cells: list[str] = [''] * n_cols  # fill-down state
+
     for row in data_rows:
         if not row.strip() or _is_divider_row(row):
             continue
-        vals = [v.strip() for v in row.split('|') if v.strip()]
-        if not vals:
-            continue
+
+        cells = _parse_row_cells(row, n_cols)
+
+        # Fill-down: inherit non-empty values from the previous row for any
+        # cell that is blank in the current row.
+        for i, cell in enumerate(cells):
+            if not cell and prev_cells[i]:
+                cells[i] = prev_cells[i]
+
+        prev_cells = cells[:]
 
         pairs = [
-            f"{cols[i]}为{vals[i]}"
-            for i in range(min(len(cols), len(vals)))
-            if vals[i]
+            f"{cols[i]}为{cells[i]}"
+            for i in range(n_cols)
+            if cells[i]
         ]
         if not pairs:
             continue

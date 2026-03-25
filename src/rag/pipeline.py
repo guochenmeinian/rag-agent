@@ -308,7 +308,7 @@ def _get_sparse_row(sparse_matrix, idx: int):
     return sparse_matrix[idx]
 
 
-def retrieve(query, ctx, limit=5, search_limit=10, sparse_weight=0.5, dense_weight=1.0, score_threshold=0.35):
+def retrieve(query, ctx, limit=5, search_limit=20, sparse_weight=0.5, dense_weight=1.0, score_threshold=0.35):
     """Hybrid retrieval (dense + sparse BM25) with score threshold filtering.
 
     Args:
