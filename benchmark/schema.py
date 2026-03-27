@@ -159,8 +159,13 @@ class AnswerGT(TypedDict):
     """Ground truth grouped by the metric they compute.
 
     match (0/1/2)
-        ground_truth — reference answer for LLM judge similarity scoring
-        key_facts    — atomic facts that must appear in a correct answer
+        ground_truth    — reference answer for LLM judge similarity scoring
+        key_facts       — SHORT atomic facts (numbers, codes, names) for hard
+                          exact/normalized substring match; missing one caps
+                          the score at 1.
+        semantic_claims — LONGER descriptive assertions (behaviour, logic,
+                          compound conditions) verified by LLM judge only;
+                          never used in hard substring check.
 
     hallucination (0/1)
         forbidden_content — strings / facts that must NOT appear in the answer
@@ -172,6 +177,7 @@ class AnswerGT(TypedDict):
     # match
     ground_truth: str
     key_facts: list[str]
+    semantic_claims: list[str]
 
     # hallucination
     forbidden_content: list[str]

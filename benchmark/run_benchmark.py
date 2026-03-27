@@ -254,7 +254,9 @@ def run_case(
                     result["detail"]["retrieval"]["expect_no_hit"] = True
 
     if "answer" in layers and "answer" in targets and case.get("answer_gt"):
-        r = eval_answer_case(case, parsed["answer"])
+        # Pass retrieved chunks so RAGAS faithfulness + context_recall can be computed
+        ranked_chunks_for_answer = _extract_chunks(parsed["tool_results"])
+        r = eval_answer_case(case, parsed["answer"], contexts=ranked_chunks_for_answer or None)
         result["metrics"].update({f"answer/{k}": v for k, v in r["metrics"].items()})
         result["detail"]["answer"] = r["detail"]
         result["answer"] = parsed["answer"][:300]
@@ -357,6 +359,8 @@ def print_summary(summary: dict):
             ("hallucination_clean",     None),
             ("clarification_acc",       None),
             ("key_facts_coverage_avg",  None),
+            ("faithfulness_avg",        "n_ragas"),
+            ("context_recall_avg",      "n_ragas"),
         ],
     }
 

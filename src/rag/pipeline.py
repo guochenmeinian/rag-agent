@@ -308,15 +308,18 @@ def _get_sparse_row(sparse_matrix, idx: int):
     return sparse_matrix[idx]
 
 
-def retrieve(query, ctx, limit=5, search_limit=20, sparse_weight=0.5, dense_weight=1.0, score_threshold=0.35):
+def retrieve(query, ctx, limit=5, search_limit=20, sparse_weight=0.7, dense_weight=1.0,
+             score_threshold=0.35, reranker_min_score=0.25):
     """Hybrid retrieval (dense + sparse BM25) with score threshold filtering.
 
     Args:
-        limit:           Max chunks returned to caller.
-        search_limit:    Candidates fetched from Milvus before threshold filtering.
-        sparse_weight:   Weight for BM25 keyword matching.
-        dense_weight:    Weight for semantic dense embedding.
-        score_threshold: Minimum hybrid score to keep a chunk.
+        limit:              Max chunks returned to caller.
+        search_limit:       Candidates fetched from Milvus before threshold filtering.
+        sparse_weight:      Weight for BM25 keyword matching (raised to 0.7 for better exact-term recall).
+        dense_weight:       Weight for semantic dense embedding.
+        score_threshold:    Minimum hybrid score to keep a chunk (no-reranker path only).
+        reranker_min_score: Minimum cross-encoder score after reranking; chunks below this
+                            threshold are dropped. Falls back to top-2 if too aggressive.
     """
     query_emb = embed_query(query, ctx.embedder)
     dense = query_emb["dense"][0]
@@ -331,7 +334,10 @@ def retrieve(query, ctx, limit=5, search_limit=20, sparse_weight=0.5, dense_weig
     )
     total_before_filter = len(raw)
     if ctx.reranker is not None:
-        raw = rerank_candidates(query, raw, ctx.reranker, top_k=limit)
+        reranked = rerank_candidates(query, raw, ctx.reranker, top_k=limit)
+        # Filter out low-confidence chunks; keep at least 2 to avoid empty context
+        filtered = [(t, p, s) for t, p, s in reranked if s >= reranker_min_score]
+        raw = filtered if len(filtered) >= 2 else reranked[:2]
     else:
         if score_threshold > 0:
             raw = [(t, p, s) for t, p, s in raw if s >= score_threshold]

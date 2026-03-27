@@ -3,19 +3,27 @@
 Metrics
 ───────
 match          (0/1/2) — similarity to ground truth
-  hard: key_facts presence check
+  key_facts:  per-fact LLM check — semantic equivalence, not substring match
+              "4座" = "4个座位" = "座位数：4"; missing any fact caps score at 1
+  semantic_claims: fed into overall LLM judge for holistic scoring
   soft: LLM judge (0=wrong, 1=partial, 2=correct)
 
 hallucination  (0/1) — 1=clean, 0=hallucinated
-  hard: forbidden_content not present
+  hard: forbidden_content substring check (exact wrong values)
   soft: LLM judge
 
 clarification  (0/1) — correct uncertainty / safety handling
   soft: LLM judge only
+
+faithfulness   (0.0–1.0) — RAGAS-style: answer claims supported by retrieved chunks
+  vs hallucination: hallucination compares to ground_truth;
+                    faithfulness compares to actually retrieved context
+
+context_recall (0.0–1.0) — RAGAS-style: ground truth sentences covered by retrieved chunks
+  measures whether retrieval found everything needed to answer correctly
 """
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
@@ -23,76 +31,17 @@ _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO / "src"))
 
 from benchmark.eval.llm_judge import (
+    judge_key_facts,
     judge_answer_match,
     judge_hallucination,
     judge_answer_clarification,
 )
+from benchmark.eval.ragas_eval import evaluate_ragas
 
 
 # ─────────────────────────────────────────────────────────────
-# Normalization helpers
+# Hard check (forbidden content only)
 # ─────────────────────────────────────────────────────────────
-
-# Chinese unit → SI abbreviation mappings, applied only when preceded by a digit.
-# Using lookbehind so "上升" stays "上升" but "542升" → "542L".
-_UNIT_PATTERNS = [
-    (r'(?<=\d)千克', 'kg'),
-    (r'(?<=\d)公斤', 'kg'),
-    (r'(?<=\d)毫米', 'mm'),
-    (r'(?<=\d)厘米', 'cm'),
-    (r'(?<=\d)公里', 'km'),
-    (r'(?<=\d)千米', 'km'),
-    (r'(?<=\d)升',   'L'),
-    (r'(?<=\d)千瓦', 'kW'),
-    (r'(?<=\d)瓦特', 'W'),
-    (r'(?<=\d)牛·米', 'N·m'),
-    (r'(?<=\d)牛米',  'N·m'),
-]
-
-
-def _normalize_for_match(text: str) -> str:
-    """Normalize text for key_fact substring matching.
-
-    Handles format variations between ground-truth key_facts (compact/abbreviated)
-    and system answers (verbose, Chinese units, spaces around numbers):
-
-    - Collapses spaces between a digit and the following unit character:
-        "2399 千克" → "2399千克",  "180 kW" → "180kW",  "20 寸" → "20寸"
-    - Maps Chinese unit words to SI abbreviations (digit-adjacent only):
-        "2399千克" → "2399kg",  "542升" → "542L",  "5325毫米" → "5325mm"
-    """
-    # Collapse digit + space(s) + non-digit char: "2399 千克" → "2399千克"
-    result = re.sub(r'(\d)\s+([^\d\s])', r'\1\2', text)
-    # Apply unit synonym replacements
-    for pattern, replacement in _UNIT_PATTERNS:
-        result = re.sub(pattern, replacement, result)
-    return result
-
-
-# ─────────────────────────────────────────────────────────────
-# Hard checks
-# ─────────────────────────────────────────────────────────────
-
-def _check_key_facts(answer: str, key_facts: list[str]) -> dict:
-    if not key_facts:
-        return {"pass": True, "missing": [], "coverage": 1.0}
-
-    # Normalize first (unit substitutions may produce uppercase, e.g. 升→L),
-    # then lowercase for case-insensitive comparison.
-    norm_answer = _normalize_for_match(answer).lower()
-    answer_lower = answer.lower()
-    missing = []
-    for f in key_facts:
-        # Try exact (case-insensitive) match first, then normalized match
-        if f.lower() in answer_lower:
-            continue
-        if _normalize_for_match(f).lower() in norm_answer:
-            continue
-        missing.append(f)
-
-    coverage = round((len(key_facts) - len(missing)) / len(key_facts), 3)
-    return {"pass": len(missing) == 0, "missing": missing, "coverage": coverage}
-
 
 def _check_forbidden_content(answer: str, forbidden: list[str]) -> dict:
     found = [f for f in forbidden if f.lower() in answer.lower()]
@@ -106,41 +55,38 @@ def _check_forbidden_content(answer: str, forbidden: list[str]) -> dict:
 def score_match(answer: str, gt: dict) -> dict:
     """0=wrong, 1=partial, 2=correct.
 
-    Hard: key_facts all present → hard floor of 1 if passed.
-    Soft: LLM judge gives 0/1/2.
-    Final = min(llm_score + hard_bonus, 2).
+    key_facts:      per-fact LLM check; any missing → cap final score at 1.
+    semantic_claims: passed to overall LLM judge for holistic scoring.
+    Final:          min(llm_score, 1) if key_facts incomplete, else llm_score.
     """
-    kf = _check_key_facts(answer, gt.get("key_facts", []))
+    kf  = judge_key_facts(answer, gt.get("key_facts", []))
     llm = judge_answer_match(answer, gt)
     llm_score = llm.get("score", 0)
 
-    # If hard check fails (missing key facts), cap at 1
     if not kf["pass"] and llm_score == 2:
         llm_score = 1
 
     return {
-        "score": llm_score,
-        "hard": kf,
-        "llm":  llm,
+        "score":     llm_score,
+        "key_facts": kf,
+        "llm":       llm,
     }
 
 
 def score_hallucination(answer: str, gt: dict) -> dict:
     """1 = clean, 0 = hallucinated.
 
-    Hard: forbidden_content check. If fails → score=0 regardless of LLM.
+    Hard: forbidden_content substring check. Fails → score=0 regardless of LLM.
     Soft: LLM judge.
     """
-    fc = _check_forbidden_content(answer, gt.get("forbidden_content", []))
+    fc  = _check_forbidden_content(answer, gt.get("forbidden_content", []))
     llm = judge_hallucination(answer, gt)
     llm_pass = llm.get("score", 1) == 1
 
-    final = int(fc["pass"] and llm_pass)
-
     return {
-        "score": final,
-        "hard": fc,
-        "llm":  llm,
+        "score": int(fc["pass"] and llm_pass),
+        "hard":  fc,
+        "llm":   llm,
     }
 
 
@@ -157,12 +103,14 @@ def score_clarification(answer: str, gt: dict) -> dict:
 # Case-level runner
 # ─────────────────────────────────────────────────────────────
 
-def eval_answer_case(case: dict, answer: str) -> dict:
-    """Evaluate one answer case.
+def eval_answer_case(case: dict, answer: str, contexts: list[dict] | None = None) -> dict:
+    """Evaluate a single answer case.
 
     Args:
-        case:   BenchmarkCase dict with answer_gt
-        answer: actual answer string from the system
+        case:     benchmark case dict with answer_gt
+        answer:   system-generated answer string
+        contexts: optional list of {"id": str, "content": str} retrieved chunks.
+                  When provided, faithfulness and context_recall are computed.
     """
     gt = case.get("answer_gt", {})
 
@@ -170,20 +118,39 @@ def eval_answer_case(case: dict, answer: str) -> dict:
     hallu  = score_hallucination(answer, gt)
     clarif = score_clarification(answer, gt)
 
+    metrics = {
+        "match":         match["score"],
+        "hallucination": hallu["score"],
+        "clarification": clarif["score"],
+    }
+    detail = {
+        "match":         match,
+        "hallucination": hallu,
+        "clarification": clarif,
+    }
+
+    # Official RAGAS metrics (only when retrieved chunks are available)
+    if contexts:
+        ctx_texts = [c.get("content", "") for c in contexts if c.get("content")]
+        ragas = evaluate_ragas(
+            question=case["input"],
+            answer=answer,
+            contexts=ctx_texts,
+            ground_truth=gt.get("ground_truth", ""),
+        )
+        # Only store non-None scores in metrics (NaN from RAGAS → None → excluded from avg)
+        if ragas["faithfulness"]   is not None:
+            metrics["faithfulness"]   = ragas["faithfulness"]
+        if ragas["context_recall"] is not None:
+            metrics["context_recall"] = ragas["context_recall"]
+        detail["ragas"] = ragas
+
     return {
         "id":     case["id"],
         "input":  case["input"],
         "answer": answer[:400],
-        "metrics": {
-            "match":         match["score"],
-            "hallucination": hallu["score"],
-            "clarification": clarif["score"],
-        },
-        "detail": {
-            "match":         match,
-            "hallucination": hallu,
-            "clarification": clarif,
-        },
+        "metrics": metrics,
+        "detail":  detail,
     }
 
 
@@ -199,20 +166,29 @@ def aggregate_answer(results: list[dict]) -> dict:
         vals = [r["metrics"][key] for r in results]
         return round(sum(vals) / len(vals), 3)
 
-    # Diagnostic: key_facts coverage (0–1) — how many facts were present on average
     kf_coverages = [
-        r["detail"]["match"]["hard"]["coverage"]
+        r["detail"]["match"]["key_facts"]["coverage"]
         for r in results
-        if r.get("detail", {}).get("match", {}).get("hard", {}).get("coverage") is not None
+        if r.get("detail", {}).get("match", {}).get("key_facts", {}).get("coverage") is not None
     ]
     kf_coverage_avg = round(sum(kf_coverages) / len(kf_coverages), 3) if kf_coverages else None
 
-    return {
-        "n":             len(results),
-        "match_avg":     avg("match"),         # 0–2 scale
-        "match_full":    round(sum(1 for r in results if r["metrics"]["match"] == 2) / len(results), 3),
-        "hallucination_clean": avg("hallucination"),
-        "clarification_acc":   avg("clarification"),
-        # Diagnostics
+    # RAGAS metrics — only average over cases where not skipped
+    faith_scores  = [r["metrics"]["faithfulness"]   for r in results
+                     if r.get("metrics", {}).get("faithfulness")   is not None]
+    recall_scores = [r["metrics"]["context_recall"] for r in results
+                     if r.get("metrics", {}).get("context_recall") is not None]
+
+    out = {
+        "n":                      len(results),
+        "match_avg":              avg("match"),
+        "match_full":             round(sum(1 for r in results if r["metrics"]["match"] == 2) / len(results), 3),
+        "hallucination_clean":    avg("hallucination"),
+        "clarification_acc":      avg("clarification"),
         "key_facts_coverage_avg": kf_coverage_avg,
     }
+    if faith_scores:
+        out["faithfulness_avg"]    = round(sum(faith_scores) / len(faith_scores), 3)
+        out["context_recall_avg"]  = round(sum(recall_scores) / len(recall_scores), 3) if recall_scores else None
+        out["n_ragas"]             = len(faith_scores)
+    return out

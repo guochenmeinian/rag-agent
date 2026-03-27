@@ -31,8 +31,8 @@ def _get_client() -> tuple[OpenAI, str]:
     return OpenAI(**kw), config.EXECUTOR_MODEL
 
 
-def _call(system: str, user: str) -> dict:
-    """Call the judge LLM; expect JSON {"score": int, "reason": str}."""
+def _call(system: str, user: str, max_tokens: int = 300) -> dict:
+    """Call the judge LLM; expect JSON response."""
     client, model = _get_client()
     resp = client.chat.completions.create(
         model=model,
@@ -41,10 +41,69 @@ def _call(system: str, user: str) -> dict:
             {"role": "user",   "content": user},
         ],
         temperature=0,
-        max_tokens=300,
+        max_tokens=max_tokens,
         response_format={"type": "json_object"},
     )
     return json.loads(resp.choices[0].message.content)
+
+
+# ─────────────────────────────────────────────────────────────
+# Key-facts per-fact LLM check
+# ─────────────────────────────────────────────────────────────
+
+def judge_key_facts(answer: str, key_facts: list[str]) -> dict:
+    """Check each key_fact semantically against the answer.
+
+    Unlike substring matching, this handles linguistic variation:
+      "4座" = "4个座位" = "座位数：4" = "可乘坐4人"
+      "163Wh/km" = "16.3kWh/100km"  (unit equivalence)
+      "163Wh/km" ≠ "13.2kWh/100km"  (wrong value → fail)
+
+    Returns:
+        {
+          "pass": bool,
+          "missing": [fact, ...],
+          "coverage": float,
+          "results": [{"fact": str, "pass": bool, "reason": str}, ...]
+        }
+    """
+    if not key_facts:
+        return {"pass": True, "missing": [], "coverage": 1.0, "results": []}
+
+    system = """\
+You are a fact-checking judge. For each numbered fact, determine whether the \
+SYSTEM ANSWER expresses that fact — regardless of exact wording or format.
+
+Return JSON: {"results": [{"fact": "<fact text>", "pass": true/false, "reason": "<brief>"}]}
+
+Rules:
+- Semantic equivalence counts: "4座" = "4个座位" = "座位数：4"
+- Unit equivalence counts: "163Wh/km" = "16.3kWh/100km"
+- Numerical values must be correct: "13.2kWh/100km" does NOT satisfy "163Wh/km"
+- pass=true only if the fact is explicitly stated or unambiguously implied
+"""
+    facts_str = "\n".join(f"{i+1}. {f}" for i, f in enumerate(key_facts))
+    user = f"FACTS TO CHECK:\n{facts_str}\n\nSYSTEM ANSWER: {answer}"
+
+    raw = _call(system, user, max_tokens=600)
+    results = raw.get("results", [])
+
+    # Align results with original key_facts in case LLM reorders
+    fact_to_result = {r.get("fact", ""): r for r in results}
+    aligned = []
+    for f in key_facts:
+        r = fact_to_result.get(f, {"fact": f, "pass": False, "reason": "no result returned"})
+        aligned.append(r)
+
+    missing = [r["fact"] for r in aligned if not r.get("pass", False)]
+    coverage = round((len(key_facts) - len(missing)) / len(key_facts), 3)
+
+    return {
+        "pass": len(missing) == 0,
+        "missing": missing,
+        "coverage": coverage,
+        "results": aligned,
+    }
 
 
 # ─────────────────────────────────────────────────────────────
@@ -214,19 +273,26 @@ def judge_answer_match(
     answer: str,
     gt: dict,
 ) -> dict:
-    """Score: 0=wrong, 1=partial, 2=correct."""
+    """Score: 0=wrong, 1=partial, 2=correct.
+
+    Evaluates both key_facts (atomic values) and semantic_claims (logical
+    assertions about behaviour / conditions) against the system answer.
+    """
     system = """\
 You are an evaluation judge. Compare the SYSTEM ANSWER to the GROUND TRUTH.
 
 Return JSON: {"score": 0 | 1 | 2, "reason": "<brief explanation>"}
 
-score=2: all key facts present and correct, no significant errors.
-score=1: partially correct — some key facts present but incomplete or minor errors.
-score=0: missing most key facts, or contains factual errors.
+score=2: all atomic key facts AND all semantic claims are present and correct,
+         no significant errors.
+score=1: partially correct — some facts/claims present but incomplete or minor errors.
+score=0: missing most facts/claims, or contains factual errors.
 """
+    semantic_claims = gt.get("semantic_claims", [])
+    claims_line = f"\nSEMANTIC CLAIMS (logical assertions to verify): {semantic_claims}" if semantic_claims else ""
     user = f"""\
 GROUND TRUTH: {gt.get("ground_truth", "")}
-KEY FACTS (must all appear): {gt.get("key_facts", [])}
+KEY FACTS (atomic values that must appear): {gt.get("key_facts", [])}{claims_line}
 
 SYSTEM ANSWER: {answer}
 """
@@ -254,6 +320,127 @@ FORBIDDEN CONTENT (must not appear): {gt.get("forbidden_content", [])}
 SYSTEM ANSWER: {answer}
 """
     return _call(system, user)
+
+
+# ─────────────────────────────────────────────────────────────
+# RAGAS-style judges
+# ─────────────────────────────────────────────────────────────
+
+def judge_faithfulness(answer: str, contexts: list[dict]) -> dict:
+    """RAGAS Faithfulness: are answer claims supported by retrieved chunks?
+
+    Different from hallucination (which compares to ground_truth),
+    faithfulness checks grounding in the *actual retrieved context*.
+
+    Args:
+        answer:   system answer string
+        contexts: list of {"id": str, "content": str} retrieved chunks
+
+    Returns:
+        {"score": float 0-1, "claims": [...], "supported": int, "total": int}
+    """
+    if not contexts or not answer.strip():
+        return {"score": 1.0, "claims": [], "supported": 0, "total": 0, "skipped": True}
+
+    ctx_text = "\n\n".join(
+        f"[Context {i+1}]\n{c.get('content', '')[:1200]}"
+        for i, c in enumerate(contexts[:6])  # cap at 6 chunks to stay within token limit
+    )
+    system = """\
+You are a faithfulness evaluator. Your task:
+1. Decompose the SYSTEM ANSWER into atomic factual claims (ignore greetings/hedges).
+2. For each claim, check whether it is explicitly supported by the CONTEXT CHUNKS.
+3. A claim is supported if the chunk text clearly states or implies the same fact.
+
+Return JSON:
+{
+  "claims": [
+    {"claim": "<text>", "supported": true/false, "reason": "<brief>"}
+  ],
+  "score": <supported_count / total_count, float 0-1>
+}
+
+Important: only evaluate claims about specific facts (numbers, names, features, behaviors).
+Skip vague or evaluative statements like "the car is excellent".
+If no factual claims found, return score=1.0 and empty claims list.
+"""
+    user = f"CONTEXT CHUNKS:\n{ctx_text}\n\nSYSTEM ANSWER: {answer}"
+    raw = _call(system, user, max_tokens=800)
+
+    claims = raw.get("claims", [])
+    score = raw.get("score")
+    if score is None:
+        supported = sum(1 for c in claims if c.get("supported", False))
+        score = round(supported / len(claims), 3) if claims else 1.0
+    else:
+        score = round(float(score), 3)
+    supported = sum(1 for c in claims if c.get("supported", False))
+
+    return {
+        "score":     score,
+        "claims":    claims,
+        "supported": supported,
+        "total":     len(claims),
+    }
+
+
+def judge_context_recall(ground_truth: str, contexts: list[dict]) -> dict:
+    """RAGAS Context Recall: does retrieved context cover the ground truth?
+
+    Checks whether each sentence in the ground_truth is attributable to
+    the retrieved chunks. If a sentence cannot be found in any chunk,
+    it means the retrieval missed that piece of information.
+
+    Args:
+        ground_truth: expected answer string
+        contexts:     list of {"id": str, "content": str} retrieved chunks
+
+    Returns:
+        {"score": float 0-1, "sentences": [...], "attributed": int, "total": int}
+    """
+    if not contexts or not ground_truth.strip():
+        return {"score": 1.0, "sentences": [], "attributed": 0, "total": 0, "skipped": True}
+
+    ctx_text = "\n\n".join(
+        f"[Context {i+1}]\n{c.get('content', '')[:1200]}"
+        for i, c in enumerate(contexts[:6])
+    )
+    system = """\
+You are a context recall evaluator. Your task:
+1. Break the GROUND TRUTH into individual factual sentences/statements.
+2. For each sentence, check if the information is present in the CONTEXT CHUNKS.
+3. A sentence is attributed if the chunk text contains the same information
+   (exact wording not required — semantic equivalence counts).
+
+Return JSON:
+{
+  "sentences": [
+    {"text": "<sentence>", "attributed": true/false, "reason": "<brief>"}
+  ],
+  "score": <attributed_count / total_count, float 0-1>
+}
+
+Only include substantive factual sentences (skip intro phrases like "根据用户手册").
+If no factual sentences found, return score=1.0 and empty list.
+"""
+    user = f"CONTEXT CHUNKS:\n{ctx_text}\n\nGROUND TRUTH: {ground_truth}"
+    raw = _call(system, user, max_tokens=800)
+
+    sentences = raw.get("sentences", [])
+    score = raw.get("score")
+    if score is None:
+        attributed = sum(1 for s in sentences if s.get("attributed", False))
+        score = round(attributed / len(sentences), 3) if sentences else 1.0
+    else:
+        score = round(float(score), 3)
+    attributed = sum(1 for s in sentences if s.get("attributed", False))
+
+    return {
+        "score":      score,
+        "sentences":  sentences,
+        "attributed": attributed,
+        "total":      len(sentences),
+    }
 
 
 def judge_answer_clarification(
