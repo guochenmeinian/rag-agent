@@ -1,0 +1,261 @@
+{
+  "version": "2.1-smoke",
+  "description": "快速冒烟测试 — 10个代表性case。key_facts仅存放原子值（数字/枚举/代码）用于精确匹配；semantic_claims存放逻辑断言/行为描述，仅交LLM judge验证。",
+  "cases": [
+    {
+      "id": "ans_rag_critical_001",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "EC7各电池版本的精确整备质量因轮圈不同而差异细微，GPT-4o无法知道75kWh+20寸轮圈与21寸轮圈之间的具体差值",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "EC7的75kWh版本，选20寸轮圈和21寸轮圈，整备质量分别是多少千克？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC7 75kWh（类型B）版本：选配20寸轮圈时整备质量为2399kg，选配21寸轮圈时整备质量为2420kg，两者相差21kg。（注：75kWh类型A版本仅提供21寸，整备质量为2420kg；75kWh类型B版本20寸整备质量为2399kg，21寸为2420kg。）",
+        "key_facts": ["2399kg", "2420kg", "75kWh", "20寸", "21寸"],
+        "semantic_claims": [],
+        "forbidden_content": ["2350kg", "2380kg", "2400kg", "2410kg", "约2.4吨"],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_rag_critical_010",
+      "layer_targets": ["answer"],
+      "category": "ans_rag_critical",
+      "notes": "ET7 150kWh版本的CLTC续航（1050km）和精确的能耗（163Wh/km），以及轮胎型号（245/45 R20普利司通），GPT-4o不会知道这种精细数据",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "ET7的150kWh超长续航版，CLTC工况续航能跑多少公里？能耗是多少？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册动力性参数，ET7 150kWh版本配备245/45 R20（普利司通，轮胎滚阻5.4）轮胎时，CLTC工况续航里程为1050km，百公里能耗为163Wh/km。ET7 150kWh版本整备质量（20寸轮圈）为2434kg，最高车速200km/h。",
+        "key_facts": ["1050km", "163Wh/km", "150kWh", "ET7"],
+        "semantic_claims": [],
+        "forbidden_content": ["1200km", "900km", "1000km", "180Wh/km", "150Wh/km"],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_proc_001",
+      "layer_targets": ["answer"],
+      "category": "ans_proc",
+      "notes": "EC6电动尾翼自动模式下的精确车速阈值（60/130/10 km/h）是NIO专有参数，GPT-4o无法知道具体切换速度",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "EC6的电动尾翼自动模式下，各个挡位在什么车速时切换？怎么在中控屏上设置？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，EC6电动尾翼可在中控屏下方控制栏进入设置页面，点击驾驶>电动尾翼进行调节。自动模式下：车速上升时，当车速超过60公里/小时，尾翼自动切换到减阻挡；当车速超过130公里/小时，尾翼自动切换到极速挡。车速下降时，当车速降至130公里/小时，尾翼自动切换到减阻挡；当车速降至10公里/小时，尾翼自动收回。",
+        "key_facts": ["60公里/小时", "130公里/小时", "10公里/小时", "减阻挡", "极速挡"],
+        "semantic_claims": [
+          "中控屏下方控制栏进入设置页面，点击驾驶>电动尾翼",
+          "车速超过60公里/小时切换到减阻挡",
+          "车速超过130公里/小时切换到极速挡",
+          "车速降至10公里/小时尾翼自动收回"
+        ],
+        "forbidden_content": [
+          "车速超过80公里/小时切换到减阻挡",
+          "车速超过120公里/小时切换到极速挡",
+          "车速超过170公里/小时切换到极速挡"
+        ],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_proc_003",
+      "layer_targets": ["answer"],
+      "category": "ans_proc",
+      "notes": "ET9悬架调节的具体挡位数值（最高抬升约40毫米、最低降低约50毫米）和限速值（35km/h、5km/h）是ET9专有参数",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "ET9的悬架高度有几个挡位？最高和最低挡分别比标准挡高低多少毫米？各有什么速度限制？",
+      "answer_gt": {
+        "ground_truth": "根据用户手册，ET9悬架高度有4个挡位：标准（常规行驶挡位，舒适等驾驶模式下默认选择）、低（常规行驶挡位，运动等驾驶模式下默认选择）、最高（非常规行驶挡位，悬架高度较标准挡位抬升约40毫米，限速35公里/小时）、最低（非常规行驶挡位，悬架高度较标准挡位降低约50毫米，当车速超过5公里/小时将自动退出）。激活非常规行驶挡位后，可长按方向盘右侧中键快速退出当前悬架高度设置。",
+        "key_facts": ["4个挡位", "40毫米", "35公里/小时", "50毫米", "5公里/小时"],
+        "semantic_claims": [
+          "最高挡抬升约40毫米，限速35公里/小时",
+          "最低挡降低约50毫米，车速超过5公里/小时自动退出",
+          "长按方向盘右侧中键快速退出非常规挡位"
+        ],
+        "forbidden_content": ["抬升约30毫米", "降低约40毫米", "限速40公里/小时", "限速20公里/小时"],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_001",
+      "layer_targets": ["answer"],
+      "category": "ans_feat",
+      "notes": "蔚来宠物托管模式的具体保护机制（温度异常时车窗下降三指宽度、续航低于10公里自动退出并开窗等）是NIO专有细节，GPT-4o无法准确回答",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "蔚来ET5的宠物托管模式具体有哪些保护措施？如果车辆出问题了怎么办？",
+      "answer_gt": {
+        "ground_truth": "ET5宠物托管模式开启后：空调进入自动模式（车内温度默认22℃，可手动调整），中控屏显示当前车内温度及相关提示；车窗、车外大灯等自动关闭；仪表屏和HUD亮度调至最低，中控屏亮度调至50%；后排门窗儿童锁开启；NOMI语音唤醒、门窗按键等功能被禁用；蔚来App部分远程车控功能被禁用。若车辆发生高压系统、空调系统、车内温度异常时，车辆将降低四门车窗约三指宽度，并通过蔚来App、短信及电话方式通知车主。每隔两小时通过蔚来App消息提示宠物在车内。若续航里程低于60公里且未充电时会消息提示；若续航里程低于10公里时，宠物托管将自动退出且四门车窗将自动开启约三指宽度。",
+        "key_facts": ["22℃", "10公里", "三指宽度", "两小时"],
+        "semantic_claims": [
+          "空调默认22℃自动模式",
+          "后排门窗儿童锁开启",
+          "异常时四门车窗降低约三指宽度",
+          "通过蔚来App、短信及电话通知",
+          "续航低于10公里自动退出并开窗",
+          "每隔两小时App提醒宠物在车内"
+        ],
+        "forbidden_content": ["空调默认25℃", "车窗全部打开", "续航低于20公里自动退出"],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_feat_006",
+      "layer_targets": ["answer"],
+      "category": "ans_feat",
+      "notes": "ET9电动尾翼自动模式的车速阈值（80/10 km/h）与EC6（60/130/10）完全不同，是ET9专有参数",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "ET9的电动尾翼自动模式怎么工作？什么速度展开和收回？",
+      "answer_gt": {
+        "ground_truth": "ET9电动尾翼有展开、自动和关闭三种模式。自动模式下：当车速超过80公里/小时并保持稳定时，尾翼将自动展开；当车速低于10公里/小时并保持稳定时，尾翼将自动收回。电动尾翼具有频繁操作保护机制，连续操作15次及以上时，调节功能将暂停，需等待150秒后恢复。锁车后尾翼将自动收回。",
+        "key_facts": ["80公里/小时", "10公里/小时", "15次", "150秒"],
+        "semantic_claims": [
+          "自动模式车速超过80公里/小时展开",
+          "车速低于10公里/小时自动收回",
+          "有展开、自动和关闭三种模式",
+          "连续操作15次以上暂停需等150秒"
+        ],
+        "forbidden_content": ["车速超过60公里/小时展开", "车速超过120公里/小时展开", "有减阻挡和极速挡"],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_safe_001",
+      "layer_targets": ["answer"],
+      "category": "ans_safe",
+      "notes": "ES6儿童安全座椅的具体安装限制（后排中间不推荐、副驾安全气囊打开时X级别限制）是精确安全数据",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "ES6哪些座位可以安装儿童安全座椅？有什么限制？",
+      "answer_gt": {
+        "ground_truth": "ES6儿童安全座椅安装限制：后排中间座椅不建议安装儿童安全座椅。前排副驾安全气囊打开时，0组（小于10千克）、0+组（小于13千克）、I组（9-18千克）、II组（15-25千克）、III组（22-36千克）均不适用（标记X）。副驾安全气囊关闭时，0组和0+组适用通用类（U），I组适用通用类或前向通用类（U/UF），II组和III组仅适用前向通用类（UF）。后排外侧座椅：0组和0+组为U，I/II/III组为U/L。在前排副驾安装安全带式儿童座椅时需把副驾座椅调整至最高位置。身高1.5米以上的儿童可直接使用车辆安全带。",
+        "key_facts": ["后排中间", "1.5米"],
+        "semantic_claims": [
+          "后排中间座椅不建议安装",
+          "副驾安全气囊打开时所有组别均不适用",
+          "副驾安全气囊关闭时0组和0+组为U级别",
+          "副驾安装时需将座椅调至最高位置",
+          "身高1.5米以上可直接使用安全带"
+        ],
+        "forbidden_content": [
+          "后排中间可以安装ISOFIX座椅",
+          "副驾安全气囊打开时可安装后向座椅",
+          "身高1.2米以上可使用安全带"
+        ],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_001",
+      "layer_targets": ["answer"],
+      "category": "ans_comp",
+      "notes": "EC6和ET9电动尾翼的模式差异（EC6有减阻/极速/自动/关闭，ET9有展开/自动/关闭）和车速阈值差异需对比两个手册",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "EC6和ET9的电动尾翼有什么不同？模式和自动展开速度一样吗？",
+      "answer_gt": {
+        "ground_truth": "EC6和ET9的电动尾翼存在明显差异。EC6有四种模式：减阻挡（低角度降风阻）、极速挡（最高角度增加下压力）、自动和关闭。EC6自动模式下车速超过60公里/小时切换减阻挡，超过130公里/小时切换极速挡，降至10公里/小时收回。ET9只有三种模式：展开、自动和关闭。ET9自动模式下车速超过80公里/小时展开，低于10公里/小时收回。EC6还支持锁车保持尾翼展开功能，且进入拖挂模式后尾翼保持收回。两者都有频繁操作保护机制（连续15次暂停，150秒恢复），锁车后都会自动收回。",
+        "key_facts": ["60公里/小时", "80公里/小时", "130公里/小时", "10公里/小时", "15次", "150秒"],
+        "semantic_claims": [
+          "EC6有减阻挡和极速挡而ET9没有",
+          "EC6自动展开速度60公里/小时ET9是80公里/小时",
+          "EC6极速挡切换速度130公里/小时",
+          "两者收回速度都是10公里/小时",
+          "两者都有15次/150秒保护机制"
+        ],
+        "forbidden_content": [
+          "EC6和ET9尾翼模式完全相同",
+          "ET9也有减阻挡和极速挡",
+          "两者自动展开速度相同"
+        ],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_comp_006",
+      "layer_targets": ["answer"],
+      "category": "ans_comp",
+      "notes": "ET7和ET9离地间隙差异巨大（128 vs 200mm）以及ET9有4座而ET7有5座需对比规格表",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "ET7和ET9哪个底盘更高？座位数一样吗？",
+      "answer_gt": {
+        "ground_truth": "ET9底盘明显更高。ET9离地间隙为200mm，ET7离地间隙仅128mm，ET9比ET7高72mm。座位数不同：ET9为4座，ET7为5座。ET9车身更大（5325x2017x1621mm vs 5101x1987x1509mm），轴距更长（3250 vs 3060mm）。ET9最高车速220km/h，ET7最高车速200km/h。ET9整备质量2700kg，ET7整备质量约2349-2379kg（因电池规格不同）。ET9接近角17°离去角22°，ET7接近角整备14°满载13°离去角整备17°满载16°。",
+        "key_facts": ["200mm", "128mm", "4座", "5座", "220km/h", "200km/h", "3250mm", "3060mm"],
+        "semantic_claims": [
+          "ET9离地间隙200mm ET7仅128mm",
+          "ET9为4座ET7为5座",
+          "ET9最高车速220km/h ET7为200km/h",
+          "ET9轴距3250mm ET7为3060mm",
+          "ET7接近角整备14°满载13°"
+        ],
+        "forbidden_content": [
+          "ET7离地间隙比ET9高",
+          "两者都是5座",
+          "两者最高车速相同"
+        ],
+        "should_clarify": false, "is_safe": true
+      }
+    },
+    {
+      "id": "ans_fault_001",
+      "layer_targets": ["answer"],
+      "category": "ans_fault",
+      "notes": "ET9线控转向三级故障的具体系统响应和限速时间表是ET9专有故障处理信息",
+      "dimensions": {
+        "is_multi_turn": false, "history_length": 0, "has_coref": false,
+        "depends_on_memory": false, "is_ambiguous": false, "should_clarify": false
+      },
+      "context": { "user_profile": "", "memory_facts": [], "conversation_history": [] },
+      "input": "ET9线控转向出现故障时，车辆分别会怎么处理？会限速吗？",
+      "answer_gt": {
+        "ground_truth": "ET9线控转向故障分三种情形：情形1：转向能力正常但天际屏点亮黄色故障指示灯，提示'转向系统异常，请尽快维修车辆'，需立即安全停车联系服务中心，系统在故障发生后20小时自动限速至80公里/小时。情形2：转向能力部分失效，天际屏点亮红色故障警告灯，提示'转向系统故障，请立刻靠边停车'，系统故障后立即限速至80公里/小时，10分钟后进一步降至10公里/小时。情形3：转向能力完全失效，天际屏点亮红色故障警告灯，提示'转向系统失效，请立刻减速停车'，系统将自动介入减速并限速至10公里/小时。当处于情形2或3时，挂入P挡后尝试再次换挡时系统将弹出提示窗口。",
+        "key_facts": ["20小时", "80公里/小时", "10分钟", "10公里/小时"],
+        "semantic_claims": [
+          "情形1黄灯20小时后限速80公里/小时",
+          "情形2红灯立即限速80后10分钟降至10",
+          "情形3红灯系统自动减速限至10公里/小时",
+          "情形2和3再次换挡时弹出提示窗口",
+          "三种情形都需联系蔚来服务中心"
+        ],
+        "forbidden_content": [
+          "所有故障统一限速60公里/小时",
+          "故障后车辆立即停止无法移动",
+          "故障后不会自动限速"
+        ],
+        "should_clarify": false, "is_safe": true
+      }
+    }
+  ]
+}

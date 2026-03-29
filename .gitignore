@@ -37,3 +37,4 @@ frontend/.vite/
 # optional local env
 # -------------------------
 .env
+third-party/

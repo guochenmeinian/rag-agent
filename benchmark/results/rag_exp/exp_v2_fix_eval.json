@@ -1,0 +1,4445 @@
+{
+  "summary": {
+    "n_total": 83,
+    "n_run": 83,
+    "n_error": 0,
+    "answer": {
+      "n": 78,
+      "match_avg": 0.91,
+      "match_full": 0.077,
+      "hallucination_clean": 0.756,
+      "clarification_acc": 0.91,
+      "key_facts_coverage_avg": 0.205
+    },
+    "latency": {
+      "p50": 14.99,
+      "p95": 23.08
+    },
+    "cost": {
+      "total_prompt_tokens": 506411,
+      "total_completion_tokens": 17832,
+      "total_tokens": 524243
+    }
+  },
+  "results": [
+    {
+      "id": "ans_rag_critical_001",
+      "category": "ans_rag_critical",
+      "input": "EC7的75kWh版本，选20寸轮圈和21寸轮圈，整备质量分别是多少千克？",
+      "latency_s": 7.63,
+      "usage": {
+        "prompt_tokens": 7067,
+        "completion_tokens": 139,
+        "total_tokens": 7206
+      },
+      "metrics": {
+        "answer/match": 2,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 2,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: '2399kg', '2420kg', '75kWh', '20寸', and '21寸'. There are no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "对于 EC7 的 75kWh 版本，选配不同轮圈时的整备质量如下：\n\n- 20 寸轮圈：整备质量为 2399 千克\n- 21 寸轮圈：整备质量为 2420 千克"
+    },
+    {
+      "id": "ans_rag_critical_002",
+      "category": "ans_rag_critical",
+      "input": "EC7的150kWh超长续航版，CLTC工况下能跑多少公里？百公里能耗是多少？",
+      "latency_s": 27.0,
+      "usage": {
+        "prompt_tokens": 10097,
+        "completion_tokens": 120,
+        "total_tokens": 10217
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "2448kg"
+              ],
+              "coverage": 0.75
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the key facts '940km', '175Wh/km', and '150kWh', but it is missing the '2448kg' fact."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer is consistent with the ground truth and does not contain any fabricated facts."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC7 的 150kWh 超长续航版在 CLTC 工况下的续航里程为 940 公里，百公里能耗为 175 Wh/km。"
+    },
+    {
+      "id": "ans_rag_critical_003",
+      "category": "ans_rag_critical",
+      "input": "ET9的车身长宽高和轴距各是多少？它是几座的车？",
+      "latency_s": 5.94,
+      "usage": {
+        "prompt_tokens": 4940,
+        "completion_tokens": 107,
+        "total_tokens": 5047
+      },
+      "metrics": {
+        "answer/match": 2,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 2,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "All key facts are present and correct, with no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer accurately reflects the information provided in the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the Nio ET9's dimensions and seating capacity."
+            }
+          }
+        }
+      },
+      "answer": "Nio ET9 的车身尺寸和座位数如下：\n\n- 长度：5325 mm\n- 宽度（无外后视镜）：2017 mm\n- 高度：1621 mm\n- 轴距：3250 mm\n- 座位数：4座\n\n如果还有其他问题，请随时告诉我！"
+    },
+    {
+      "id": "ans_rag_critical_004",
+      "category": "ans_rag_critical",
+      "input": "ET9的高压动力电池参数是什么？电池包重多少千克？里面有多少个单体电芯？",
+      "latency_s": 7.07,
+      "usage": {
+        "prompt_tokens": 5024,
+        "completion_tokens": 80,
+        "total_tokens": 5104
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "102kWh",
+                "三元锂离子电池",
+                "2062x1500x124.8mm",
+                "763V"
+              ],
+              "coverage": 0.333
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as '204个' and '545kg', but it is missing other key details like '102kWh', '三元锂离子电池', '2062x1500x124.8mm', and '763V'. Therefore, it is partially correct."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer is consistent with the ground truth and does not contain any fabricated facts."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9的高压动力电池参数如下：\n- 电池包内单体电芯数量：204个\n- 电池包重量：545千克\n\n如果需要更多信息，请随时告诉我！"
+    },
+    {
+      "id": "ans_rag_critical_005",
+      "category": "ans_rag_critical",
+      "input": "ET9的车载冰箱温度可以调到多少度？有哪些智能预设模式？",
+      "latency_s": 11.48,
+      "usage": {
+        "prompt_tokens": 5735,
+        "completion_tokens": 94,
+        "total_tokens": 5829
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "6种智能模式",
+                "20km"
+              ],
+              "coverage": 0.714
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the temperature range and mentions the six intelligent modes, including '冰镇模式', '香槟模式', and '红酒模式'. However, it misses the key fact about the '20km' condition for the off-vehicle operation."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9 的车载冰箱温度调节范围为 -2℃ 到 55℃。它支持六种智能预设模式，分别是冰镇模式、果蔬模式、香槟模式、红酒模式、常温模式和暖饮模式。"
+    },
+    {
+      "id": "ans_rag_critical_006",
+      "category": "ans_rag_critical",
+      "input": "ET5和ET5T在75kWh配置下，整备质量分别是多少？两者相差多少千克？",
+      "latency_s": 18.7,
+      "usage": {
+        "prompt_tokens": 18214,
+        "completion_tokens": 248,
+        "total_tokens": 18462
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the key facts about the curb weights (2165kg for ET5 and 2205kg for ET5T) and the difference of 40kg. However, it lacks information about the full load weights and the reason for the weight difference (ET5T being a travel version with additional features like a luggage rack)."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without introducing any fabricated facts."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific figures, without hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET5和ET5T在75kWh配置下的整备质量分别为：\n\n- ET5：2165 kg\n- ET5T：2205 kg\n\n两者相差40千克。"
+    },
+    {
+      "id": "ans_rag_critical_007",
+      "category": "ans_rag_critical",
+      "input": "ES8的前备箱容积是多少升？最多能放多重的东西？",
+      "latency_s": 6.64,
+      "usage": {
+        "prompt_tokens": 6984,
+        "completion_tokens": 122,
+        "total_tokens": 7106
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "547L",
+                "75kg"
+              ],
+              "coverage": 0.5
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER contains incorrect information about the load capacity and omits key facts about the rear trunk capacity and weight limits."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER contains hallucinated information about the static load capacity of the front trunk, which is not mentioned in the ground truth."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "根据最新的信息，蔚来ES8的前备箱容积为230升。静态载重可达80-100公斤，动态载重最大为50公斤。"
+    },
+    {
+      "id": "ans_rag_critical_008",
+      "category": "ans_rag_critical",
+      "input": "ET9的前备箱能放多少东西？最大承载重量是多少？",
+      "latency_s": 12.29,
+      "usage": {
+        "prompt_tokens": 7535,
+        "completion_tokens": 117,
+        "total_tokens": 7652
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "544L"
+              ],
+              "coverage": 0.667
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly mentions the front trunk capacity (105L) and its maximum load (30kg), but it does not mention the rear trunk capacity (544L), which is a key fact."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer accurately reflects the information provided in the ground truth without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio ET9 的前备箱容积为 105 升，最大承载重量为 30 千克。请注意，超载可能导致结构变形或部件损坏。"
+    },
+    {
+      "id": "ans_rag_critical_009",
+      "category": "ans_rag_critical",
+      "input": "ES6和EC6的后备箱容积分别是多少？后排座椅放倒后最大容积是多少？",
+      "latency_s": 15.97,
+      "usage": {
+        "prompt_tokens": 6092,
+        "completion_tokens": 255,
+        "total_tokens": 6347
+      },
+      "metrics": {
+        "answer/match": 2,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 2,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "All key facts are present and correct, with no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific measurements for both ES6 and EC6, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES6和EC6的后备箱容积及后排座椅放倒后的最大容积如下：\n\n- **ES6**\n  - 后备箱容积：542升\n  - 后备箱容积（含隐藏式储物格）：631升\n  - 后排座椅放倒后最大容积：1430升\n\n- **EC6**\n  - 后备箱容积：505升\n  - 后备箱容积（含隐藏式储物格）：594升\n  - 后排座椅放倒后最大容积：1402升\n\n这两款车型在后备箱容积和后排座椅放倒后的最大容积上有一些差异，ES6的容积稍大一些。"
+    },
+    {
+      "id": "ans_rag_critical_010",
+      "category": "ans_rag_critical",
+      "input": "ET7的150kWh超长续航版，CLTC工况续航能跑多少公里？能耗是多少？",
+      "latency_s": 15.68,
+      "usage": {
+        "prompt_tokens": 15139,
+        "completion_tokens": 159,
+        "total_tokens": 15298
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "163Wh/km"
+              ],
+              "coverage": 0.75
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly mentions the 150kWh battery and the 1050km range, but it incorrectly states the energy consumption as 13.2 kWh/100km instead of 163Wh/km. It also omits other details like the tire specifications and vehicle weight."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER provides an average energy consumption of 13.2 kWh/100km, which contradicts the ground truth of 163Wh/km (or 16.3 kWh/100km)."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio ET7 搭载 150kWh 电池的 CLTC 工况续航里程为 1050 公里。其能耗在不同测试条件下有所不同，平均能耗约为 13.2 kWh/100km。"
+    },
+    {
+      "id": "ans_rag_critical_011",
+      "category": "ans_rag_critical",
+      "input": "EC7的前后电机类型和峰值参数是什么？前后驱动电机型号分别是什么？",
+      "latency_s": 4.72,
+      "usage": {
+        "prompt_tokens": 4461,
+        "completion_tokens": 159,
+        "total_tokens": 4620
+      },
+      "metrics": {
+        "answer/match": 2,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 2,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: 'TZ180S001', 'YS300S002', '180kW', '300kW', '350N·m', '500N·m', '交流永磁同步', and '交流异步'. There are no significant errors or omissions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer with detailed parameters for both the front and rear motors of the EC7, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC7 的电机参数如下：\n\n- **前电机**\n  - 类型：交流永磁同步电机\n  - 型号：TZ180S001\n  - 峰值功率/转速/转矩：180 kW / 16000 r/min / 350 N·m\n\n- **后电机**\n  - 类型：交流异步电机\n  - 型号：YS300S002\n  - 峰值功率/转速/转矩：300 kW / 15000 r/min / 500 N·m"
+    },
+    {
+      "id": "ans_rag_critical_012",
+      "category": "ans_rag_critical",
+      "input": "ET9的线控转向系统出现故障时会怎么处理？系统会如何限速？",
+      "latency_s": 14.19,
+      "usage": {
+        "prompt_tokens": 5722,
+        "completion_tokens": 308,
+        "total_tokens": 6030
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "80km/h",
+                "10km/h",
+                "三级"
+              ],
+              "coverage": 0.5
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER accurately describes the three levels of handling for the ET9 line control steering fault, including all key facts such as '20小时', '80km/h', '10分钟', '10km/h', '三级', and '线控转向'. The response is complete and correct."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information from the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging, detailing the steps to take when the Nio ET9's steering system fails."
+            }
+          }
+        }
+      },
+      "answer": "当 Nio ET9 的线控转向系统出现故障时，系统会根据故障的严重程度采取不同的处理措施：\n\n1. **转向能力正常**：如果天际屏点亮黄色故障指示灯，并提示“转向系统异常，请尽快维修车辆”，请立即安全停车，并联系蔚来汽车服务中心。系统将在故障发生后 20 小时自动将车速限制至 80 公里/小时。\n\n2. **转向能力部分失效**：如果天际屏点亮红色故障警告灯，并提示“转向系统故障，请立刻靠边停车”，请立即安全停车，并联系蔚来汽车服务中心。系统将在故障发生后自动限速至 80 公里/小时，并在 10 分钟后进一步降至 10 公里/小时。\n\n3. **转向能力完全失效**：如果天际屏点亮红色故障警"
+    },
+    {
+      "id": "ans_rag_critical_013",
+      "category": "ans_rag_critical",
+      "input": "ET5T能不能拖车？最大牵引质量是多少？和ES6相比谁的拖车能力更强？",
+      "latency_s": 19.52,
+      "usage": {
+        "prompt_tokens": 6831,
+        "completion_tokens": 180,
+        "total_tokens": 7011
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "ECE R55",
+                "C6驾驶证"
+              ],
+              "coverage": 0.714
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts such as the towing capacities of ET5T and ES6, and the maximum vertical load for ET5T. However, it omits the ECE R55 standard, the requirement for a C6 driving license, and the tire pressure information."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER incorrectly states that the electric tow hook maximum load capacity for ES6 is 75 kg, which is not mentioned in the ground truth. This is a fabricated fact."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the towing capacities of ET5T and ES6, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET5T 和 ES6 都支持拖车功能，但它们的最大牵引质量不同：\n\n- **ET5T** 的最大牵引质量为 1400 千克，电动拖钩最大承载质量为 75 千克。\n- **ES6** 的最大牵引质量为 1200 千克，电动拖钩最大承载质量同样为 75 千克。\n\n因此，ET5T 的拖车能力比 ES6 更强。"
+    },
+    {
+      "id": "ans_rag_critical_014",
+      "category": "ans_rag_critical",
+      "input": "ES8选22寸轮毂和21寸轮毂，CLTC续航里程分别是多少？差距大吗？",
+      "latency_s": 18.66,
+      "usage": {
+        "prompt_tokens": 6472,
+        "completion_tokens": 178,
+        "total_tokens": 6650
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "265/45 R21",
+                "265/40 R22",
+                "102kWh"
+              ],
+              "coverage": 0.5
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts: '635km', '412km', '223km', '21寸', and '22寸'. However, it does not mention the specific tire sizes '265/45 R21' and '265/40 R22', nor does it mention the '102kWh' battery, which are required for a perfect score."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific data on the CLTC range for different wheel sizes."
+            }
+          }
+        }
+      },
+      "answer": "根据检索结果，Nio ES8 选装不同尺寸轮毂时的CLTC续航里程如下：\n\n- **22寸轮毂**：CLTC续航里程为 412 公里\n- **21寸轮毂**：CLTC续航里程为 635 公里\n\n两者之间的续航里程差距为 223 公里，21寸轮毂的续航里程明显更长。"
+    },
+    {
+      "id": "ans_rag_critical_015",
+      "category": "ans_rag_critical",
+      "input": "EC7后备箱能放多少东西？后排座椅放倒后最大有多少升？后备箱最大承载重量是多少？",
+      "latency_s": 14.59,
+      "usage": {
+        "prompt_tokens": 9864,
+        "completion_tokens": 199,
+        "total_tokens": 10063
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts: '442L', '532L', '1449L', '75千克', and 'EC7'. However, it is missing the detail about the load fixing rings' maximum load capacity of 300kg."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC7 的后备箱容积为 442 升，包含隐藏式储物格时为 532 升。后排座椅放倒后的最大容积为 1449 升。后备箱的最大承载重量为 75 千克。"
+    },
+    {
+      "id": "ans_rag_critical_016",
+      "category": "ans_rag_critical",
+      "input": "ET9的整备质量和满载质量分别是多少千克？和ES8相比哪个更重？",
+      "latency_s": 5.66,
+      "usage": {
+        "prompt_tokens": 5929,
+        "completion_tokens": 181,
+        "total_tokens": 6110
+      },
+      "metrics": {
+        "answer/match": 2,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 2,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: ET9's curb weight (2700kg) and full load weight (3100kg), and ES8's curb weight (2630kg) and full load weight (3250kg). It also correctly compares the weights of the two vehicles, matching the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific data on the weights of ET9 and ES8, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9 和 ES8 的整备质量和满载质量如下：\n\n- **ET9**\n  - 整备质量：2700 千克\n  - 满载质量：3100 千克\n\n- **ES8**\n  - 整备质量：2630 千克\n  - 满载质量：3250 千克\n\n比较两款车的重量：\n- 在整备质量方面，ET9 比 ES8 更重。\n- 在满载质量方面，ES8 比 ET9 更重。"
+    },
+    {
+      "id": "ans_rag_critical_017",
+      "category": "ans_rag_critical",
+      "input": "EC7和ES6的空调制冷剂型号一样吗？分别用的是什么型号的制冷剂？",
+      "latency_s": 5.85,
+      "usage": {
+        "prompt_tokens": 4352,
+        "completion_tokens": 107,
+        "total_tokens": 4459
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "R1234yf",
+                "R-134a",
+                "1000g",
+                "两种"
+              ],
+              "coverage": 0.333
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER does not provide any of the key facts required, such as the types of refrigerants used, their quantities, or the specific models EC7 and ES6."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The system answer claims no data was obtained about the refrigerant models for EC7 and ES6, which contradicts the provided ground truth that specifies the refrigerants used."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system incorrectly claims it cannot answer by stating it did not obtain relevant data, which is a form of over-hedging."
+            }
+          }
+        }
+      },
+      "answer": "未获取到EC7和ES6的空调制冷剂型号的相关数据。如果您需要进一步的信息，建议联系Nio官方客服或查看车辆的用户手册。"
+    },
+    {
+      "id": "ans_rag_critical_018",
+      "category": "ans_rag_critical",
+      "input": "ET7的车身尺寸是多少？它的离地间隙和EC7相比哪个更低？",
+      "latency_s": 5.75,
+      "usage": {
+        "prompt_tokens": 7433,
+        "completion_tokens": 196,
+        "total_tokens": 7629
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "3060mm",
+                "ET7更低"
+              ],
+              "coverage": 0.714
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: the dimensions of the ET7 (5101mm, 1987mm, 1509mm), the wheelbase (3060mm), the ground clearance of both ET7 (128mm) and EC7 (162mm), and the fact that ET7 has a lower ground clearance than EC7. There are no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific measurements, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7 的车身尺寸为：\n- 长：5101 毫米\n- 宽（无外后视镜）：1987 毫米\n- 高：1509 毫米\n\n关于离地间隙：\n- ET7 的离地间隙为 128 毫米\n- EC7 的离地间隙为 162 毫米\n\n因此，ET7 的离地间隙比 EC7 更低。"
+    },
+    {
+      "id": "ans_rag_critical_019",
+      "category": "ans_rag_critical",
+      "input": "EC7的75kWh电池分几种类型？化学体系有什么区别？CLTC续航一样吗？",
+      "latency_s": 10.01,
+      "usage": {
+        "prompt_tokens": 5455,
+        "completion_tokens": 122,
+        "total_tokens": 5577
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "类型A",
+                "类型B",
+                "三元锂离子/磷酸铁锂",
+                "455km",
+                "490km"
+              ],
+              "coverage": 0.286
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER is missing several key facts and contains factual errors. It incorrectly states the battery types as '三元锂离子电池' and '磷酸铁锂电池', whereas the correct types are '三元锂离子' and '三元锂离子/磷酸铁锂混合电池'. It also fails to mention the specific range figures (455km and 490km) and the specific tire options that affect the range."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER incorrectly states that the EC7 has a version with a pure lithium iron phosphate battery, which contradicts the ground truth that both types are based on ternary lithium-ion chemistry, with one being a mix with lithium iron phosphate. Additionally, it does not mention the specific tire options and their impact on range as described in the ground truth."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "蔚来EC7搭载的75kWh电池包有两种类型：三元锂离子电池和磷酸铁锂电池。它们的化学体系分别为三元锂离子和磷酸铁锂。不同版本的CLTC续航里程可能会有所不同，具体取决于电池类型和其他配置组合。"
+    },
+    {
+      "id": "ans_rag_critical_020",
+      "category": "ans_rag_critical",
+      "input": "ET5T旅行版的后备箱比ET5标准版大多少？两者后排座椅放倒后分别有多少升？",
+      "latency_s": 17.23,
+      "usage": {
+        "prompt_tokens": 6534,
+        "completion_tokens": 230,
+        "total_tokens": 6764
+      },
+      "metrics": {
+        "answer/match": 2,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 2,
+            "hard": {
+              "pass": true,
+              "missing": [],
+              "coverage": 1.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "All key facts are present and correct, with no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without any fabricated or contradicted information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident comparison of the trunk volumes for ET5 and ET5T without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET5 和 ET5T 的后备箱容积对比如下：\n\n- **ET5 标准版**：\n  - 后备箱容积：386 升\n  - 后排座椅放倒后容积：1135 升\n\n- **ET5T 旅行版**：\n  - 后备箱容积：450 升\n  - 后排座椅放倒后容积：1300 升\n\n**对比**：\n- 后备箱容积：ET5T 比 ET5 大 64 升\n- 后排座椅放倒后容积：ET5T 比 ET5 大 165 升"
+    },
+    {
+      "id": "ret_rag_critical_001",
+      "category": "ret_rag_critical",
+      "input": "ET9电池包重量和尺寸",
+      "latency_s": 10.03,
+      "usage": {
+        "prompt_tokens": 7242,
+        "completion_tokens": 102,
+        "total_tokens": 7344
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_002",
+      "category": "ret_rag_critical",
+      "input": "ES8 22寸轮毂续航多少",
+      "latency_s": 8.85,
+      "usage": {
+        "prompt_tokens": 7480,
+        "completion_tokens": 91,
+        "total_tokens": 7571
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_003",
+      "category": "ret_rag_critical",
+      "input": "EC7拖车最大承重多少",
+      "latency_s": 3.15,
+      "usage": {
+        "prompt_tokens": 4220,
+        "completion_tokens": 51,
+        "total_tokens": 4271
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_004",
+      "category": "ret_rag_critical",
+      "input": "ET9线控转向故障怎么处理",
+      "latency_s": 11.34,
+      "usage": {
+        "prompt_tokens": 5683,
+        "completion_tokens": 284,
+        "total_tokens": 5967
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ret_rag_critical_005",
+      "category": "ret_rag_critical",
+      "input": "EC7 150kWh电池是什么类型的？多重？",
+      "latency_s": 3.99,
+      "usage": {
+        "prompt_tokens": 5289,
+        "completion_tokens": 57,
+        "total_tokens": 5346
+      },
+      "metrics": {},
+      "detail": {}
+    },
+    {
+      "id": "ans_proc_001",
+      "category": "ans_proc",
+      "input": "EC6的电动尾翼自动模式下，各个挡位在什么车速时切换？怎么在中控屏上设置？",
+      "latency_s": 15.21,
+      "usage": {
+        "prompt_tokens": 5509,
+        "completion_tokens": 209,
+        "total_tokens": 5718
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "中控屏下方控制栏进入设置页面，点击驾驶>电动尾翼",
+                "车速超过60公里/小时切换到减阻挡",
+                "车速超过130公里/小时切换到极速挡",
+                "车速降至10公里/小时尾翼自动收回"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts from the GROUND TRUTH, with no significant errors. It correctly describes the conditions under which the EC6's electric spoiler changes modes and provides instructions on how to access the settings on the central control screen."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer accurately reflects the information provided in the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在EC6的电动尾翼自动模式下，车速达到以下条件时会自动切换挡位：\n\n- 当车速超过60公里/小时时，尾翼将自动切换到减阻挡。\n- 当车速超过130公里/小时时，尾翼将自动切换到极速挡。\n- 当车速降至130公里/小时时，尾翼将自动切换回减阻挡。\n- 当车速降至10公里/小时时，尾翼将自动收回。\n\n要在中控屏上设置电动尾翼，您可以在中控屏下方控制栏进入设置页面，点击“驾驶”>“电动尾翼”，然后调节尾翼的挡位或关闭该功能。您还可以选择开启锁车保持尾翼展开功能。"
+    },
+    {
+      "id": "ans_proc_002",
+      "category": "ans_proc",
+      "input": "EC7的矩阵远光控制功能怎么开启？开启后怎么用灯光拨杆手动退出？",
+      "latency_s": 11.9,
+      "usage": {
+        "prompt_tokens": 5659,
+        "completion_tokens": 273,
+        "total_tokens": 5932
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "灯光>外部灯光>大灯，选择开启自动车灯",
+                "灯光>外部灯光>矩阵远光控制，打开开关",
+                "向前推动灯光拨杆并保持超过1秒退出",
+                "退出后向前轻推一次可再次进入"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts from the GROUND TRUTH, with no significant errors. It correctly describes the steps to enable and disable the matrix high beam control, including the specific actions required with the light stalk."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific steps to enable the matrix high beam control function, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "要开启EC7的矩阵远光控制功能，您可以通过以下步骤进行操作：\n\n1. **开启矩阵远光控制功能**：\n   - 在中控屏下方控制栏进入设置页面。\n   - 点击“灯光 > 外部灯光 > 大灯”，选择开启自动车灯。\n   - 再点击“灯光 > 外部灯光 > 矩阵远光控制”，打开矩阵远光控制功能的开关。\n\n2. **手动退出矩阵远光控制功能**：\n   - 向前推动灯光拨杆并保持超过1秒，将手动退出矩阵远光控制功能，车辆将进入近光照明状态。\n\n3. **重新进入矩阵远光控制功能**：\n   - 当退出矩阵远光控制功能后，向前轻推一次灯光拨杆，可再次进入该功能。\n\n请注意，在极端天气或摄像头被遮挡时"
+    },
+    {
+      "id": "ans_proc_003",
+      "category": "ans_proc",
+      "input": "ET9的悬架高度有几个挡位？最高和最低挡分别比标准挡高低多少毫米？各有什么速度限制？",
+      "latency_s": 10.4,
+      "usage": {
+        "prompt_tokens": 5774,
+        "completion_tokens": 200,
+        "total_tokens": 5974
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "4个挡位：标准、低、最高、最低",
+                "最高挡抬升约40毫米，限速35公里/小时",
+                "最低挡降低约50毫米，车速超过5公里/小时自动退出",
+                "长按方向盘右侧中键快速退出非常规挡位"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts about the ET9 suspension height settings, such as the four modes and their specific characteristics. However, it misses the detail about '长按方向盘右侧中键快速退出非常规挡位', which is a key fact."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer about the suspension height settings of the ET9, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9的悬架高度有以下挡位：\n\n- **标准挡位**：常规行驶挡位，默认在“舒适”等驾驶模式下选择。\n- **低挡位**：常规行驶挡位，默认在“运动”等驾驶模式下选择。\n- **最高挡位**：非常规行驶挡位，悬架高度比标准挡位抬升约40毫米，限速35公里/小时。\n- **最低挡位**：非常规行驶挡位，悬架高度比标准挡位降低约50毫米，当车速超过5公里/小时将自动退出。\n\n这些悬架高度设置可以根据不同的驾驶模式和路况进行手动或自动调节，以提高行驶的安全性和舒适性。"
+    },
+    {
+      "id": "ans_proc_004",
+      "category": "ans_proc",
+      "input": "ET9充电完成后充电枪拔不出来怎么办？有几种应急解锁方法？",
+      "latency_s": 13.29,
+      "usage": {
+        "prompt_tokens": 5752,
+        "completion_tokens": 226,
+        "total_tokens": 5978
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "3种方法依次尝试",
+                "中控屏电池页面或蔚来APP停止充放电",
+                "重新插紧充电枪后按住解锁按钮等待1到2秒",
+                "后备箱对应盖板内拉动充电底座紧急解锁拉索"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all key facts: it outlines the three methods to try in sequence, mentions stopping charging via the central control screen or app, describes reinserting and holding the unlock button for 1-2 seconds, and explains using the emergency release cable in the trunk. There are no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer accurately reflects the steps outlined in the ground truth without introducing any fabricated information or forbidden content."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific steps to resolve the issue without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "如果ET9充电完成后充电枪拔不出来，可以尝试以下几种应急解锁方法：\n\n1. **停止充放电**：在中控屏电池页面或蔚来APP上再次停止充放电，以解锁充电枪。\n\n2. **重新插紧充电枪**：确保充电枪解锁按钮弹起，再按住充电枪解锁按钮等待1到2秒钟后尝试拔下充电枪。\n\n3. **使用紧急解锁拉索**：打开后备箱对应盖板，拉动充电底座紧急解锁拉索，然后尝试拔下充电枪。注意，这种方法仅适用于紧急情况，频繁使用可能会损坏紧急解锁拉索或充电设备。\n\n如果以上方法仍无法解决问题，请立即停止充电并联系蔚来汽车服务中心。"
+    },
+    {
+      "id": "ans_proc_005",
+      "category": "ans_proc",
+      "input": "EC6的遮光天幕怎么调节？有几个挡位？哪个挡位最亮哪个最暗？",
+      "latency_s": 11.97,
+      "usage": {
+        "prompt_tokens": 5839,
+        "completion_tokens": 171,
+        "total_tokens": 6010
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "4挡，0挡最亮、3挡最暗",
+                "常用>遮光天幕或者门窗锁>车窗>遮光天幕",
+                "支持自动和手动两种控制模式",
+                "可通过NOMI快速调节"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts such as the 4 levels of shading, the ability to choose between automatic and manual modes, and the use of NOMI for quick adjustments. However, it misses the specific operation path '常用>遮光天幕或者门窗锁>车窗>遮光天幕' for accessing the settings, which is a key detail in the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer is consistent with the ground truth and does not contain any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC6 的遮光天幕可以通过中控屏下方的控制栏进行调节，您可以选择自动或手动模式：\n\n- **自动模式**：天窗玻璃会根据周围环境自动调节至适宜的遮光度。\n- **手动模式**：您可以根据用车场景，自由调节天窗玻璃的遮光度。\n\n遮光天幕的遮光度分为 4 个挡位：\n- **0 挡**：最亮\n- **3 挡**：最暗\n\n您可以通过中控屏的快捷界面或 NOMI 快速调节遮光天幕。"
+    },
+    {
+      "id": "ans_proc_006",
+      "category": "ans_proc",
+      "input": "ET9陷车后怎么用弹跳脱困功能？有什么限制条件？",
+      "latency_s": 19.04,
+      "usage": {
+        "prompt_tokens": 5704,
+        "completion_tokens": 323,
+        "total_tokens": 6027
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "驾驶>弹跳脱困开启",
+                "通过悬架上下交替运动产生垂直振动",
+                "限速15公里/小时"
+              ],
+              "coverage": 0.25
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes the activation method and some operational details, but it lacks the specific explanation of how the function works ('通过悬架上下交替运动产生垂直振动'). It also adds extra information not present in the GROUND TRUTH, such as environmental checks and suspension height limitations, which are not required key facts."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and detailed answer without excessive hedging, outlining the use and limitations of the ET9's bounce escape feature."
+            }
+          }
+        }
+      },
+      "answer": "ET9的弹跳脱困功能可以帮助车辆在松软路面（如沙漠、深雪等）中脱困。以下是使用方法和限制条件：\n\n### 使用方法\n1. **进入设置**：在车辆静止时，通过中控屏下方控制栏进入设置页面。\n2. **激活功能**：点击“驾驶”>“弹跳脱困”来开启或关闭该功能。\n3. **操作注意**：功能激活后，车辆的最高时速将被限制为15公里/小时，并在运行1分钟后自动退出。任何切换驾驶模式、打开车门等操作都会退出脱困模式。\n\n### 限制条件\n- **悬架高度**：在部分场景辅助模式（如“雪地”等）、悬架高度设置为“低”的情况下，悬架主动控制功能无法被激活。\n- **周围环境检查**：功能开启前，请检查车"
+    },
+    {
+      "id": "ans_es6_001",
+      "category": "ans_es6",
+      "input": "ES6能拖挂拖车吗？最大能拖多重的车？拖挂时轮胎气压要调到多少？有什么驾照要求？",
+      "latency_s": 14.87,
+      "usage": {
+        "prompt_tokens": 5601,
+        "completion_tokens": 187,
+        "total_tokens": 5788
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "最大牵引质量1200千克",
+                "电动拖钩最大承载质量75千克",
+                "拖挂胎压保持在2.9bar",
+                "驾驶员需持有C6驾驶证",
+                "驾驶车辆总质量应小于4500kg"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts such as the maximum towing weight, tire pressure, and driver's license requirement. However, it omits the maximum load capacity of the tow hook (75 kg) and does not mention that the tow hook's load capacity must be at least 4% of the trailer's total mass."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer is consistent with the ground truth and does not contain fabricated facts."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the towing capabilities of the Nio ES6, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio ES6 支持拖挂功能，以下是相关信息：\n\n- **最大允许拖拽重量**：1200 千克。\n- **拖挂时轮胎气压**：应保持在 2.9 bar。\n- **驾照要求**：进行拖挂时，驾驶员需持有 C6 驾驶证。\n\n请注意，拖挂时的车辆总质量（包含拖车质量）应小于 4500kg，且拖挂时的最大上坡坡度为 12%。确保拖挂装置和车辆的连接牢固，并遵循所有相关法规和法律要求。"
+    },
+    {
+      "id": "ans_es6_002",
+      "category": "ans_es6",
+      "input": "ES6的自动紧急制动（AEB）功能在什么车速范围内工作？前向和后向有什么区别？对行人和对障碍物的工作范围一样吗？",
+      "latency_s": 14.99,
+      "usage": {
+        "prompt_tokens": 5887,
+        "completion_tokens": 251,
+        "total_tokens": 6138
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "前向AEB对行人/骑行人/车辆速度范围约4-150公里/小时",
+                "后向AEB对行人/骑行人/车辆速度范围约0-30公里/小时",
+                "前向AEB对通用障碍物速度范围约1-150公里/小时",
+                "后向AEB对通用障碍物速度范围约2-10公里/小时",
+                "前向仅支持单次关闭，后向支持永久关闭"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly lists the speed ranges for both forward and rear AEB for pedestrians, cyclists, vehicles, and general obstacles. However, it misses the key fact about the ability to disable the AEB: '前向仅支持单次关闭，后向支持永久关闭'."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer regarding the speed ranges for the automatic emergency braking (AEB) function in different scenarios, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES6 的自动紧急制动（AEB）功能在不同情况下的工作速度范围如下：\n\n- **前向自动紧急制动**：\n  - 对行人、骑行人和车辆的工作速度范围为约 4-150 公里/小时。\n  - 对部分通用障碍物的工作速度范围为约 1-150 公里/小时。\n\n- **后向自动紧急制动**：\n  - 对行人、骑行人和车辆的工作速度范围为约 0-30 公里/小时。\n  - 对部分通用障碍物的工作速度范围为约 2-10 公里/小时。\n\n前向和后向自动紧急制动在工作速度范围和响应对象上有所不同，尤其是在对行人和障碍物的识别和响应能力上。前向自动紧急制动的速度范围更广，而后向自动紧急制动的速度范围较窄。"
+    },
+    {
+      "id": "ans_es6_003",
+      "category": "ans_es6",
+      "input": "ES6在高速行驶中爆胎了车辆会怎么处理？这个功能有什么速度限制条件？",
+      "latency_s": 16.51,
+      "usage": {
+        "prompt_tokens": 5679,
+        "completion_tokens": 191,
+        "total_tokens": 5870
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "直线行驶最高时速不超过130km/h",
+                "弯道行驶最高不超过80km/h",
+                "侧向加速度低于0.5g",
+                "触发时危险警告灯主动亮起",
+                "减小横摆和转向过度"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all key facts: speed limits for straight and curved driving, lateral acceleration limit, activation of the warning light, and reduction of yaw and oversteer. No significant errors are present."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer regarding the safety features and conditions for the NIO ES6 in the event of a high-speed tire blowout."
+            }
+          }
+        }
+      },
+      "answer": "在高速行驶中，如果蔚来ES6发生爆胎，车辆的高速爆胎安全控制系统会迅速对车辆姿态变化做出反应，减小爆胎后车辆产生的横摆以及可能的转向过度，尽可能让驾驶员控制住车辆以保证安全。\n\n该功能的速度限制条件如下：\n- 车辆直线行驶时，最高时速不超过 130 km/h。\n- 车辆弯道行驶时，最高时速不超过 80 km/h，且侧向加速度低于 0.5g。\n\n当高速爆胎安全控制触发时，危险警告灯会主动亮起，驾驶员需扶稳方向盘，注意安全靠边停车。"
+    },
+    {
+      "id": "ans_es6_004",
+      "category": "ans_es6",
+      "input": "ES6有几种驾驶模式？运动+和节能模式的百公里加速分别是多少？不同模式的悬架软硬和能量回收等级有什么区别？",
+      "latency_s": 20.75,
+      "usage": {
+        "prompt_tokens": 5525,
+        "completion_tokens": 195,
+        "total_tokens": 5720
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "六种基础驾驶模式",
+                "运动+百公里加速4.5秒",
+                "节能百公里加速9.9秒",
+                "后排尊享悬架超软、能量回收极低",
+                "节能模式常规由单电机驱动"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts such as the six driving modes, acceleration times for Sport+ and Eco modes, and suspension settings. However, it misses the detail that the Eco mode is typically driven by a single motor and the specific suspension and energy recovery settings for the 'Rear Comfort' mode."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the driving modes of the Nio ES6, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio ES6 共有六种驾驶模式：舒适、后排尊享、节能、运动、运动+和个性化。以下是运动+和节能模式的具体参数：\n\n- **运动+模式**：\n  - 百公里加速时间：4.5 秒\n  - 悬架软硬：较硬\n  - 能量回收等级：低\n\n- **节能模式**：\n  - 百公里加速时间：9.9 秒\n  - 悬架软硬：较软\n  - 能量回收等级：标准\n\n不同模式下，悬架的软硬程度和能量回收等级会有所不同，以适应不同的驾驶需求和路况。"
+    },
+    {
+      "id": "ans_es6_005",
+      "category": "ans_es6",
+      "input": "ES6有自动紧急避让功能吗？在什么车速下才能工作？对车道有什么要求？",
+      "latency_s": 15.13,
+      "usage": {
+        "prompt_tokens": 5710,
+        "completion_tokens": 197,
+        "total_tokens": 5907
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "默认关闭需手动开启",
+                "自车时速需满足80-150公里/小时",
+                "车道宽度要大于2.5米且车道线清晰连续",
+                "前后连环追尾场景自车时速不低于60公里/小时即可",
+                "触发时鸣笛警示并亮起危险警告灯"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as the speed requirement (80-150 km/h) and the lane conditions (width greater than 2.5 meters, clear lane markings). However, it misses the fact that the feature is '默认关闭需手动开启' and does not mention the activation condition for rear-end collision scenarios (speed not less than 60 km/h). It also omits the warning signals (horn and hazard lights) that are triggered during activation."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the conditions for the automatic emergency avoidance feature as described in the GROUND TRUTH, without introducing any fabricated or contradictory information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer without excessive hedging, detailing the conditions under which the Nio ES6's automatic emergency avoidance feature operates."
+            }
+          }
+        }
+      },
+      "answer": "Nio ES6 的自动紧急避让功能在以下条件下可以正常工作：\n\n- **车速范围**：自车时速需在 80-150 公里/小时之间。\n- **车道要求**：车道宽度需大于 2.5 米，且车道线必须清晰连续。此外，相邻车道需具备安全变道条件，且当前车道不能有实线限制。\n\n该功能会在检测到与前方行人、骑行人或车辆有碰撞风险时，判断仅靠刹车无法避免碰撞，并且相邻车道具备安全变道条件时，车辆将向相邻车道紧急转向以尽可能避免或降低碰撞风险。"
+    },
+    {
+      "id": "ans_es6_006",
+      "category": "ans_es6",
+      "input": "ES6充电完成后充电枪拔不出来应该怎么处理？具体操作步骤是什么？",
+      "latency_s": 14.77,
+      "usage": {
+        "prompt_tokens": 5709,
+        "completion_tokens": 225,
+        "total_tokens": 5934
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "重新插紧充电枪确保解锁按钮弹起",
+                "按住充电枪解锁按钮等待1到2秒钟",
+                "待充电口指示灯变成绿色常亮后拔下",
+                "如仍无法拔下联系蔚来汽车服务中心"
+              ],
+              "coverage": 0.2
+            },
+            "llm": {
+              "score": 2,
+              "reason": "All key facts are present and correct, with no significant errors. The steps are clearly outlined and match the ground truth instructions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer follows the steps outlined in the ground truth without introducing any forbidden content or fabricating information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident step-by-step solution to the problem without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "如果在充电完成后发现充电枪无法拔出，可以按照以下步骤进行处理：\n\n1. **重新插紧充电枪**：确保充电枪的解锁按钮已经弹起。\n2. **重新进行全车上锁及解锁**：尝试通过车钥匙或车内按钮进行全车的上锁和解锁操作。\n3. **按住充电枪解锁按钮**：按住充电枪上的解锁按钮等待1到2秒钟，观察充电口指示灯是否变成绿色常亮，然后再尝试拔下充电枪。\n4. **联系服务中心**：如果以上步骤仍无法解决问题，请立即停止充电并联系蔚来汽车服务中心寻求帮助。\n\n注意：在操作过程中，请勿用力晃动或强行拔出充电枪，以免损坏充电设备或车辆充电口。"
+    },
+    {
+      "id": "ans_et7_001",
+      "category": "ans_et7",
+      "input": "ET7能拖挂拖车吗？最大牵引质量是多少？拖挂时轮胎气压和平时有什么不同？",
+      "latency_s": 12.53,
+      "usage": {
+        "prompt_tokens": 5321,
+        "completion_tokens": 131,
+        "total_tokens": 5452
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "最大牵引质量2000kg",
+                "电动拖钩最大承载质量100kg",
+                "拖挂时胎压保持在2.8bar",
+                "需在悬架高度为正常模式下完成拖车连接",
+                "拖挂时车速不能超过100km/h"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER is missing several key facts such as '电动拖钩最大承载质量100kg', '需在悬架高度为正常模式下完成拖车连接', and '拖挂时车速不能超过100km/h'. It also introduces irrelevant information about the driver's license and total vehicle mass, which are not part of the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER introduces the requirement for a C6 driving license and a total vehicle mass limit of 4500 kg, which are not mentioned in the GROUND TRUTH."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7 支持拖挂拖车，其最大牵引质量为2000公斤。在拖挂状态下，轮胎气压需要保持在2.8 bar，比正常建议胎压高0.2 bar。拖挂时，驾驶员应持有C6驾驶证，且驾驶车辆的总质量（包含拖车质量）应小于4500公斤。"
+    },
+    {
+      "id": "ans_et7_002",
+      "category": "ans_et7",
+      "input": "ET7的运动+模式百公里加速需要多少秒？不同驾驶模式下悬架高度和悬架刚度的设定分别是什么？",
+      "latency_s": 23.22,
+      "usage": {
+        "prompt_tokens": 7234,
+        "completion_tokens": 251,
+        "total_tokens": 7485
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "运动+百公里加速3.8秒",
+                "运动+悬架高度低、刚度较硬",
+                "后排尊享悬架刚度超软",
+                "节能模式悬架高度标准、刚度较软",
+                "共六种驾驶模式含个性化"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER correctly includes all key facts: '运动+百公里加速3.8秒', '运动+悬架高度低、刚度较硬', '后排尊享悬架刚度超软', '节能模式悬架高度标准、刚度较软', and mentions the six driving modes including the customizable one. There are no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the information provided in the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the ET7's acceleration and suspension settings in different driving modes."
+            }
+          }
+        }
+      },
+      "answer": "在ET7的运动+模式下，百公里加速时间为3.8秒。不同驾驶模式下的悬架高度和悬架刚度设定如下：\n\n| 驾驶模式   | 悬架高度 | 悬架刚度 |\n|------------|----------|----------|\n| 运动+      | 低       | 较硬     |\n| 运动       | 标准     | 标准     |\n| 舒适       | 标准     | 较软     |\n| 后排尊享   | 标准     | 超软     |\n| 节能       | 标准     | 较软     |\n| 个性化     | 自定义   | 自定义   |\n\n这些设定可以"
+    },
+    {
+      "id": "ans_et7_003",
+      "category": "ans_et7",
+      "input": "ET7的悬架主动控制有哪些子功能？智能辅助通过是怎么工作的？怎么触发辅助通过模式？",
+      "latency_s": 33.1,
+      "usage": {
+        "prompt_tokens": 5805,
+        "completion_tokens": 339,
+        "total_tokens": 6144
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "包含舒适领航和智能辅助通过两个子功能",
+                "舒适领航显示颠簸指数0-99",
+                "智能辅助通过记忆地理定位",
+                "再次以30公里/小时以下车速经过时自动调节悬架",
+                "辅助通过通过中控台驾驶模式物理按键开启"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER accurately includes all key facts from the GROUND TRUTH, such as the two sub-functions of the suspension control, the display of the bump index, the memory of geographic location for intelligent assistance, automatic suspension adjustment at speeds below 30 km/h, and the activation of the assist mode via the physical button on the center console."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and detailed explanation of the ET7's suspension active control features without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7 的悬架主动控制包含以下子功能：\n\n1. **舒适领航**：该功能通过采集路况信息，根据前方路面的起伏情况，对车身进行提前控制与实时调整，以提升驾乘舒适性。当遇到颠簸路况时，车辆会在中控屏上进行提示，显示颠簸指数和到达该颠簸路况的距离。\n\n2. **智能辅助通过**：该功能可以通过记忆您手动进入辅助通过模式时的地理定位，当您再次以 30 公里/小时以下车速经过此地时，车辆将自动调节悬架至辅助通过的高度。您还可以在地图上查看历史记忆位置。\n\n**智能辅助通过模式的工作原理**：\n- 系统会记忆您手动进入辅助通过模式时的地理位置。\n- 当您再次以 30 公里/小时以下的车速经过该位置时，车辆"
+    },
+    {
+      "id": "ans_et7_004",
+      "category": "ans_et7",
+      "input": "ET7的紧急车道保持功能在哪些场景下会触发？默认是开启的吗？触发时仪表屏会显示什么？",
+      "latency_s": 17.23,
+      "usage": {
+        "prompt_tokens": 5865,
+        "completion_tokens": 228,
+        "total_tokens": 6093
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "默认关闭需手动开启",
+                "车速65-130公里/小时",
+                "三种场景：右侧路沿偏离、左侧迎面来车、左侧后方快速接近",
+                "右侧偏离时中央车道线右侧显示黄色",
+                "左侧风险时中央车道线左侧显示红色"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all key facts: the feature is default off and needs manual activation, it operates at speeds of 65-130 km/h, and it describes the three scenarios where the feature may activate. It also correctly mentions the color indications for lane departure. No significant errors are present."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information from the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7的紧急车道保持功能在以下场景下可能会触发：\n\n1. 未打转向灯时，车辆向右侧路沿非意图性偏离本车道。\n2. 未打转向灯时，左侧车道有迎面来车，车辆向左非意图性偏离本车道。\n3. 左侧车道后方有车快速接近，车辆向左非意图性偏离本车道或主动变道。\n\n该功能默认是关闭的。您可以在中控屏下方控制栏进入设置页面，通过点击辅助驾驶>安全守护>紧急车道保持来开启或关闭该功能。\n\n当紧急车道保持功能触发时，仪表屏会显示中央车道线的左侧为红色或右侧为黄色，具体取决于偏离的方向。"
+    },
+    {
+      "id": "ans_et7_005",
+      "category": "ans_et7",
+      "input": "ET7后排有行政屏吗？左右两块屏幕可以独立使用吗？支持什么功能？",
+      "latency_s": 13.87,
+      "usage": {
+        "prompt_tokens": 5515,
+        "completion_tokens": 259,
+        "total_tokens": 5774
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "两块行政屏可独立操控、独立运行应用",
+                "可分别连接蓝牙耳机实现声音私享",
+                "支持与中控屏、后排中控屏、AR眼镜跨屏交互",
+                "支持跨屏同播共享和跨端投屏",
+                "包含屏幕控制、座椅控制、空调控制、环境调节等功能"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER accurately includes all key facts from the GROUND TRUTH, such as independent operation of the screens, Bluetooth headphone connectivity, cross-screen interaction, and detailed control functions like screen, seat, air conditioning, and environment adjustments."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and detailed answer about the features of the Nio ET7's rear screens without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio ET7 的后排配备有两块行政屏，这两块屏幕可以独立使用。每块屏幕可以独立运行应用，并支持分别连接蓝牙耳机，实现声音私享。此外，这些屏幕还支持与中控屏、后排中控屏、AR 眼镜及移动设备等进行跨屏交互、跨屏同播共享、跨端投屏等功能。\n\n具体功能包括：\n- 屏幕控制：手动调节屏幕角度或随动座椅位置。\n- 座椅控制：对前、后排座椅进行调节。\n- 后排座椅舒适调节：包括通风、按摩、加热等功能。\n- 后排空调控制：温度、风量、模式与风向调节。\n- 环境调节：车内阅读灯、氛围灯、香氛、天幕等调节。\n\n这些功能使得后排乘客可以享受个性化的舒适和娱乐体验。"
+    },
+    {
+      "id": "ans_et7_006",
+      "category": "ans_et7",
+      "input": "ET7和ES6的拖挂能力哪个更强？最大牵引质量分别是多少？拖挂时的胎压要求有什么区别？",
+      "latency_s": 18.12,
+      "usage": {
+        "prompt_tokens": 6762,
+        "completion_tokens": 296,
+        "total_tokens": 7058
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "ET7最大牵引质量2000kg，ES6为1200kg",
+                "ET7拖钩承载100kg，ES6为75kg",
+                "ET7拖挂胎压2.8bar，ES6为2.9bar",
+                "两车均需C6驾照",
+                "ET7需在悬架正常模式下完成拖车连接"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly mentions the maximum towing capacities and tire pressure requirements for both ET7 and ES6. However, it omits the towing hook load capacities, the requirement for a C6 driver's license, and the specific suspension mode requirement for ET7. Additionally, it introduces an incorrect detail about tire pressure adjustment that is not present in the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes fabricated information about the requirement for rear tire pressure to be at least 0.2 bar higher than the normal recommended pressure, which is not mentioned in the GROUND TRUTH."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the towing capacities and tire pressure requirements for ET7 and ES6, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7和ES6的拖挂能力和相关参数如下：\n\n### 最大牵引质量\n- **ET7**：最大牵引质量为2000千克。\n- **ES6**：最大牵引质量为1200千克。\n\n### 拖挂时的胎压要求\n- **ET7**：拖挂时，胎压需保持在2.8 bar。\n- **ES6**：拖挂时，胎压需保持在2.9 bar。\n\n### 其他拖挂要求\n- **ET7**：拖挂时，后轮胎压必须至少比正常建议胎压高0.2 bar。\n- **ES6**：同样要求后轮胎压至少比正常建议胎压高0.2 bar。\n\n从以上数据可以看出，ET7的拖挂能力更强，最大牵引质量更大。拖挂时的胎压要求略有不同，ET7要求2.8 bar，"
+    },
+    {
+      "id": "ans_feat_001",
+      "category": "ans_feat",
+      "input": "蔚来ET5的宠物托管模式具体有哪些保护措施？如果车辆出问题了怎么办？",
+      "latency_s": 14.87,
+      "usage": {
+        "prompt_tokens": 5686,
+        "completion_tokens": 288,
+        "total_tokens": 5974
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "空调默认22℃自动模式",
+                "后排门窗儿童锁开启",
+                "异常时四门车窗降低约三指宽度",
+                "续航低于10公里自动退出并开窗",
+                "每隔两小时App提醒宠物在车内"
+              ],
+              "coverage": 0.167
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts from the GROUND TRUTH, such as the air conditioning default setting, child lock activation, window adjustment in case of anomalies, notification methods, reminders every two hours, and the automatic exit condition when the range is below 10 km. There are no significant errors or omissions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a detailed and confident answer about the pet care mode in the NIO ET5, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "蔚来ET5的宠物托管模式提供了一系列保护措施，以确保宠物在车内的安全：\n\n1. **空调自动模式**：车内温度默认为22℃，可手动调整，确保车内环境适宜。\n2. **车窗和车外大灯自动关闭**：减少外界干扰。\n3. **仪表屏和HUD亮度调节**：降低亮度以节省电量。\n4. **后排门窗儿童锁**：防止意外开启。\n5. **禁用部分功能**：NOMI语音唤醒、门窗按键等功能被禁用，蔚来App部分远程车控功能也被禁用。\n\n如果车辆出现问题，例如高压系统或空调系统异常，车辆会自动降低四门车窗约三指宽度，并通过蔚来App、短信及电话通知车主前往车辆进行检查。此外，每隔两小时会通过蔚来App提示车主宠"
+    },
+    {
+      "id": "ans_feat_002",
+      "category": "ans_feat",
+      "input": "EC6的电动尾翼有几种模式？减阻挡和极速挡有什么区别？有什么保护机制？",
+      "latency_s": 13.82,
+      "usage": {
+        "prompt_tokens": 5805,
+        "completion_tokens": 338,
+        "total_tokens": 6143
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "减阻挡降低风阻提高续航",
+                "极速挡增加下压力提高稳定性",
+                "连续操作15次以上暂停调节",
+                "需等待150秒后恢复",
+                "进入拖挂模式尾翼保持收回"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts such as '减阻挡降低风阻提高续航', '极速挡增加下压力提高稳定性', '连续操作15次以上暂停调节', and '需等待150秒后恢复'. However, it misses the key fact about '进入拖挂模式尾翼保持收回'. The SYSTEM ANSWER also adds extra information not present in the GROUND TRUTH, such as the procedure for resetting the wing if it malfunctions, which is not required for a perfect score."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes fabricated information about the tail wing automatically retracting when the car is locked, which is not mentioned in the ground truth. The ground truth states that there is an option to keep the tail wing extended when the car is locked, but it does not mention automatic retraction upon locking."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and detailed answer about the modes and mechanisms of the Nio EC6's electric spoiler without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio EC6 的电动尾翼有以下几种模式：\n\n1. **减阻挡**：尾翼展开至低角度位置，以降低车辆的行驶风阻，提高续航里程。\n2. **极速挡**：尾翼展开至最高角度，以增加车辆行驶中受到的下压力，提高行驶稳定性。\n3. **自动模式**：\n   - 车速上升时：当车速超过 60 公里/小时，尾翼将自动切换到减阻挡；当车速超过 130 公里/小时，尾翼将自动切换到极速挡。\n   - 车速下降时：当车速降至 130 公里/小时，尾翼将自动切换到减阻挡；当车速降至 10 公里/小时，尾翼将自动收回。\n4. **关闭模式**：尾翼将自动收回。\n\n**保护机制**：\n- 电动尾翼具有频繁操作保护机制"
+    },
+    {
+      "id": "ans_feat_003",
+      "category": "ans_feat",
+      "input": "ET9的线控转向系统是怎么工作的？如果出现故障怎么处理？",
+      "latency_s": 11.1,
+      "usage": {
+        "prompt_tokens": 5531,
+        "completion_tokens": 363,
+        "total_tokens": 5894
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "电信号取代机械连接",
+                "低速时后轮与前轮反向转动减少转弯半径",
+                "一级故障20小时后限速80公里/小时",
+                "二级故障10分钟后降至10公里/小时",
+                "三级故障系统自动减速限速10公里/小时"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER accurately captures all the key facts from the GROUND TRUTH, including the replacement of mechanical connections with electrical signals, the rear-wheel steering functionality at low speeds, and the detailed fault handling procedures with corresponding speed limitations. There are no significant errors or omissions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging, detailing the procedures to follow in case of different levels of failure in the ET9's steer-by-wire system."
+            }
+          }
+        }
+      },
+      "answer": "ET9的线控转向系统通过电信号传递转向指令至转向机构，取代了传统的机械连接，实现更精准、更快的响应。该系统具备无迟滞响应特性，并集成了后轮转向功能，低速时后轮与前轮反向转动以减少转弯半径，中高速时后轮转向与底盘控制系统结合以提升行驶稳定性。\n\n如果线控转向系统出现故障，处理方法如下：\n\n1. **黄色故障指示灯亮起**：提示“转向系统异常，请尽快维修车辆”。请立即安全停车，并联系蔚来汽车服务中心。系统将在故障发生后20小时自动将车速限制至80公里/小时。\n\n2. **红色故障警告灯亮起，转向能力部分失效**：提示“转向系统故障，请立刻靠边停车”。请立即安全停车，并联系蔚来汽车服务中心。系统将在"
+    },
+    {
+      "id": "ans_feat_004",
+      "category": "ans_feat",
+      "input": "ES8的后排娱乐屏有什么功能？遥控器怎么用？有没有安全保护？",
+      "latency_s": 17.44,
+      "usage": {
+        "prompt_tokens": 5841,
+        "completion_tokens": 428,
+        "total_tokens": 6269
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "支持视频、音乐、游戏、手机投屏",
+                "遥控器有触控板和Type-C充电口",
+                "正面三个方向有防夹功能",
+                "防磕碰提醒仅P挡下生效",
+                "防晕车模式显示圆点动效随车辆运动变化",
+                "锁车后娱乐屏自动收起"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts from the GROUND TRUTH: it mentions support for video, music, games, and phone mirroring; describes the remote control with a touchpad and Type-C charging port; notes the anti-pinch feature on three sides; specifies the anti-collision reminder only works in P gear; describes the anti-motion sickness mode with moving dots; and states the entertainment screen automatically retracts when the car is locked. No significant errors are present."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a detailed and confident answer about the features and functionalities of the ES8's rear entertainment screen without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES8的后排娱乐屏具备以下功能和特点：\n\n### 功能\n- **娱乐功能**：支持视频播放、音乐播放、游戏、手机投屏等多种娱乐功能。\n- **控制方式**：可以通过遥控器、触控屏幕、语音指令进行控制，提供便捷的操作体验。\n- **多屏互联**：可以在中控屏上操作娱乐屏，实现多屏控制。\n- **防晕车模式**：通过快捷控制开启或关闭，功能开启后，非 P 档时将自动显示防晕车效果。\n\n### 遥控器使用\n- **配对**：按照娱乐屏指示进行遥控器配对。\n- **功能键**：\n  - 触控板：滑动以移动光标，调节屏幕角度。\n  - 返回键：返回上一页/上一级菜单。\n  - 自定义键：快捷打开自定义的"
+    },
+    {
+      "id": "ans_feat_005",
+      "category": "ans_feat",
+      "input": "ET9的天行主动悬架有哪些特殊功能？弹跳脱困是什么？",
+      "latency_s": 19.45,
+      "usage": {
+        "prompt_tokens": 4272,
+        "completion_tokens": 75,
+        "total_tokens": 4347
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 1,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "弹跳脱困限速15公里/小时运行1分钟后自动退出",
+                "香槟塔模式限速18公里/小时",
+                "最高挡位较标准抬升约40毫米限速35公里/小时",
+                "最低挡位较标准降低约50毫米",
+                "舒适领航显示颠簸指数0-99"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER does not provide any of the key facts or details about the ET9天行主动悬架's special functions. It lacks all the required information."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer does not contain any fabricated or contradicted information. It simply states that it cannot provide specific information about the ET9's suspension features."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system incorrectly claims it cannot answer by stating it cannot access specific information about ET9's features, which is an over-hedge."
+            }
+          }
+        }
+      },
+      "answer": "目前我无法获取到关于ET9的天行主动悬架特殊功能和弹跳脱困的具体信息。如果您有其他问题或需要进一步帮助，请随时告诉我！"
+    },
+    {
+      "id": "ans_feat_006",
+      "category": "ans_feat",
+      "input": "ET9的电动尾翼自动模式怎么工作？什么速度展开和收回？",
+      "latency_s": 15.12,
+      "usage": {
+        "prompt_tokens": 5711,
+        "completion_tokens": 136,
+        "total_tokens": 5847
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "自动模式车速超过80公里/小时展开",
+                "车速低于10公里/小时自动收回",
+                "有展开、自动和关闭三种模式",
+                "连续操作15次以上暂停需等150秒"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly describes the automatic mode operation for speeds over 80 km/h and under 10 km/h, but it misses the key facts about the three modes (展开、自动和关闭) and the protection mechanism (连续操作15次以上暂停需等150秒)."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes fabricated information about selecting the tail wing's position or turning off the function through a control panel, which is not mentioned in the GROUND TRUTH."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9 的电动尾翼在自动模式下的工作方式如下：\n\n- **展开**：当车速超过 80 公里/小时并保持稳定时，电动尾翼将自动展开。\n- **收回**：当车速低于 10 公里/小时并保持稳定时，电动尾翼将自动收回。\n\n此外，您可以通过中控屏下方的控制栏进入设置页面，选择尾翼的挡位或关闭该功能。"
+    },
+    {
+      "id": "ans_feat_007",
+      "category": "ans_feat",
+      "input": "ET9有儿童遗留检测功能吗？具体是怎么工作的？",
+      "latency_s": 20.01,
+      "usage": {
+        "prompt_tokens": 4255,
+        "completion_tokens": 58,
+        "total_tokens": 4313
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 1,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "需要官方蓝牙儿童座椅连接后自动激活",
+                "检测到温度异常自动开空调",
+                "续航不足10公里时车窗下降约12%",
+                "数据仅本地处理每次检测后删除",
+                "宠物托管模式下该功能被禁用"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The system answer does not provide any of the key facts about the ET9's child detection feature. It states an inability to provide information, which is incorrect given the detailed information available in the ground truth."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer does not contain any fabricated or contradicted information. It simply states a lack of information about the ET9's features."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system incorrectly claims it cannot answer the query, which suggests over-hedging."
+            }
+          }
+        }
+      },
+      "answer": "目前我无法获取到关于ET9是否具备儿童遗留检测功能的信息。如果您有其他问题或需要进一步帮助，请随时告诉我。"
+    },
+    {
+      "id": "ans_feat_008",
+      "category": "ans_feat",
+      "input": "ES8的守卫模式有几级守护？每级具体怎么反应？",
+      "latency_s": 16.78,
+      "usage": {
+        "prompt_tokens": 5723,
+        "completion_tokens": 279,
+        "total_tokens": 6002
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "一级守护触发循环视频录制",
+                "二级守护双闪8秒鸣笛8秒",
+                "三级守护双闪5分钟鸣笛30秒",
+                "激活需续航大于40公里或充电中"
+              ],
+              "coverage": 0.2
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts but omits the activation conditions related to the vehicle's range and charging status. It also adds unnecessary details about the distance for threat detection, which is not in the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER contains fabricated details not present in the GROUND TRUTH, such as the camera detecting proximity at 20 cm and the display message '守卫模式已激活' for all levels. Additionally, it incorrectly states that the camera detects anomalies in the third level, which is not mentioned in the GROUND TRUTH."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and detailed answer about the three levels of the ES8's guard mode without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES8的守卫模式分为三级，每级的反应如下：\n\n1. **一级守护：威胁接近**\n   - 当车辆摄像头感知到行人或车辆接近至车身约20厘米时，中控屏会显示“守卫模式已激活”，并触发循环视频的录制。\n\n2. **二级守护：受到碰撞**\n   - 当车辆传感器检测到异常震动时，中控屏显示“守卫模式已激活”；双闪灯持续闪烁8秒，鸣笛8秒，触发紧急视频录制，并通过蔚来App和短信通知用户。\n\n3. **三级守护：盗窃**\n   - 当车辆传感器检测到车门被非法打开或车内摄像头检测到异常时，中控屏显示“守卫模式已激活”；双闪灯持续闪烁5分钟，鸣笛30秒，触发紧急视频录制，并通过蔚来App和短信通知用户。"
+    },
+    {
+      "id": "ans_feat_009",
+      "category": "ans_feat",
+      "input": "ES8后排控制屏能控制哪些功能？",
+      "latency_s": 12.93,
+      "usage": {
+        "prompt_tokens": 5960,
+        "completion_tokens": 284,
+        "total_tokens": 6244
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "包含后排冰箱控制功能",
+                "可控制娱乐屏开合",
+                "有侧窗变色玻璃控制",
+                "有观影模式场景选择",
+                "可设置车内220V供电"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most of the key facts, such as rear refrigerator control, entertainment screen control, side window tint control, and movie mode scene selection. However, it does not explicitly mention the ability to set the 220V power supply, which is a key fact from the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES8的后排控制屏可以控制以下功能：\n\n1. **后排空调控制**：包括开启/关闭、温度调节、风量调节、吹风模式等。\n2. **后排座椅舒适调节**：可以调节后排座椅的位置、通风、按摩、加热等功能。\n3. **后排乘坐空间调节**：通过调整主/副驾座椅位置来扩展后排乘坐空间。\n4. **后排媒体控制**：可以暂停/播放、上下首切换、展示当前播放进度、查看歌词等。\n5. **后排冰箱控制**：调节后排车载冰箱。\n6. **娱乐屏控制**：包括展开和关闭娱乐屏。\n7. **车内灯光、音场模式、顶棚遮阳帘、侧窗变色玻璃控制**。\n8. **场景模式选择**：如观影模式。\n9. **后排娱乐媒体播放*"
+    },
+    {
+      "id": "ans_feat_010",
+      "category": "ans_feat",
+      "input": "ES8的超级节能模式（ECO+）具体限制了哪些功能？什么时候会自动退出？",
+      "latency_s": 12.47,
+      "usage": {
+        "prompt_tokens": 5783,
+        "completion_tokens": 129,
+        "total_tokens": 5912
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "禁用非驾驶必需功能以降低功耗",
+                "部分驾驶、舒适、娱乐、制冷制热功能被关闭",
+                "电量补能超过50%自动退出",
+                "在中控屏驾驶>超级节能设置"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts: it mentions disabling non-essential functions to reduce power consumption, closing certain high-energy functions, and automatic exit when battery exceeds 50%. However, it misses the detail about accessing the mode through the central control screen settings."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer is consistent with the ground truth and does not contain any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer about the ES8's ECO+ mode without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES8的超级节能模式（ECO+）通过禁用非驾驶必需的功能来降低整车功耗，以节约电量。开启该模式后，部分驾驶、舒适、娱乐、制冷和制热等耗能较多的功能将被关闭或禁用，以提高车辆的续航里程。\n\n该模式会在车辆高压动力电池电量补能至超过50%后自动退出。"
+    },
+    {
+      "id": "ans_feat_011",
+      "category": "ans_feat",
+      "input": "ET7支持iPhone数字钥匙吗？用的什么技术？哪些手机可以用？",
+      "latency_s": 12.44,
+      "usage": {
+        "prompt_tokens": 5418,
+        "completion_tokens": 121,
+        "total_tokens": 5539
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "采用UWB+NFC技术",
+                "支持iPhone 11及后续大部分机型",
+                "支持Apple Watch Series 6及后续",
+                "添加到苹果钱包后快捷模式自动打开",
+                "可分享给家人朋友"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts such as the use of UWB+NFC technology, support for iPhone 11 and later models, and Apple Watch Series 6 and later. However, it misses the details about adding the key to Apple Wallet and the automatic activation of quick mode, as well as the ability to share the key with family and friends."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer is consistent with the ground truth and does not contain fabricated information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7支持iPhone数字钥匙，使用的是UWB（超宽带）和NFC技术。通过这些技术，用户可以使用iPhone或Apple Watch进行车辆的解锁、上锁和启动操作。\n\n支持的手机型号包括iPhone 11及后续大部分机型，以及Apple Watch Series 6及后续机型。请确保设备的系统更新至最新版本，以确保功能的正常使用。"
+    },
+    {
+      "id": "ans_feat_012",
+      "category": "ans_feat",
+      "input": "ES6的洗车模式会关闭哪些功能？怎么退出？",
+      "latency_s": 13.18,
+      "usage": {
+        "prompt_tokens": 5679,
+        "completion_tokens": 213,
+        "total_tokens": 5892
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "门把手感应开启被禁用",
+                "后备箱脚踢感应被禁用",
+                "空调自动切换为内循环",
+                "车速超过15公里/小时自动退出"
+              ],
+              "coverage": 0.2
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: '天窗将被关闭', '门把手感应开启被禁用', '后备箱脚踢感应被禁用', '空调自动切换为内循环', and '车速超过15公里/小时自动退出'. There are no significant errors or omissions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated or contradictory information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在 ES6 的洗车模式下，以下功能会被关闭或禁用：\n\n- 车窗、外后视镜、尾门、充电口盖和天窗将被关闭。\n- 离车自动上锁、近车自动解锁、自动除雾功能将被禁用。\n- 充电口盖车外开启、门把手感应开启、门把手自动回收、自动雨刮感应、后备箱脚踢感应、守卫模式将被禁用。\n- 空调若开启，将自动切换为内循环。\n\n要退出洗车模式，可以通过以下方式：\n\n- 在中控屏下方控制栏进入设置页面，点击“我的 ES6 > 洗车模式”来关闭该模式。\n- 当车速超过 15 公里/小时，洗车模式将自动退出。"
+    },
+    {
+      "id": "ans_safe_001",
+      "category": "ans_safe",
+      "input": "ES6哪些座位可以安装儿童安全座椅？有什么限制？",
+      "latency_s": 14.9,
+      "usage": {
+        "prompt_tokens": 5768,
+        "completion_tokens": 339,
+        "total_tokens": 6107
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "后排中间座椅不建议安装",
+                "副驾安全气囊打开时所有组别均不适用",
+                "副驾安全气囊关闭时0组和0+组为U级别",
+                "副驾安装时需将座椅调至最高位置",
+                "身高1.5米以上可直接使用安全带"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as not recommending installation in the rear middle seat and adjusting the front passenger seat to the highest position when installing a child seat. However, it lacks specific details about the applicability of different child seat groups when the airbag is on or off, and it does not mention that children over 1.5 meters can use the seatbelt directly. It also misses the specific group classifications (U, UF) for different scenarios."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the ground truth information regarding the installation restrictions and recommendations for child safety seats in the Nio ES6. It does not contain any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer regarding the installation and restrictions of child safety seats in the Nio ES6, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在Nio ES6上，儿童安全座椅的安装位置和限制如下：\n\n1. **后排座椅**：\n   - 推荐在后排两侧座位上安装儿童安全座椅。\n   - 后排中间位置不建议安装儿童安全座椅。\n   - 体重低于13千克的婴儿适宜使用可躺卧的儿童安全座椅，尽量采用后向安装。\n   - 体重介于9~18千克的婴幼儿适宜使用带安全台或五点式安全带的儿童安全座椅，推荐采用后向安装。\n   - 体重介于15~25千克的儿童适宜直接使用前向儿童安全座椅，并配合安全带。\n   - 体重介于22~36千克，身高低于1.5米的儿童适宜直接使用儿童安全坐垫，并配合安全带。\n\n2. **前排座椅**：\n   - 在前排副驾座"
+    },
+    {
+      "id": "ans_safe_002",
+      "category": "ans_safe",
+      "input": "EC6的车顶行李架最多能装多重？有什么行驶限制？",
+      "latency_s": 18.67,
+      "usage": {
+        "prompt_tokens": 5750,
+        "completion_tokens": 245,
+        "total_tokens": 5995
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "负载总重量不超过75千克",
+                "行驶速度不超过120公里/小时",
+                "负载应均匀分布",
+                "避免剧烈加速急刹和急转弯"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all key facts: the load should not exceed 75 kg, speed should not exceed 120 km/h, load should be evenly distributed, and avoid sudden acceleration, braking, and sharp turns. There are no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer regarding the maximum load capacity of the Nio EC6's roof rack and offers additional safety tips without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "Nio EC6的车顶行李架最大承重为75千克。在行驶过程中，使用车顶行李架时需要注意以下几点：\n\n1. **负载分布**：负载应均匀地分布在车顶行李架上。\n2. **定期检查**：定期检查车顶行李架和负载是否牢固，以避免车辆损坏或人身伤害。\n3. **行驶行为**：装载重物时，车辆应避免剧烈加速、急刹和急转弯。\n4. **速度限制**：当车顶承载载荷时，行驶速度不应超过行李架说明书规定的速度，且不超过120公里/小时。\n5. **重心变化**：注意车辆的重心会因车顶载荷而变化，影响行驶稳定性。\n\n请确保严格按照车顶行李架的说明书进行安装和使用，以确保安全。"
+    },
+    {
+      "id": "ans_safe_003",
+      "category": "ans_safe",
+      "input": "EC7充电时有哪些安全注意事项？哪些人需要特别注意？",
+      "latency_s": 14.03,
+      "usage": {
+        "prompt_tokens": 5904,
+        "completion_tokens": 376,
+        "total_tokens": 6280
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "检查充电枪头是否变形发黑烧蚀",
+                "禁止未成年人使用和靠近充电设备",
+                "心脏起搏器用户需远离快充车辆",
+                "结束充电后等待3秒再拔充电枪",
+                "充电过程中禁止强行拔枪避免电弧"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts but misses the specific instruction to wait 3 seconds after charging before unplugging the gun. It also does not explicitly mention avoiding forcibly unplugging the gun during charging to prevent arcing, although it does mention pressing the unlock button before unplugging. Other key facts are present."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the ground truth without introducing any fabricated facts or contradictions. It includes all necessary safety precautions for charging the Nio EC7, including specific instructions for users with pacemakers, and does not mention any forbidden content."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific safety precautions for charging a Nio EC7, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在为Nio EC7充电时，需要注意以下安全事项：\n\n1. **心脏起搏器用户**：体内植入心脏起搏器的用户需远离快充作业的车辆，以避免电磁干扰影响医疗设备的正常功效。\n\n2. **充电设备检查**：在充电前，检查充电枪头及车辆充电口是否有变形、发黑、烧蚀或污物，保持接口清洁。如发现异常，请勿进行充电作业。\n\n3. **充电环境**：避免在有易燃气体或液体的地方进行充电，建议在通风处进行充电。禁止在大雨及极端天气时进行露天充电。\n\n4. **充电设备使用**：请使用符合当地标准的充电设备，禁止私自修改或拆卸充电连接器及充电设备。\n\n5. **未成年人安全**：禁止未成年人使用充电设备，充电作业时"
+    },
+    {
+      "id": "ans_safe_004",
+      "category": "ans_safe",
+      "input": "EC7的限速模式能设定多少范围？能不能突破限速？和辅助驾驶有冲突吗？",
+      "latency_s": 13.7,
+      "usage": {
+        "prompt_tokens": 5805,
+        "completion_tokens": 168,
+        "total_tokens": 5973
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "限速范围30-180公里/小时",
+                "深踩加速踏板可暂时突破限速",
+                "辅助驾驶激活后限速模式自动退出",
+                "退出辅助驾驶后限速不会自动重新激活",
+                "辅助驾驶关闭后才能激活限速模式"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: the speed limit range of 30-180 km/h, the ability to temporarily override the limit by pressing the accelerator, the automatic exit of the speed limit mode when the driver assistance is activated, the non-automatic reactivation of the speed limit mode after exiting driver assistance, and the requirement to deactivate driver assistance to activate the speed limit mode. No significant errors are present."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated or contradictory information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC7的限速模式设定范围为30到180公里/小时。当车速达到设定值时，将不再上升。不过，通过深踩或快速踩下加速踏板，可以暂时突破限速模式的限制，当车速低于设定值后，限速模式将重新启用。\n\n限速模式与辅助驾驶功能之间存在一定的冲突。当辅助驾驶功能激活后，限速模式会自动退出，并且在退出辅助驾驶功能后，限速模式不会自动重新激活。只有在辅助驾驶功能关闭后，才能激活限速模式。"
+    },
+    {
+      "id": "ans_safe_005",
+      "category": "ans_safe",
+      "input": "ES6的自动紧急制动在什么速度范围下工作？对行人有什么识别限制？",
+      "latency_s": 15.41,
+      "usage": {
+        "prompt_tokens": 5947,
+        "completion_tokens": 282,
+        "total_tokens": 6229
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "前向对行人工作速度约4-150公里/小时",
+                "后向对行人工作速度约0-30公里/小时",
+                "行人高于200厘米或矮于100厘米可能无法识别",
+                "前向仅支持单次关闭重新上电自动开启",
+                "后向支持永久关闭"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as the speed ranges for forward and backward emergency braking and the limitations on pedestrian recognition. However, it misses specific details like '前向仅支持单次关闭重新上电自动开启' and '后向支持永久关闭'. It also adds extra information not present in the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes fabricated details not present in the GROUND TRUTH, such as '行人最早出现在传感器视野的距离较近', '行人与行人之间的距离较近', and '行人因衣物颜色、衣物材质、物品遮挡、环境、光线、速度等因素造成轮廓无法被清晰识别'. These details are not mentioned in the GROUND TRUTH."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and specific answer regarding the operational speed ranges of the ES6 automatic emergency braking system and the limitations in pedestrian recognition, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ES6 的自动紧急制动系统在以下速度范围内工作：\n\n- **前向自动紧急制动**：约 4-150 公里/小时。\n- **后向自动紧急制动**：约 0-30 公里/小时。\n\n对于行人的识别限制，系统需要识别到行人尽可能清晰完整的身体轮廓和主要特征。以下情况可能导致行人无法被识别：\n\n- 行人高于 200 厘米或矮于 100 厘米，尤其是儿童。\n- 行人在夜间道路、隧道内等黑暗的地方。\n- 行人最早出现在传感器视野的距离较近。\n- 行人与行人之间的距离较近。\n- 行人蹲下、弯腰、躺下或倒立。\n- 行人突然窜出。\n- 行人因衣物颜色、衣物材质、物品遮挡、环境、光线、速度等因素造成轮廓无法被清晰识别。"
+    },
+    {
+      "id": "ans_safe_006",
+      "category": "ans_safe",
+      "input": "EC6拖挂拖车时有什么停车限制？在坡道上怎么停车？",
+      "latency_s": 16.67,
+      "usage": {
+        "prompt_tokens": 5650,
+        "completion_tokens": 308,
+        "total_tokens": 5958
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "建议不在坡度超过12%（约7°）坡道停车",
+                "需在拖车车轮下方放置楔块",
+                "拖车过程中不应退出拖挂模式",
+                "拖挂时部分辅助驾驶功能不可用",
+                "脚踢传感器和便利进出功能不可用"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as the recommendation not to park on slopes exceeding 12% and the need to place wheel chocks under the trailer wheels. However, it misses mentioning that the towing mode should not be exited during towing and that some auxiliary driving functions, as well as the kick sensor and convenience entry functions, may be unavailable. Additionally, it includes extra information not present in the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes fabricated details not present in the GROUND TRUTH, such as prohibiting passengers in the trailer and placing heavy objects near the axle. These details are not mentioned in the GROUND TRUTH."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific guidelines for parking with a trailer, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在拖挂拖车时，EC6有以下停车限制和坡道停车建议：\n\n1. **停车限制**：\n   - 建议不在坡度超过 12%（坡角约为 7°）的坡道上停车。\n   - 拖挂行驶时，挂车内禁止人员乘坐。\n   - 挂车内的重物应尽量安置在车轴附近，以降低行驶中的摆动对车组的干扰。\n\n2. **坡道停车**：\n   - 如果必须在斜坡上停车，需在拖车车轮下方放置车轮楔块。\n   - 一人踩下制动踏板并保持，另一人将轮楔放置在车辆轮胎下坡侧车轮下方。\n   - 当轮楔就位时，松开制动踏板并确保轮楔可承受车辆和拖车的质量。\n   - 将车辆挂入驻车挡，拖车接入停车制动。\n   - 确保所有拖车车轮均已用楔块牢牢"
+    },
+    {
+      "id": "ans_safe_007",
+      "category": "ans_safe",
+      "input": "EC7的高压动力电池有哪些警告灯？分别代表什么意思？",
+      "latency_s": 16.91,
+      "usage": {
+        "prompt_tokens": 5892,
+        "completion_tokens": 284,
+        "total_tokens": 6176
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "电池故障警告灯需立即停车联系服务中心",
+                "电池温度过高警告灯需立即停车联系服务中心",
+                "电池切断警告灯表示未上高压电",
+                "冰雪路面指示灯提示温度过低影响电池性能",
+                "低压蓄电池充电故障需立即联系服务中心"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts from the GROUND TRUTH, with no significant errors. It accurately describes the meanings of the various indicator and warning lights related to the EC7 high-voltage power battery."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes a fabricated fact: '充电电缆已连接指示灯' which is not mentioned in the GROUND TRUTH."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging, detailing the meanings of various warning lights related to the EC7 high-voltage power battery."
+            }
+          }
+        }
+      },
+      "answer": "EC7的高压动力电池警告灯及其含义如下：\n\n1. **高压动力电池正常指示灯**：表明当前高压动力电池工作正常。\n2. **高压动力电池电量不足指示灯**：提示电池电量不足，需要及时充电。\n3. **高压动力电池切断警告灯**：车辆未上高压，建议联系蔚来汽车服务中心。\n4. **低压蓄电池充电故障警告灯**：建议立即联系蔚来汽车服务中心。\n5. **高压动力电池故障警告灯**：建议立即停车并联系蔚来汽车服务中心。\n6. **高压动力电池温度过高警告灯**：建议立即停车并联系蔚来汽车服务中心。\n7. **冰雪路面指示灯**：环境温度过低，可能影响电池性能。\n8. **充电电缆已连接指示灯**：表"
+    },
+    {
+      "id": "ans_safe_008",
+      "category": "ans_safe",
+      "input": "ET7如果电子门锁失效了，车内怎么紧急开门？后排有儿童锁的话呢？",
+      "latency_s": 15.42,
+      "usage": {
+        "prompt_tokens": 5824,
+        "completion_tokens": 223,
+        "total_tokens": 6047
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "拉动一次内把手机械开关即可开门",
+                "12V亏电时仅可解锁主驾车门",
+                "开启儿童锁后后门无法从内部打开",
+                "安全气囊弹出时儿童安全锁自动解锁",
+                "机械开门时车门可能无法降窗"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts but misses the detail about the 12V battery issue, specifically that only the driver's door can be unlocked when the battery is depleted. This is a significant omission."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging, detailing the emergency door opening procedures for the Nio ET7."
+            }
+          }
+        }
+      },
+      "answer": "在Nio ET7中，如果电子门锁失效，车内可以通过以下方式紧急开门：\n\n1. **车内应急开门**：在全车上锁的情况下，如遇紧急情况（例如内把手电子开关失效或车辆落入水中），可以拉动一次内把手机械开关来打开对应侧的车门。\n\n2. **儿童锁的情况**：如果后排车门开启了儿童安全锁，车门将无法从内部打开。此时，只有在全车解锁后才能从车外打开后门。此外，如果发生重大事故导致安全气囊弹出，后排车门的儿童安全锁会自动解锁。\n\n请注意，使用内把手机械开关开门时，车门可能无法执行降窗操作，这可能会有损坏车窗饰板的风险。"
+    },
+    {
+      "id": "ans_comp_001",
+      "category": "ans_comp",
+      "input": "EC6和ET9的电动尾翼有什么不同？模式和自动展开速度一样吗？",
+      "latency_s": 22.13,
+      "usage": {
+        "prompt_tokens": 7344,
+        "completion_tokens": 449,
+        "total_tokens": 7793
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "EC6有减阻挡和极速挡而ET9没有",
+                "EC6自动展开速度60公里/小时ET9是80公里/小时",
+                "EC6极速挡切换速度130公里/小时",
+                "两者收回速度都是10公里/小时",
+                "两者都有15次/150秒保护机制"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER captures most of the key differences between EC6 and ET9, such as the different modes and automatic deployment speeds. However, it misses the detail about the EC6's lock feature and the towing mode, as well as the 15 times/150 seconds protection mechanism, which are part of the key facts."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the differences between EC6 and ET9 as described in the GROUND TRUTH, without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and detailed comparison of the EC6 and ET9 electric tail wings, outlining the differences in control modes and automatic deployment speeds without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "EC6和ET9的电动尾翼在控制模式和自动展开速度上有以下不同：\n\n### EC6\n- **控制模式**：\n  - **减阻挡**：尾翼展开至低角度位置以降低风阻。\n  - **极速挡**：尾翼展开至最高角度以增加下压力。\n  - **自动模式**：\n    - 车速超过 60 公里/小时时，尾翼自动切换到减阻挡。\n    - 车速超过 130 公里/小时时，尾翼自动切换到极速挡。\n    - 车速降至 130 公里/小时时，尾翼自动切换到减阻挡。\n    - 车速降至 10 公里/小时时，尾翼自动收回。\n  - **关闭**：尾翼自动收回。\n\n### ET9\n- **控制模式**：\n  - *"
+    },
+    {
+      "id": "ans_comp_002",
+      "category": "ans_comp",
+      "input": "ET9和ES8哪个更大？座位数、尺寸和最高车速有什么区别？",
+      "latency_s": 20.42,
+      "usage": {
+        "prompt_tokens": 6689,
+        "completion_tokens": 290,
+        "total_tokens": 6979
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "ET9长5325mm ES8长5280mm",
+                "ET9高1621mm ES8高1800mm",
+                "ET9座位4座ES8座位6/7座",
+                "ET9离地间隙200mm ES8为165mm",
+                "两者最高车速均为220km/h"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all the key facts: ET9 is longer (5325mm vs 5280mm), shorter in height (1621mm vs 1800mm), has fewer seats (4 vs 6/7), has a higher ground clearance (200mm vs 165mm), and both have the same top speed of 220 km/h. The answer is complete and accurate."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and concrete comparison between Nio ET9 and ES8 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在座位数、车身尺寸和最高车速方面，Nio ET9 和 ES8 的区别如下：\n\n| 参数       | ET9          | ES8          |\n|------------|--------------|--------------|\n| 座位数     | 4            | 6/7          |\n| 车身长度   | 5325 mm      | 5280 mm      |\n| 车身宽度   | 2017 mm      | 2010 mm      |\n| 车身高度   | 1621 mm      | 1800 mm      |\n| 轴距    "
+    },
+    {
+      "id": "ans_comp_003",
+      "category": "ans_comp",
+      "input": "ET9和ES8的驾驶模式有什么区别？悬架和转向设置一样吗？",
+      "latency_s": 23.54,
+      "usage": {
+        "prompt_tokens": 7421,
+        "completion_tokens": 496,
+        "total_tokens": 7917
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "两者都有五种基础驾驶模式",
+                "ET9悬架名为天行主动悬架",
+                "ET9有线控转向可变转向比ES8没有",
+                "ES8舒适模式转向手感为轻松ET9为标准",
+                "两者节能模式能量回收均为5挡"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER captures some key facts such as both vehicles having five driving modes and ET9 having a unique steer-by-wire system. However, it misses specific details like the exact names of the suspensions, the specific steering feel differences in comfort mode, and the energy recovery settings. It also lacks the comparison of steering feel in comfort mode between ET9 and ES8."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes fabricated details not present in the GROUND TRUTH, such as the mention of '悬架高度都有标准、低、最高和最低挡位' and '悬架主动控制功能' for ES8, which are not mentioned in the GROUND TRUTH. Additionally, it incorrectly implies that both ET9 and ES8 have similar steering sensitivity adjustments, whereas the GROUND TRUTH specifies that only ET9 has the line-controlled variable steering ratio feature."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a detailed and confident comparison of ET9 and ES8 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET9和ES8在驾驶模式、悬架和转向设置上有以下相似和不同之处：\n\n### 驾驶模式\n- **ET9** 和 **ES8** 都提供五种基础驾驶模式：舒适、后排尊享、节能、运动和个性化。每种模式下可以手动调整动力、悬架、方向盘和能量回收挡位等设置。\n- **舒适模式**：加速动力平缓，注重乘坐舒适性。\n- **后排尊享模式**：加速动力更加平缓，悬架设定更加柔和。\n- **节能模式**：加速动力相对平缓，优先考虑节约能耗。\n- **运动模式**：动力充沛，操控表现优异。\n- **个性化模式**：支持自定义动力、悬架、转向手感和能量回收。\n\n### 悬架设置\n- **ET9** 和 **ES8*"
+    },
+    {
+      "id": "ans_comp_004",
+      "category": "ans_comp",
+      "input": "EC6和EC7尺寸差多少？轴距和离地间隙呢？",
+      "latency_s": 21.62,
+      "usage": {
+        "prompt_tokens": 6822,
+        "completion_tokens": 342,
+        "total_tokens": 7164
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "EC7比EC6长119mm",
+                "EC6比EC7宽21mm",
+                "EC7轴距比EC6长45mm",
+                "EC6离地间隙165mm EC7为162mm",
+                "两者最高车速均为200km/h座位数均5座"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most of the key facts, such as the differences in length, width, height, and wheelbase between EC6 and EC7, as well as the ground clearance. However, it omits the information about the top speed and seating capacity being the same for both vehicles, which is a key fact."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without any contradictions or fabrications."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident comparison of the dimensions of Nio EC6 and EC7 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "以下是Nio EC6和EC7的车身尺寸、轴距以及离地间隙的对比：\n\n| 参数       | EC6       | EC7       |\n|------------|-----------|-----------|\n| 车身长度   | 4849 mm   | 4968 mm   |\n| 车身宽度   | 1995 mm   | 1974 mm   |\n| 车身高度   | 1697 mm   | 1714 mm   |\n| 轴距       | 2915 mm   | 2960 mm   |\n| 离地间隙   | 165 mm    | 162 mm    |\n\n**差异分析：**\n- "
+    },
+    {
+      "id": "ans_comp_005",
+      "category": "ans_comp",
+      "input": "ES8和EC7的后排配置有什么区别？哪个更豪华？",
+      "latency_s": 23.08,
+      "usage": {
+        "prompt_tokens": 7404,
+        "completion_tokens": 398,
+        "total_tokens": 7802
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "ES8有后排娱乐屏EC7没有",
+                "ES8有后排冰箱EC7没有",
+                "ES8有侧窗变色玻璃控制",
+                "两者都有后排空调和座椅调节",
+                "ES8后排座椅可调位置EC7仅通风按摩加热"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER captures some key facts but misses others. It correctly notes that ES8 has a rear entertainment screen and a rear fridge, which EC7 lacks. It also mentions both have rear air conditioning and seat adjustment. However, it does not explicitly state that ES8 has side window tint control, nor does it clarify that ES8's rear seats can adjust position while EC7's only offer ventilation, massage, and heating. The SYSTEM ANSWER is partially correct but incomplete."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER incorrectly states that EC7 has a '后排尊享模式' with '超软悬架、舒适的乘坐体验,' which is not mentioned in the GROUND TRUTH. Additionally, it implies that EC7 has similar luxury features as ES8, which contradicts the GROUND TRUTH that specifies EC7 lacks certain features like a rear entertainment screen and a rear refrigerator."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident comparison of the rear seat configurations and luxury features of the ES8 and EC7, concluding that the ES8 is more luxurious without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在后排配置和豪华程度方面，ES8和EC7各有特色：\n\n### ES8 后排配置\n- **后排控制屏**：包括空调控制、座椅舒适调节（通风、按摩、加热）、乘坐空间调节、媒体控制、冰箱控制等。\n- **后排娱乐**：支持视频播放、音乐播放、游戏、手机投屏等多种娱乐功能。\n- **后排尊享模式**：提供超软悬架、舒适的乘坐体验。\n- **后排冰箱**：提供车载冰箱功能。\n\n### EC7 后排配置\n- **后排控制屏**：包括空调控制、座椅舒适调节（通风、按摩、加热）、乘坐空间调节、媒体控制等。\n- **座椅调节**：提供靠背和腰托调节，舒适自选键可记忆座椅舒适功能。\n- **后排尊享模式**：提供"
+    },
+    {
+      "id": "ans_comp_006",
+      "category": "ans_comp",
+      "input": "ET7和ET9哪个底盘更高？座位数一样吗？",
+      "latency_s": 17.37,
+      "usage": {
+        "prompt_tokens": 5819,
+        "completion_tokens": 164,
+        "total_tokens": 5983
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "ET9离地间隙200mm ET7仅128mm",
+                "ET9为4座ET7为5座",
+                "ET9最高车速220km/h ET7为200km/h",
+                "ET9轴距3250mm ET7为3060mm",
+                "ET7接近角整备14°满载13°"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly mentions the ground clearance and seating capacity differences between ET7 and ET9, which are key facts. However, it lacks other key details such as the differences in top speed, wheelbase, and approach angles, which are necessary for a complete comparison."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth regarding the chassis height and seating capacity of ET7 and ET9."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific details about the ET7 and ET9 models, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET7和ET9的底盘高度和座位数如下：\n\n- **ET7**\n  - 底盘高度（离地间隙）：128毫米\n  - 座位数：5\n\n- **ET9**\n  - 底盘高度（离地间隙）：200毫米\n  - 座位数：4\n\n因此，ET9的底盘更高，而ET7的座位数更多。"
+    },
+    {
+      "id": "ans_comp_007",
+      "category": "ans_comp",
+      "input": "蔚来哪些车型有线控转向？ET5和ET9的转向系统有什么不同？",
+      "latency_s": 20.76,
+      "usage": {
+        "prompt_tokens": 8924,
+        "completion_tokens": 313,
+        "total_tokens": 9237
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "仅ET9配备线控转向",
+                "ET9集成后轮转向功能",
+                "ET9根据车速自动调节转向比",
+                "ET5使用传统机械转向",
+                "ET9运动模式转向灵敏度因线控可变转向比更高"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly identifies that only the ET9 is equipped with the steer-by-wire system and that it integrates rear-wheel steering. However, it does not mention that the ET9 adjusts the steering ratio based on speed, nor does it specify that the ET9's steering sensitivity in sport mode is higher due to the variable steering ratio. It also fails to explicitly state that the ET5 uses a traditional mechanical steering system without these advanced features. Thus, some key facts are missing or incomplete."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer, detailing the differences in the steering systems of ET5 and ET9 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "蔚来ET5和ET9在转向系统方面有以下不同：\n\n1. **ET5**：\n   - 目前未明确提到配备线控转向技术。\n   - 转向系统主要依赖传统的机械连接，配合辅助驾驶功能，如转向灯控制变道功能。\n\n2. **ET9**：\n   - 配备了线控转向技术，通过电信号传递转向指令至转向机构，取代了传统的机械连接。\n   - 线控转向技术集成了后轮转向功能，低速时后轮与前轮反向转动以减少转弯半径，中高速时后轮转向与底盘控制系统结合以提升行驶稳定性。\n\n总结：ET9采用了更先进的线控转向技术，提供更灵活和稳定的操控体验，而ET5则依赖传统的转向系统。"
+    },
+    {
+      "id": "ans_comp_008",
+      "category": "ans_comp",
+      "input": "ET5T和ES6的驾驶模式有什么不同？ET5T有赛道模式吗？",
+      "latency_s": 20.44,
+      "usage": {
+        "prompt_tokens": 7187,
+        "completion_tokens": 336,
+        "total_tokens": 7523
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "ET5T有赛道模式ES6没有",
+                "两者都有舒适节能运动等基础模式",
+                "两者都有雪地和湿地等场景辅助模式",
+                "两者都有运动+模式"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER correctly identifies that ET5T has a track mode while ES6 does not, mentions both have basic driving modes like comfort, energy-saving, and sport, and both have scenario-based modes like snow and wetland. It also notes that both have a sport+ mode. All key facts are present and correct."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer accurately reflects the ground truth, stating that ET5T has a track mode while ES6 does not, and does not include any forbidden content."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer, detailing the differences in driving modes between ET5T and ES6 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "ET5T 和 ES6 的驾驶模式区别如下：\n\n### ET5T 驾驶模式\n- **舒适模式**：注重乘坐舒适性。\n- **节能模式**：优先节省能耗。\n- **运动模式**：动力充沛，操控优异。\n- **运动+模式**：更强动力和操控。\n- **个性化模式**：可自定义动力、悬架、转向等。\n- **赛道模式**：专为驾驶性能爱好者设计，提升操控表现，适合赛道驾驶。\n\n### ES6 驾驶模式\n- **舒适模式**：平缓加速，注重舒适性。\n- **后排尊享模式**：更柔和的悬架设定。\n- **节能模式**：优先节约能耗。\n- **运动模式**：动力充沛，操控优异。\n- **运动+模式**：最强动"
+    },
+    {
+      "id": "ans_fault_001",
+      "category": "ans_fault",
+      "input": "ET9线控转向出现故障时，车辆分别会怎么处理？会限速吗？",
+      "latency_s": 12.17,
+      "usage": {
+        "prompt_tokens": 5674,
+        "completion_tokens": 292,
+        "total_tokens": 5966
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "情形1黄灯20小时后限速80公里/小时",
+                "情形2红灯立即限速80后10分钟降至10",
+                "情形3红灯系统自动减速限至10公里/小时",
+                "情形2和3再次换挡时弹出提示窗口",
+                "三种情形都需联系蔚来服务中心"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly describes the three scenarios and their respective actions, including the color of the warning lights and speed limitations. However, it misses the detail about the prompt window appearing when attempting to shift gears again in scenarios 2 and 3. This omission makes the answer incomplete."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information provided in the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging, detailing the specific actions to take based on the severity of the steering system failure."
+            }
+          }
+        }
+      },
+      "answer": "当ET9的线控转向系统出现故障时，车辆会根据故障的严重程度采取不同的处理措施：\n\n1. **转向能力正常**：如果天际屏点亮黄色故障指示灯，并提示“转向系统异常，请尽快维修车辆”，请立即安全停车，并联系蔚来汽车服务中心。系统将在故障发生后20小时自动将车速限制至80公里/小时。\n\n2. **转向能力部分失效**：如果天际屏点亮红色故障警告灯，并提示“转向系统故障，请立刻靠边停车”，请立即安全停车，并联系蔚来汽车服务中心。系统将在故障发生后自动限速至80公里/小时，并在10分钟后进一步降至10公里/小时。\n\n3. **转向能力完全失效**：如果天际屏点亮红色故障警告灯，并提示“转向系统失效，请立"
+    },
+    {
+      "id": "ans_fault_002",
+      "category": "ans_fault",
+      "input": "EC7充电后充电枪拔不下来怎么办？具体步骤是什么？",
+      "latency_s": 6.88,
+      "usage": {
+        "prompt_tokens": 2104,
+        "completion_tokens": 289,
+        "total_tokens": 2393
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "第一步重新插紧充电枪确保解锁按钮弹起",
+                "第二步重新全车上锁及解锁",
+                "第三步按住解锁按钮等待1到2秒",
+                "等待充电口指示灯变绿色常亮再拔",
+                "仍无法拔下需联系蔚来服务中心"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER does not include any of the key steps from the GROUND TRUTH. It provides a different set of instructions that do not align with the specific steps required for the EC7 model as outlined in the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER includes steps not mentioned in the GROUND TRUTH, such as checking the charging station, manually unlocking via app, and restarting the vehicle system. These steps are not part of the provided procedure for handling a stuck charging gun."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and concrete answer with specific steps to follow, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "如果蔚来EC7充电后充电枪拔不下来，可以按照以下步骤进行处理：\n\n1. **确认车辆状态**：确保车辆已经解锁，并且充电已经完成。可以通过车内显示屏或手机App查看充电状态。\n\n2. **检查充电桩**：有些充电桩在充电完成后需要手动结束充电会话，确保充电桩的充电会话已经结束。\n\n3. **尝试手动解锁**：在车内或通过手机App尝试手动解锁充电口。有些车型在解锁车辆时会自动解锁充电口。\n\n4. **重启车辆系统**：如果以上步骤无效，可以尝试重启车辆的电气系统。通常可以通过长按车辆的启动按钮或使用车内菜单进行重启。\n\n5. **检查充电枪锁定机制**：有些充电枪有机械锁定机制，确保没有物理障"
+    },
+    {
+      "id": "ans_fault_003",
+      "category": "ans_fault",
+      "input": "ET5中控屏死机了怎么重启？方向盘双键重启是按哪两个键？",
+      "latency_s": 6.67,
+      "usage": {
+        "prompt_tokens": 2113,
+        "completion_tokens": 68,
+        "total_tokens": 2181
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "同时按住方向盘左侧右键和右侧下键",
+                "保持约8秒",
+                "等待约30秒后屏幕重新点亮",
+                "必须挂P挡在驻车状态",
+                "严禁行驶中双键重启"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER lacks several key facts: it does not mention holding the buttons for about 8 seconds, waiting 30 seconds for the screen to relight, ensuring the car is in P gear and parked, and the prohibition of rebooting while driving. It also incorrectly identifies the buttons as '滚轮' and '语音' instead of '左侧右键' and '右侧下键.'"
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER contains fabricated information about the specific buttons to press ('滚轮' and '语音' keys) which are not mentioned in the GROUND TRUTH. The correct buttons are '方向盘左侧右键和右侧下键'."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "当ET5的中控屏死机时，可以通过方向盘上的双键重启来解决。具体操作是同时按住方向盘上的“滚轮”键和“语音”键，持续几秒钟，直到中控屏重新启动。这样可以帮助你重启系统并恢复正常功能。"
+    },
+    {
+      "id": "ans_fault_004",
+      "category": "ans_fault",
+      "input": "EC7的12V蓄电池没电了，怎么跨接启动？电缆连接顺序是什么？",
+      "latency_s": 18.06,
+      "usage": {
+        "prompt_tokens": 5894,
+        "completion_tokens": 342,
+        "total_tokens": 6236
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "12V蓄电池位于后备箱",
+                "先连红色电缆到亏电车正极再到供电车正极",
+                "黑色电缆先连供电车负极再连亏电车接地点",
+                "按连接顺序逆序拆除"
+              ],
+              "coverage": 0.2
+            },
+            "llm": {
+              "score": 2,
+              "reason": "The SYSTEM ANSWER includes all key facts: the 12V battery is located in the trunk, the correct order of connecting the red and black cables, the reverse order for cable removal, and the caution that the two vehicles should not touch. There are no significant errors."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately follows the steps outlined in the GROUND TRUTH without introducing any fabricated information or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear, step-by-step guide for jump-starting a NIO EC7 without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "要对蔚来EC7进行跨接启动，请按照以下步骤进行：\n\n1. **准备工作**：确保车辆处于驻车状态，12V蓄电池电源关闭，并与整车电气系统正确连接。打开后备箱饰盖，找到亏电车辆A的12V蓄电池。\n\n2. **连接电缆**：\n   - 将红色电缆的一端连接到亏电车辆A的12V蓄电池正极（+）。\n   - 将红色电缆的另一端连接到供电车辆B的12V蓄电池正极（+）。\n   - 将黑色电缆的一端连接到供电车辆B的12V蓄电池负极（-）。\n   - 将黑色电缆的另一端连接到亏电车辆A的良好接地点上。\n\n3. **启动车辆**：\n   - 启动供电车辆，等待几分钟后，再启动亏电车辆A，观察其是否正常启动。"
+    },
+    {
+      "id": "ans_fault_005",
+      "category": "ans_fault",
+      "input": "EC6的电动尾翼出了问题怎么办？中控屏弹出提示了怎么处理？",
+      "latency_s": 6.73,
+      "usage": {
+        "prompt_tokens": 2108,
+        "completion_tokens": 234,
+        "total_tokens": 2342
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "停在安全区域挂P挡",
+                "按照中控屏提示进行功能重置",
+                "问题未解决联系蔚来服务中心",
+                "勿在尾翼上放置重物",
+                "连续操作15次暂停需等150秒"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER misses most key facts from the GROUND TRUTH. It does not mention '停在安全区域挂P挡', '按照中控屏提示进行功能重置', '勿在尾翼上放置重物', or the '连续操作15次暂停需等150秒' mechanism. It only partially covers contacting the service center, but lacks specific instructions and safety precautions."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The system answer includes steps not mentioned in the ground truth, such as restarting the vehicle's central control system and manually checking the tailgate for physical obstacles or damage. These steps are not part of the provided ground truth instructions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer with specific steps to address the issue with the EC6's electric tailgate."
+            }
+          }
+        }
+      },
+      "answer": "当 EC6 的电动尾翼出现问题并且中控屏弹出提示时，建议按照以下步骤进行处理：\n\n1. **查看提示信息**：首先，仔细阅读中控屏上显示的提示信息，了解具体的故障描述和建议的初步解决方案。\n\n2. **重启系统**：尝试重启车辆的中控系统，有时系统重启可以解决临时的电子故障。\n\n3. **检查电动尾翼**：手动检查电动尾翼是否有明显的物理障碍或损坏。如果发现任何异物或损坏，尽量清除或避免使用。\n\n4. **联系售后服务**：如果问题仍然存在，建议联系 Nio 的售后服务中心或授权维修点，安排专业技术人员进行检查和维修。\n\n5. **记录问题**：在联系售后服务时，记录下故障发生的时间、频率以及"
+    },
+    {
+      "id": "ans_fault_006",
+      "category": "ans_fault",
+      "input": "ET7发生事故后怎么切断高压电路？具体操作步骤是什么？",
+      "latency_s": 18.17,
+      "usage": {
+        "prompt_tokens": 5737,
+        "completion_tokens": 312,
+        "total_tokens": 6049
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 0,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "紧急高压切断插头位于前舱内左侧区域",
+                "12V蓄电池负极位于前舱靠近前挡风玻璃区域",
+                "先断高压切断插头再断12V负极",
+                "需绝缘手套可绝缘1000V以上",
+                "断开负极电缆后需用保护层包裹"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes most key facts, such as the location of the emergency high-voltage disconnect plug and the 12V battery negative terminal, and the sequence of disconnecting them. However, it lacks specific details about the insulation level of the gloves (1000V), and it does not mention ensuring no metal items are carried to avoid electric shock. Additionally, it incorrectly mentions '溶剂绝缘手套' instead of specifying rubber insulated gloves."
+            }
+          },
+          "hallucination": {
+            "score": 0,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER contains fabricated information about wearing a '防护面罩和溶剂绝缘手套,' which is not mentioned in the GROUND TRUTH. The GROUND TRUTH specifies '橡胶绝缘手套' and other protective gear, but not a face shield or solvent-resistant gloves."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear, step-by-step procedure for cutting off the high-voltage circuit in an ET7 after an accident, without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在ET7发生事故后，切断高压电路的具体操作步骤如下：\n\n1. **拉动前舱盖拉手**：在乘客舱内，拉动两次前舱盖拉手以松开前舱盖。\n2. **提起前舱盖**：打开前舱盖。\n3. **断开紧急高压切断插头**：位于前舱内左侧区域。断开后可切断高压供给回路，取下插头并妥善保管。\n4. **断开12V蓄电池负极电缆**：位于前舱靠近前挡风玻璃区域。断开后需用保护层包裹，以免误接触而导通。\n\n注意事项：\n- 在操作过程中，确保佩戴防护面罩和溶剂绝缘手套，以防对皮肤和面部造成伤害。\n- 断开高压电路后，车辆应静置5分钟以上。\n- 禁止无资质人员操作高压部件，操作人员必须佩戴符合要求的绝缘手套等防护措施。"
+    },
+    {
+      "id": "ans_conf_001",
+      "category": "ans_conf",
+      "input": "蔚来的宠物托管模式和其他场景模式可以同时用吗？会影响哪些功能？",
+      "latency_s": 20.48,
+      "usage": {
+        "prompt_tokens": 4297,
+        "completion_tokens": 86,
+        "total_tokens": 4383
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 1,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "宠物托管与离车不下电和露营模式互斥",
+                "开启后守卫模式和远程车外实况不可用",
+                "开启后无法系统升级和换挡",
+                "NOMI语音唤醒被禁用",
+                "ET9上宠物托管禁用儿童遗留检测"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER does not provide any of the key facts required. It suggests consulting a manual or customer service, which does not address the specific details about the mutual exclusivity of modes or the effects on various functions."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer does not contradict the ground truth or fabricate facts. It simply states a lack of specific information and suggests consulting official sources for details."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system unnecessarily hedges by stating it cannot provide information and suggests contacting customer service, instead of directly addressing the query."
+            }
+          }
+        }
+      },
+      "answer": "目前我无法获取到关于蔚来汽车宠物托管模式和其他场景模式同时使用时的具体影响信息。建议您查看蔚来汽车的用户手册或联系蔚来客服以获取详细信息。"
+    },
+    {
+      "id": "ans_conf_002",
+      "category": "ans_conf",
+      "input": "ET9悬架调到最高有什么限制？轻松进出功能还能用吗？",
+      "latency_s": 11.47,
+      "usage": {
+        "prompt_tokens": 5666,
+        "completion_tokens": 84,
+        "total_tokens": 5750
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "最高挡位限速35公里/小时",
+                "最高挡位时轻松进出功能被禁用",
+                "最高挡位抬升约40毫米",
+                "最低挡位超过5公里/小时自动退出",
+                "系统升级和换电时悬架不可调节"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER correctly mentions that the '轻松进出功能' is disabled at the highest suspension setting, which is one of the key facts. However, it misses other key facts such as the speed limit of 35 km/h at the highest setting, the 40 mm lift, the automatic exit at over 5 km/h for the lowest setting, and the suspension adjustment restrictions during system upgrades and battery changes."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The answer is consistent with the ground truth and does not contain fabricated information."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "当ET9的悬架调到最高时，轻松进出功能将被暂时禁用。这意味着在悬架处于最高挡位时，车辆不会自动降低悬架高度以便于乘客进出。"
+    },
+    {
+      "id": "ans_conf_003",
+      "category": "ans_conf",
+      "input": "ET9的儿童遗留检测需要满足什么条件才能使用？",
+      "latency_s": 19.59,
+      "usage": {
+        "prompt_tokens": 4246,
+        "completion_tokens": 57,
+        "total_tokens": 4303
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 1,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "需要官方推荐的蓝牙儿童座椅",
+                "儿童座椅需与车辆蓝牙成功连接",
+                "需要网络良好环境",
+                "宠物托管或离车不下电时被禁用",
+                "使用车内摄像头检测数据本地处理后删除"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER does not provide any of the key facts required for the ET9儿童遗留检测's conditions and usage. It states an inability to provide information, which is not aligned with the detailed requirements and conditions outlined in the GROUND TRUTH."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer does not provide any information that contradicts the ground truth or fabricates facts. It simply states an inability to provide specific details."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system incorrectly claims it cannot answer by stating it is unable to provide specific conditions for ET9's functionality, which is an over-hedge."
+            }
+          }
+        }
+      },
+      "answer": "目前我无法获取到ET9的儿童遗留检测功能的具体使用条件。如果您有其他问题或需要进一步帮助，请告诉我！"
+    },
+    {
+      "id": "ans_conf_004",
+      "category": "ans_conf",
+      "input": "EC6开启拖挂模式后哪些功能会受影响？电动尾翼还能用吗？",
+      "latency_s": 17.11,
+      "usage": {
+        "prompt_tokens": 5517,
+        "completion_tokens": 150,
+        "total_tokens": 5667
+      },
+      "metrics": {
+        "answer/match": 1,
+        "answer/hallucination": 1,
+        "answer/clarification": 1
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 1,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "部分辅助驾驶功能不可用",
+                "脚踢传感器和便利进出不可用",
+                "电动尾翼保持收回状态",
+                "电动拖钩装置时后部牵引钩无法使用",
+                "拖车过程中不应退出拖挂模式"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER includes some key facts such as the electric tailgate remaining retracted and some auxiliary driving functions being unavailable. However, it misses the detail about the rear towing hook being unusable and the critical safety warning about not exiting towing mode during towing. It also does not mention the requirement to operate in P gear or the automatic enabling/disabling of towing mode with trailer connection/disconnection."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The SYSTEM ANSWER accurately reflects the information from the GROUND TRUTH without introducing any fabricated facts or contradictions."
+            }
+          },
+          "clarification": {
+            "score": 1,
+            "llm": {
+              "score": 1,
+              "reason": "The system provides a clear and confident answer without excessive hedging."
+            }
+          }
+        }
+      },
+      "answer": "在EC6开启拖挂模式后，以下功能会受到影响：\n\n1. **电动尾翼**：进入拖挂模式后，电动尾翼将保持收回状态，并在锁车后自动收回。\n\n2. **辅助驾驶功能**：部分辅助驾驶功能可能不可用。\n\n3. **脚踢传感器、便利进出、超声波传感器**：这些功能可能在拖挂模式下不可用。\n\n因此，电动尾翼在拖挂模式下是不可用的，它会保持收回状态。"
+    },
+    {
+      "id": "ans_conf_005",
+      "category": "ans_conf",
+      "input": "ET7用NFC卡片解锁后多久必须启动车辆？超时了怎么办？",
+      "latency_s": 21.89,
+      "usage": {
+        "prompt_tokens": 4304,
+        "completion_tokens": 83,
+        "total_tokens": 4387
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 1,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "3分钟内可直接挂挡启动",
+                "超过3分钟需放置在主驾侧无线充电板上",
+                "手机NFC钥匙同样规则",
+                "车辆升级期间NFC功能不可用",
+                "NFC卡片勿叠放在手机与充电面板之间"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER does not provide any of the key facts from the GROUND TRUTH. It lacks information about the 3-minute rule, the requirement to place the NFC key on the charging pad after 3 minutes, the same rule applying to phone NFC keys, the NFC function being unavailable during vehicle upgrades, and the caution against stacking the NFC card between the phone and charging panel."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer does not contain any fabricated facts or contradictions. It simply states a lack of information and suggests contacting customer service for accurate details."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system unnecessarily hedges by stating it cannot provide the information, suggesting contacting customer service instead of providing a direct answer."
+            }
+          }
+        }
+      },
+      "answer": "目前我无法获取到ET7使用NFC卡片解锁后必须在多长时间内启动车辆的信息。如果您有紧急需求，建议您联系Nio客服或查阅车辆使用手册以获取准确的信息。"
+    },
+    {
+      "id": "ans_conf_006",
+      "category": "ans_conf",
+      "input": "EC7的低温充电预热功能需要什么条件才会自动激活？什么时候会退出？",
+      "latency_s": 20.85,
+      "usage": {
+        "prompt_tokens": 4293,
+        "completion_tokens": 72,
+        "total_tokens": 4365
+      },
+      "metrics": {
+        "answer/match": 0,
+        "answer/hallucination": 1,
+        "answer/clarification": 0
+      },
+      "detail": {
+        "answer": {
+          "match": {
+            "score": 0,
+            "hard": {
+              "pass": false,
+              "missing": [
+                "自动激活需导航到充电站",
+                "需续航里程大于120公里",
+                "需车辆不在ECO+模式",
+                "连接充电枪时自动退出预热",
+                "手动预热需环境温度低于20℃且续航大于10公里"
+              ],
+              "coverage": 0.0
+            },
+            "llm": {
+              "score": 0,
+              "reason": "The SYSTEM ANSWER does not provide any of the key facts about the EC7 low-temperature charging preheat function. It states an inability to provide information, which means it misses all the required details."
+            }
+          },
+          "hallucination": {
+            "score": 1,
+            "hard": {
+              "pass": true,
+              "found": []
+            },
+            "llm": {
+              "score": 1,
+              "reason": "The system answer does not provide any fabricated or contradictory information. It simply states that it cannot provide specific details about the activation and deactivation conditions of the EC7 low-temperature charging preheat function."
+            }
+          },
+          "clarification": {
+            "score": 0,
+            "llm": {
+              "score": 0,
+              "reason": "The system incorrectly claims it cannot answer the query, which suggests over-hedging."
+            }
+          }
+        }
+      },
+      "answer": "目前我无法获取到EC7低温充电预热功能的激活和退出条件的具体信息。如果您有其他问题或需要进一步帮助，请随时告诉我！"
+    }
+  ]
+}

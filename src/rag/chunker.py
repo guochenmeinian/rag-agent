@@ -88,8 +88,8 @@ def enforce_hard_max_length(chunks: list[str], hard_max_length: int = 1200) -> l
     return final_chunks
 
 
-def chunk_text(text: str, max_chunk_size: int = 600, hard_max_length: int = 1200) -> list[tuple[str, str]]:
-    """Split text into (small_chunk, parent_chunk) tuples.
+def chunk_text(text: str, max_chunk_size: int = 600, hard_max_length: int = 1200) -> list[tuple[str, str, str]]:
+    """Split text into (small_chunk, parent_chunk, section) tuples.
 
     small_chunk  — used for embedding:
                    • plain-text chunks: same as before
@@ -99,6 +99,8 @@ def chunk_text(text: str, max_chunk_size: int = 600, hard_max_length: int = 1200
     parent_chunk — returned to the LLM:
                    • always the original content (heading + full table or plain text)
                    so the LLM sees the real data, not the converted sentences
+    section      — the last Markdown heading seen before this chunk was created,
+                   stored as chunk metadata for source attribution and debugging
 
     Table-to-text format per row:
         "{heading}：{col1}为{val1}，{col2}为{val2}，..."
@@ -109,7 +111,7 @@ def chunk_text(text: str, max_chunk_size: int = 600, hard_max_length: int = 1200
     """
     lines = text.split('\n')
 
-    result: list[tuple[str, str]] = []
+    result: list[tuple[str, str, str]] = []
     current_chunk: list[str] = []
     current_size = 0
     in_table = False
@@ -120,7 +122,7 @@ def chunk_text(text: str, max_chunk_size: int = 600, hard_max_length: int = 1200
         nonlocal current_chunk, current_size
         if current_chunk:
             txt = '\n'.join(current_chunk)
-            result.append((txt, txt))
+            result.append((txt, txt, last_heading))
             current_chunk = []
             current_size = 0
 
@@ -145,15 +147,15 @@ def chunk_text(text: str, max_chunk_size: int = 600, hard_max_length: int = 1200
             if sentences:
                 # Group sentences into small chunks by max_chunk_size
                 for group in _group_sentences(sentences, max_chunk_size):
-                    result.append((group, parent_text))
+                    result.append((group, parent_text, last_heading))
             else:
                 # No sentences generated (e.g. empty table), fall back to original
                 small = (last_heading + '\n' + table_text) if last_heading else table_text
-                result.append((small[:hard_max_length], parent_text))
+                result.append((small[:hard_max_length], parent_text, last_heading))
         else:
             # Non-standard table, keep original
             small = (last_heading + '\n' + table_text) if last_heading else table_text
-            result.append((small[:hard_max_length], parent_text))
+            result.append((small[:hard_max_length], parent_text, last_heading))
 
         table_content = []
 
@@ -185,12 +187,12 @@ def chunk_text(text: str, max_chunk_size: int = 600, hard_max_length: int = 1200
     flush_text()
 
     # Enforce hard ceiling on small chunks
-    final: list[tuple[str, str]] = []
-    for small, parent in result:
+    final: list[tuple[str, str, str]] = []
+    for small, parent, section in result:
         if len(small) <= hard_max_length:
-            final.append((small, parent))
+            final.append((small, parent, section))
         else:
             for sc in enforce_hard_max_length([small], hard_max_length):
-                final.append((sc, parent))
+                final.append((sc, parent, section))
 
     return final

@@ -27,6 +27,8 @@ class MilvusVectorStore():
             ),
             FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=2048),
             FieldSchema(name="parent_text", dtype=DataType.VARCHAR, max_length=4096),
+            FieldSchema(name="source_file", dtype=DataType.VARCHAR, max_length=512),
+            FieldSchema(name="section", dtype=DataType.VARCHAR, max_length=512),
             FieldSchema(name="sparse_vector", dtype=DataType.SPARSE_FLOAT_VECTOR),
             FieldSchema(name="dense_vector", dtype=DataType.FLOAT_VECTOR, dim=self.dense_dim),
         ]
@@ -54,7 +56,7 @@ class MilvusVectorStore():
         return col
     
 
-    def insert(self, chunks, chunk_embeddings, parent_chunks=None):
+    def insert(self, chunks, chunk_embeddings, parent_chunks=None, source_files=None, sections=None):
         if not chunks or not chunk_embeddings:
             raise ValueError("Chunks and chunk_embeddings cannot be empty.")
 
@@ -64,21 +66,40 @@ class MilvusVectorStore():
         # parent_chunks falls back to chunks when not provided (old schema compat)
         if parent_chunks is None:
             parent_chunks = chunks
+        if source_files is None:
+            source_files = [""] * len(chunks)
+        if sections is None:
+            sections = [""] * len(chunks)
 
         sparse_embeddings = chunk_embeddings["sparse"]
+        schema_field_names = {f.name for f in self.col.schema.fields}
+        has_metadata = "source_file" in schema_field_names
 
         for i in range(0, len(chunks), 50):
             end = min(i + 50, len(chunks))
             sparse_batch = [self._sparse_row(sparse_embeddings, row_idx) for row_idx in range(i, end)]
-            self.col.insert(
-                data=[
-                    chunks[i:end],
-                    parent_chunks[i:end],
-                    sparse_batch,
-                    chunk_embeddings["dense"][i:end],
-                ],
-                fields=["text", "parent_text", "sparse_vector", "dense_vector"]
-            )
+            if has_metadata:
+                self.col.insert(
+                    data=[
+                        chunks[i:end],
+                        parent_chunks[i:end],
+                        source_files[i:end],
+                        sections[i:end],
+                        sparse_batch,
+                        chunk_embeddings["dense"][i:end],
+                    ],
+                    fields=["text", "parent_text", "source_file", "section", "sparse_vector", "dense_vector"]
+                )
+            else:
+                self.col.insert(
+                    data=[
+                        chunks[i:end],
+                        parent_chunks[i:end],
+                        sparse_batch,
+                        chunk_embeddings["dense"][i:end],
+                    ],
+                    fields=["text", "parent_text", "sparse_vector", "dense_vector"]
+                )
 
         self.col.flush()
 

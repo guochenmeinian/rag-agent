@@ -3,8 +3,9 @@
 Metrics
 ───────
 match          (0/1/2) — similarity to ground truth
-  hard: key_facts presence check
+  hard: key_facts presence check  (atomic exact/normalised match only)
   soft: LLM judge (0=wrong, 1=partial, 2=correct)
+       judge prompt also receives semantic_claims for higher-level assertions
 
 hallucination  (0/1) — 1=clean, 0=hallucinated
   hard: forbidden_content not present
@@ -15,6 +16,7 @@ clarification  (0/1) — correct uncertainty / safety handling
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -29,13 +31,48 @@ from benchmark.eval.llm_judge import (
 
 
 # ─────────────────────────────────────────────────────────────
+# Normalisation helpers (unit synonyms + digit-adjacent spaces)
+# ─────────────────────────────────────────────────────────────
+
+_UNIT_PATTERNS: list[tuple[str, str]] = [
+    (r'(?<=\d)千克', 'kg'), (r'(?<=\d)公斤', 'kg'),
+    (r'(?<=\d)毫米', 'mm'), (r'(?<=\d)厘米', 'cm'),
+    (r'(?<=\d)公里', 'km'), (r'(?<=\d)千米', 'km'),
+    (r'(?<=\d)升',   'L'),
+    (r'(?<=\d)千瓦', 'kW'),
+    (r'(?<=\d)瓦特', 'W'),
+    (r'(?<=\d)牛·米', 'N·m'), (r'(?<=\d)牛米', 'N·m'),
+]
+
+
+def _normalize_for_match(text: str) -> str:
+    """Collapse digit-adjacent spaces and normalise common unit synonyms."""
+    result = re.sub(r'(\d)\s+([^\d\s])', r'\1\2', text)
+    for pattern, replacement in _UNIT_PATTERNS:
+        result = re.sub(pattern, replacement, result)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────
 # Hard checks
 # ─────────────────────────────────────────────────────────────
 
 def _check_key_facts(answer: str, key_facts: list[str]) -> dict:
+    """Exact + normalised substring match for atomic key facts."""
     if not key_facts:
         return {"pass": True, "missing": [], "coverage": 1.0}
-    missing = [f for f in key_facts if f.lower() not in answer.lower()]
+
+    norm_answer = _normalize_for_match(answer).lower()
+    answer_lower = answer.lower()
+
+    missing = []
+    for f in key_facts:
+        if f.lower() in answer_lower:
+            continue
+        if _normalize_for_match(f).lower() in norm_answer:
+            continue
+        missing.append(f)
+
     coverage = round((len(key_facts) - len(missing)) / len(key_facts), 3)
     return {"pass": len(missing) == 0, "missing": missing, "coverage": coverage}
 
@@ -52,22 +89,22 @@ def _check_forbidden_content(answer: str, forbidden: list[str]) -> dict:
 def score_match(answer: str, gt: dict) -> dict:
     """0=wrong, 1=partial, 2=correct.
 
-    Hard: key_facts all present → hard floor of 1 if passed.
-    Soft: LLM judge gives 0/1/2.
-    Final = min(llm_score + hard_bonus, 2).
+    Hard:  key_facts (atomic) all present → cap at 1 if any missing.
+           semantic_claims are NOT checked here — LLM judge handles them.
+    Soft:  LLM judge (receives both key_facts and semantic_claims).
+    Final: min(llm_score, 1) if hard fails, else llm_score.
     """
     kf = _check_key_facts(answer, gt.get("key_facts", []))
     llm = judge_answer_match(answer, gt)
     llm_score = llm.get("score", 0)
 
-    # If hard check fails (missing key facts), cap at 1
     if not kf["pass"] and llm_score == 2:
         llm_score = 1
 
     return {
         "score": llm_score,
-        "hard": kf,
-        "llm":  llm,
+        "hard":  kf,
+        "llm":   llm,
     }
 
 
@@ -85,8 +122,8 @@ def score_hallucination(answer: str, gt: dict) -> dict:
 
     return {
         "score": final,
-        "hard": fc,
-        "llm":  llm,
+        "hard":  fc,
+        "llm":   llm,
     }
 
 
@@ -145,7 +182,6 @@ def aggregate_answer(results: list[dict]) -> dict:
         vals = [r["metrics"][key] for r in results]
         return round(sum(vals) / len(vals), 3)
 
-    # Diagnostic: key_facts coverage (0–1) — how many facts were present on average
     kf_coverages = [
         r["detail"]["match"]["hard"]["coverage"]
         for r in results
@@ -155,10 +191,9 @@ def aggregate_answer(results: list[dict]) -> dict:
 
     return {
         "n":             len(results),
-        "match_avg":     avg("match"),         # 0–2 scale
+        "match_avg":     avg("match"),
         "match_full":    round(sum(1 for r in results if r["metrics"]["match"] == 2) / len(results), 3),
         "hallucination_clean": avg("hallucination"),
         "clarification_acc":   avg("clarification"),
-        # Diagnostics
         "key_facts_coverage_avg": kf_coverage_avg,
     }

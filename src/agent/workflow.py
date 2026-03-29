@@ -9,27 +9,6 @@ from .executor import AgentExecutor
 from tools.registry import ToolRegistry
 
 
-_NO_DATA_PATTERNS = ("未找到", "未能找到", "未能获取", "没有找到", "未获取到", "没有具体")
-
-
-def _grep_hit_models(tool_results: list[dict]) -> list[str]:
-    """Return car_models where grep_search returned content (result_count > 0)."""
-    models: list[str] = []
-    for tr in tool_results:
-        if tr.get("name") != "grep_search":
-            continue
-        result = tr.get("result")
-        meta = result.metadata if result is not None else {}
-        if meta.get("result_count", 0) > 0:
-            model = meta.get("car_model", "")
-            if model and model not in models:
-                models.append(model)
-    return models
-
-
-def _answer_indicates_no_data(answer: str) -> bool:
-    return any(p in answer for p in _NO_DATA_PATTERNS)
-
 
 class AgentWorkflow:
     """Main orchestrator.
@@ -163,28 +142,6 @@ class AgentWorkflow:
                 continue
 
             # --- Direct answer branch ---
-            # Option B fallback: grep returned content but executor says "not found"
-            # → inject a rag_search retry instruction for the affected car models
-            if (
-                not state.grep_rag_fallback_done
-                and _answer_indicates_no_data(response.answer)
-            ):
-                grep_models = _grep_hit_models(state.tool_results)
-                if grep_models:
-                    state.grep_rag_fallback_done = True
-                    model_list = "、".join(grep_models)
-                    messages.append({
-                        "role": "user",
-                        "content": (
-                            f"[检索回退] grep_search 返回的内容不包含所需参数，"
-                            f"请对以下车型改用 rag_search 重新检索：{model_list}。"
-                            "请使用语义化的 query（如'续航里程'、'CLTC续航'、'快充功率'等），"
-                            "不要再用电池规格词。"
-                        ),
-                    })
-                    state.iteration += 1
-                    continue
-
             state.answer = response.answer
             self.memory.add_message("assistant", state.answer)
             self.memory.update_facts(user_input, state.answer)

@@ -44,8 +44,8 @@ def _backfill_grep_if_missing(col_name: str, pdf_files: list, manager: IngestMan
             t = manager.get_or_parse(fp, lambda f: parse_single_file(f, parser), verbose=False)
             all_text.append(t)
         merged = "".join(all_text)
-        chunk_pairs = chunk_text(merged, max_chunk_size=600, hard_max_length=1200)
-        parent_chunks = [p for _, p in chunk_pairs]
+        chunk_triples = chunk_text(merged, max_chunk_size=600, hard_max_length=1200)
+        parent_chunks = [p for _, p, _ in chunk_triples]
         if parent_chunks:
             gidx.insert_chunks(col_name, parent_chunks)
             print(f"[ingest] {col_name}: grep index backfilled from cache ({len(parent_chunks)} chunks)")
@@ -86,33 +86,6 @@ def _generate_chunk_contexts(
                 return cached
         except (json.JSONDecodeError, IOError):
             pass
-
-    # Legacy fallback: check old-style cache (no config_tag in name)
-    import glob as _glob
-    legacy_pattern = os.path.join(cache_dir, f"{col_name}_ctx_*.json")
-    for legacy_path in _glob.glob(legacy_pattern):
-        # Skip new-style files (contain version tag)
-        fname = os.path.basename(legacy_path)
-        if f"_ctx_{config_tag}_" in fname:
-            continue
-        try:
-            with open(legacy_path, "r", encoding="utf-8") as f:
-                legacy = json.load(f)
-            # Accept if chunk count differs by at most 5
-            if abs(len(legacy) - len(chunks)) <= 5:
-                # Pad with raw chunks if legacy is shorter, truncate if longer
-                if len(legacy) < len(chunks):
-                    legacy = legacy + chunks[len(legacy):]
-                else:
-                    legacy = legacy[:len(chunks)]
-                print(f"[ingest] {col_name}: reused legacy context cache ({legacy_path}), adapted to {len(chunks)} chunks")
-                # Save as new-style cache for future runs
-                os.makedirs(cache_dir, exist_ok=True)
-                with open(cache_path, "w", encoding="utf-8") as f:
-                    json.dump(legacy, f, ensure_ascii=False, indent=2)
-                return legacy
-        except (json.JSONDecodeError, IOError):
-            continue
 
     from agent.qwen_client import get_qwen_client
     client = get_qwen_client()
@@ -243,26 +216,38 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
     # 1. 初始化 parser
     parser = build_llama_parser()
 
-    # 2. Parse 每个文件（使用缓存）
-    all_text = []
+    # 2. Parse 每个文件（使用缓存）并按文件分别 chunk，追踪 source_file
+    all_texts: dict[str, str] = {}
     for filepath in sorted(pdf_files):
         parsed_text = manager.get_or_parse(
             filepath,
             lambda fp: parse_single_file(fp, parser),
             verbose=True,
         )
-        all_text.append(parsed_text)
+        all_texts[filepath] = parsed_text
 
-    # 3. Chunk — returns (small_chunk, parent_chunk) tuples
-    merged_text = "".join(all_text)
-    chunk_pairs = chunk_text(merged_text, max_chunk_size=600, hard_max_length=1200)
-    if not chunk_pairs:
+    # 3. Chunk per-file — track source_file and section per chunk
+    small_chunks: list[str] = []
+    parent_chunks: list[str] = []
+    chunk_source_files: list[str] = []
+    chunk_sections: list[str] = []
+
+    for filepath, text in all_texts.items():
+        fname = os.path.basename(filepath)
+        triples = chunk_text(text, max_chunk_size=600, hard_max_length=1200)
+        for s, p, sec in triples:
+            small_chunks.append(s)
+            parent_chunks.append(p)
+            chunk_source_files.append(fname)
+            chunk_sections.append(sec)
+
+    if not small_chunks:
         raise ValueError("No chunks generated from input documents")
 
-    small_chunks  = [s for s, _ in chunk_pairs]
-    parent_chunks = [p for _, p in chunk_pairs]
+    # merged_text is used only as document prefix for contextual retrieval
+    merged_text = "".join(all_texts.values())
 
-    print(f"[ingest] {col_name}: generated {len(small_chunks)} chunks")
+    print(f"[ingest] {col_name}: generated {len(small_chunks)} chunks from {len(all_texts)} file(s)")
 
     # 3b. Contextual Retrieval: prepend LLM-generated context to small chunks only
     if getattr(config, "CONTEXTUAL_RETRIEVAL", True):
@@ -282,7 +267,8 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
 
     # 6. 重新创建并插入（同时存 small chunk 和 parent chunk）
     store = MilvusVectorStore(uri=uri, col_name=col_name, dense_dim=dense_dim)
-    store.insert(small_chunks, emb, parent_chunks=parent_chunks)
+    store.insert(small_chunks, emb, parent_chunks=parent_chunks,
+                 source_files=chunk_source_files, sections=chunk_sections)
 
     print(f"[ingest] {col_name}: inserted {len(small_chunks)} chunks")
 
@@ -334,12 +320,21 @@ def retrieve(query, ctx, limit=5, search_limit=10, sparse_weight=0.5, dense_weig
         raw = rerank_candidates(query, raw, ctx.reranker, top_k=limit)
     else:
         if score_threshold > 0:
-            raw = [(t, p, s) for t, p, s in raw if s >= score_threshold]
+            raw = [(t, p, s, sf, sec) for t, p, s, sf, sec in raw if s >= score_threshold]
         raw = raw[:limit]
 
     # text = parent chunk (full context for LLM); chunk = small chunk used for retrieval
-    items = [{"text": p, "chunk": t, "score": round(s, 4), "rank": i + 1}
-             for i, (t, p, s) in enumerate(raw)]
+    items = [
+        {
+            "text": p,
+            "chunk": t,
+            "score": round(s, 4),
+            "rank": i + 1,
+            "source_file": sf,
+            "section": sec,
+        }
+        for i, (t, p, s, sf, sec) in enumerate(raw)
+    ]
     for item in items:
         item["_total_before_filter"] = total_before_filter
         item["_score_threshold"] = score_threshold
@@ -347,4 +342,13 @@ def retrieve(query, ctx, limit=5, search_limit=10, sparse_weight=0.5, dense_weig
 
 
 def format_citations(items):
-    return "".join(f"[{x['rank']}] {x['text']}\n" for x in items)
+    parts = []
+    for x in items:
+        source_info = ""
+        if x.get("source_file"):
+            source_info = f" ({x['source_file']}"
+            if x.get("section"):
+                source_info += f" · {x['section']}"
+            source_info += ")"
+        parts.append(f"[{x['rank']}]{source_info} {x['text']}\n")
+    return "".join(parts)

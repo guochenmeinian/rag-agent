@@ -214,19 +214,26 @@ def judge_answer_match(
     answer: str,
     gt: dict,
 ) -> dict:
-    """Score: 0=wrong, 1=partial, 2=correct."""
+    """Score: 0=wrong, 1=partial, 2=correct.
+
+    Evaluates both key_facts (atomic values) and semantic_claims (logical
+    assertions about behaviour / conditions) against the system answer.
+    """
     system = """\
 You are an evaluation judge. Compare the SYSTEM ANSWER to the GROUND TRUTH.
 
 Return JSON: {"score": 0 | 1 | 2, "reason": "<brief explanation>"}
 
-score=2: all key facts present and correct, no significant errors.
-score=1: partially correct — some key facts present but incomplete or minor errors.
-score=0: missing most key facts, or contains factual errors.
+score=2: all atomic key facts AND all semantic claims are present and correct,
+         no significant errors.
+score=1: partially correct — some facts/claims present but incomplete or minor errors.
+score=0: missing most facts/claims, or contains factual errors.
 """
+    semantic_claims = gt.get("semantic_claims", [])
+    claims_line = f"\nSEMANTIC CLAIMS (logical assertions to verify): {semantic_claims}" if semantic_claims else ""
     user = f"""\
 GROUND TRUTH: {gt.get("ground_truth", "")}
-KEY FACTS (must all appear): {gt.get("key_facts", [])}
+KEY FACTS (atomic values that must appear): {gt.get("key_facts", [])}{claims_line}
 
 SYSTEM ANSWER: {answer}
 """
@@ -239,17 +246,24 @@ def judge_hallucination(
 ) -> dict:
     """Score: 1 = clean (no hallucination), 0 = hallucinated."""
     system = """\
-You are a hallucination detector. Determine whether the SYSTEM ANSWER contains
-information that contradicts the ground truth or fabricates facts not in the source.
+You are a hallucination detector for an automotive assistant.
+
+Hallucination means the SYSTEM ANSWER contains information that is FACTUALLY WRONG
+or directly CONTRADICTS the ground truth (e.g. wrong numbers, wrong model names,
+invented features that don't exist).
+
+IMPORTANT: Extra correct information that does not appear in the ground truth is NOT
+hallucination. The ground truth is a reference, not an exhaustive list of everything
+the system is allowed to say. Only penalise clearly wrong or contradicted facts.
 
 Return JSON: {"score": 0 or 1, "reason": "<brief explanation>"}
 
-score=1: answer is grounded, no fabricated facts.
-score=0: answer contains hallucinated or contradicted information.
+score=1: no factually wrong or contradicted information.
+score=0: answer states something factually incorrect or directly contradicts known facts.
 """
     user = f"""\
-GROUND TRUTH: {gt.get("ground_truth", "")}
-FORBIDDEN CONTENT (must not appear): {gt.get("forbidden_content", [])}
+GROUND TRUTH (reference for what is correct): {gt.get("ground_truth", "")}
+FORBIDDEN CONTENT (values/claims that must NOT appear — these are wrong): {gt.get("forbidden_content", [])}
 
 SYSTEM ANSWER: {answer}
 """
