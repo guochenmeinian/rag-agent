@@ -137,6 +137,57 @@ python -m tests.eval_runner --ids q001,q004 --out results.json
 
 指标：`tool_recall` / `tool_precision` / `parallel_ok` / `keyword_hit` / `hallucination_hits`
 
+## 与主流 RAG 系统对比 Benchmark
+
+使用相同的 10 个问答用例（`benchmark/data/cases_smoke.json`），将本系统与 5 个主流 RAG 平台/框架进行横向对比。所有系统均使用相同的 8 份 NIO 车型 PDF，答案由同一 LLM judge（GPT-4o）评分。
+
+### 评分指标说明
+
+| 指标 | 满分 | 含义 |
+|------|------|------|
+| `match_avg` | 2.0 | 答案准确性：2=完全正确，1=部分正确，0=错误 |
+| `hallucination_clean` | 1.0 | 无幻觉率：1=无捏造事实，0=存在错误信息 |
+| `clarification_acc` | 1.0 | 澄清识别准确率：正确识别问题是否可回答 |
+| `key_facts_coverage` | 1.0 | 关键事实覆盖率：答案中包含的关键数值/事实比例 |
+
+### 对比结果
+
+| 系统 | 技术栈 | match_avg ↑ | hallucination_clean ↑ | clarification_acc ↑ | key_facts_coverage ↑ |
+|------|--------|:-----------:|:---------------------:|:-------------------:|:--------------------:|
+| **本系统** | BGE-M3 + Milvus 混合检索 + GPT-4o Agent | **1.10** | **1.00** | 0.90 | **0.672** |
+| **R2R** | pgvector + 语义/BM25 混合 + GPT-4o | **1.10** | 0.60 | **1.00** | 0.657 |
+| **Dify** | Weaviate + 向量检索 + GPT-4o | 0.80 | 0.70 | 0.90 | 0.582 |
+| **RAGFlow** | Elasticsearch + DeepDoc 解析 + GPT-4o | 0.60 | 0.60 | 0.70 | 0.421 |
+| **AnythingLLM** | LanceDB + 向量检索 + GPT-4o | 0.20 | 0.10 | 0.90 | 0.253 |
+| **LightRAG** | NetworkX 知识图谱 + NanoVectorDB + GPT-4o | 0.20 | 0.50 | 0.60 | 0.205 |
+
+### 关键结论
+
+- **答案准确性**：本系统与 R2R 并列第一（1.10），领先其他系统 25%+
+- **幻觉控制**：本系统幻觉率为零（1.00），远超其他所有系统；R2R（0.60）幻觉问题明显
+- **关键事实覆盖**：本系统最高（0.672），得益于 dense + sparse 双路混合检索对精确数值的精准召回
+- **LightRAG**：知识图谱对关系推理有优势，但对汽车手册中大量精确数值（续航/质量/速度）的提取效果差，且索引成本极高（8 份 PDF 约 $15 + 数小时）
+- **AnythingLLM**：幻觉率最高（0.10 clean），不适合对准确性要求高的垂直领域问答
+
+### 运行第三方对比
+
+```bash
+# 启动对应 Docker 服务后运行
+source .venv/bin/activate
+
+# 单独测试某个系统
+python benchmark/third_party/run_comparison.py --systems r2r
+python benchmark/third_party/run_comparison.py --systems lightrag
+
+# 测试所有系统
+python benchmark/third_party/run_comparison.py --systems ragflow dify anythingllm r2r lightrag
+
+# 跳过重新索引（已索引过）
+python benchmark/third_party/run_comparison.py --systems r2r lightrag --skip-setup
+```
+
+结果保存在 `benchmark/results/` 目录。
+
 ## 参考
 
 - [LlamaCloud Demo](https://github.com/run-llama/llamacloud-demo)

@@ -41,7 +41,7 @@ def _call(system: str, user: str) -> dict:
             {"role": "user",   "content": user},
         ],
         temperature=0,
-        max_tokens=300,
+        max_tokens=512,
         response_format={"type": "json_object"},
     )
     return json.loads(resp.choices[0].message.content)
