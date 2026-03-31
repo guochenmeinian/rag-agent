@@ -38,3 +38,9 @@ frontend/.vite/
 # -------------------------
 .env
 third-party/
+
+# -------------------------
+# benchmark local results
+# -------------------------
+benchmark/results/
+benchmark/third_party/
