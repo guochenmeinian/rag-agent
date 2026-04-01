@@ -88,6 +88,22 @@ export default function App() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    const el = e.target;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isProcessing) return;
 
@@ -406,13 +422,14 @@ export default function App() {
           <div className="max-w-3xl mx-auto">
             <div className="relative group">
               <div className="absolute inset-0 bg-blue-600/5 blur-3xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
-              <input
-                type="text"
+              <textarea
+                ref={textareaRef}
+                rows={1}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                onChange={handleTextareaInput}
+                onKeyDown={handleKeyDown}
                 placeholder={t.chat.placeholder}
-                className="w-full bg-white border border-slate-200 rounded-2xl py-6 pl-8 pr-20 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50/30 shadow-sm transition-all placeholder:text-slate-300"
+                className="w-full bg-white border border-slate-200 rounded-2xl py-5 pl-8 pr-20 text-sm font-medium text-slate-800 focus:outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-50/30 shadow-sm transition-all placeholder:text-slate-300 resize-none overflow-hidden leading-relaxed"
               />
               <button
                 onClick={handleSend}

@@ -41,7 +41,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, lang = 'zh' }) 
         }`}>
           {message.content ? (
             isUser ? (
-              <p className="text-[15px] leading-relaxed font-medium">{message.content}</p>
+              <p className="text-[15px] leading-relaxed font-medium whitespace-pre-wrap text-left">{message.content}</p>
             ) : (
               <div className="prose prose-sm prose-slate max-w-none
                 prose-headings:font-black prose-headings:text-slate-800 prose-headings:tracking-tight

@@ -1,10 +1,16 @@
+import json
+import logging
 import os
+import uuid
 from typing import Generator
+
+log = logging.getLogger(__name__)
 
 import config
 from .state import AgentState
 from .memory import ConversationMemory
 from .rewriter import QueryRewriter
+from .planner import QueryPlanner
 from .executor import AgentExecutor
 from tools.registry import ToolRegistry
 
@@ -58,6 +64,7 @@ class AgentWorkflow:
             )
 
         self.rewriter = QueryRewriter(**(qwen_cfg or {}))
+        self.planner = QueryPlanner(**(qwen_cfg or {}))
         self.executor = AgentExecutor(tool_schemas=registry.schemas, **(executor_cfg or {}))
         self.registry = registry
         self.disabled: set[str] = disabled or set()
@@ -79,10 +86,10 @@ class AgentWorkflow:
 
         Event schema:
             {"type": "rewriting"}
-            {"type": "clarify",      "message": str}          # rewriter short-circuit
+            {"type": "clarify",      "message": str}                            # rewriter short-circuit
             {"type": "refined",      "query": str}
-            {"type": "tool_calling", "calls": [{"name": str, "query": str, ...}]}
-            {"type": "tool_done",    "results": list[dict]}
+            {"type": "tool_calling", "calls": [...], "source": "planner"|None}  # planner pre-fetch or executor
+            {"type": "tool_done",    "results": list[dict], "source": ...}
             {"type": "done",         "answer": str, "tool_results": list[dict] | None}
         """
         self.memory.add_message("user", user_input)
@@ -110,6 +117,69 @@ class AgentWorkflow:
         state = AgentState(user_input=user_input, refined_query=refined_query)
         messages = [{"role": "user", "content": refined_query}]
         _usage: dict[str, int] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+
+        # --- Planner: decompose multi-topic queries before Executor loop ---
+        if "planner" not in self.disabled:
+            plan = self.planner.plan(refined_query, context_prompt)
+            if plan.type == "decomposed" and plan.calls:
+                # Build OpenAI-compatible tool_calls + registry calls
+                fake_tool_calls = []
+                registry_calls = []
+                for spec in plan.calls:
+                    call_id = f"plan_{uuid.uuid4().hex[:8]}"
+                    # grep_search uses "keywords" field; all others use "query"
+                    query_key = "keywords" if spec.tool == "grep_search" else "query"
+                    args: dict = {query_key: spec.query}
+                    if spec.car_model:
+                        args["car_model"] = spec.car_model
+                    fake_tool_calls.append({
+                        "id": call_id,
+                        "type": "function",
+                        "function": {
+                            "name": spec.tool,
+                            "arguments": json.dumps(args, ensure_ascii=False),
+                        },
+                    })
+                    registry_calls.append({"id": call_id, "name": spec.tool, "input": args})
+
+                yield {
+                    "type": "tool_calling",
+                    "calls": [{"name": c["name"], **c["input"]} for c in registry_calls],
+                    "source": "planner",
+                }
+
+                # Inject fake assistant tool_call message so tool results are valid
+                messages.append({
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": fake_tool_calls,
+                })
+
+                # Execute all planned calls in parallel
+                tool_results = self.registry.run_parallel(registry_calls)
+
+                # If ALL results failed (e.g. Milvus "Already borrowed" burst), skip
+                # injection — let the Executor loop decide tools from scratch instead of
+                # reasoning over empty / error-only context.
+                successful = [r for r in tool_results if r["result"].success]
+                if not successful:
+                    log.warning(
+                        "planner: all %d pre-fetched calls failed, skipping injection",
+                        len(tool_results),
+                    )
+                    # Roll back the fake assistant message we just appended
+                    messages.pop()
+                else:
+                    state.tool_results.extend(tool_results)
+                    yield {"type": "tool_done", "results": tool_results, "source": "planner"}
+
+                    # Inject tool results into conversation
+                    for r in tool_results:
+                        messages.append({
+                            "role": "tool",
+                            "tool_call_id": r["id"],
+                            "content": r["result"].to_llm_content(),
+                        })
 
         while state.iteration < config.MAX_ITERATIONS:
             response = self.executor.run(messages, extra_system=context_prompt)

@@ -1,3 +1,4 @@
+import threading
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -5,6 +6,12 @@ from pydantic import BaseModel, Field
 from rag.pipeline import retrieve, format_citations, RAGContext
 from .base import BaseTool
 from .result import ToolResult
+
+# Local Milvus uses a single-file DuckDB backend that cannot handle many
+# concurrent connections.  This semaphore caps simultaneous Milvus queries
+# across all threads (Planner + Executor combined) to avoid "Already borrowed"
+# errors.  Switch to Milvus Docker to remove this limit.
+_MILVUS_SEMAPHORE = threading.Semaphore(2)
 
 MAX_CONTENT = 3000   # chars — prevents context overflow
 
@@ -34,7 +41,7 @@ class RagSearchTool(BaseTool):
         "仅用于Nio车型相关查询，需指定具体车型（car_model）。"
     )
     InputModel  = RagSearchInput
-    timeout     = 15
+    timeout     = 30
     max_retries = 1
     cacheable   = True
 
@@ -42,6 +49,10 @@ class RagSearchTool(BaseTool):
         self.contexts = contexts
 
     def _execute(self, inputs: RagSearchInput) -> ToolResult:
+        with _MILVUS_SEMAPHORE:
+            return self._query(inputs)
+
+    def _query(self, inputs: RagSearchInput) -> ToolResult:
         ctx = self.contexts.get(inputs.car_model)
         if ctx is None:
             available = list(self.contexts.keys())

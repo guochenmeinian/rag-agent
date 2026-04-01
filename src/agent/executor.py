@@ -33,7 +33,7 @@ class AgentExecutor:
         create_kwargs: dict = dict(
             model=self._model,
             max_tokens=4096,
-            temperature=0,
+            temperature=0.3,
             messages=[{"role": "system", "content": sys_content}] + messages,
         )
         if self._tool_schemas and not force_direct:
