@@ -1,11 +1,24 @@
 # download bge model
 import os
+import platform
 from pathlib import Path
 from modelscope import snapshot_download
 from pymilvus import model
 from FlagEmbedding import FlagReranker
 
 os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+
+
+def _get_device() -> str:
+    """Return the best available device: mps > cpu."""
+    if platform.system() == "Darwin":
+        try:
+            import torch
+            if torch.backends.mps.is_available():
+                return "mps"
+        except Exception:
+            pass
+    return "cpu"
 
 def _get_model_cache_dir() -> Path:
     project_root = Path(__file__).resolve().parents[2]
@@ -29,7 +42,7 @@ def load_bge_m3_embedder():
     return model.hybrid.BGEM3EmbeddingFunction(
         model_dir,
         use_fp16=False,
-        device="cpu"
+        device=_get_device()
     )
 
 
@@ -54,7 +67,7 @@ def load_bge_reranker() -> FlagReranker:
             revision='master',
         )
 
-    _reranker_instance = FlagReranker(model_dir, use_fp16=False, device="cpu")
+    _reranker_instance = FlagReranker(model_dir, use_fp16=False, device=_get_device())
     return _reranker_instance
 
 def embed_texts(chunks, embedder):

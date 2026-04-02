@@ -182,7 +182,12 @@ class AgentWorkflow:
                         })
 
         while state.iteration < config.MAX_ITERATIONS:
-            response = self.executor.run(messages, extra_system=context_prompt)
+            response = None
+            for item_type, item_val in self.executor.run_stream(messages, extra_system=context_prompt):
+                if item_type == "delta":
+                    yield {"type": "text_delta", "text": item_val}
+                else:
+                    response = item_val
             for k in _usage:
                 _usage[k] += response.usage.get(k, 0)
 
@@ -214,32 +219,39 @@ class AgentWorkflow:
             # --- Direct answer branch ---
             state.answer = response.answer
             self.memory.add_message("assistant", state.answer)
-            self.memory.update_facts(user_input, state.answer)
-            self._persist()
             yield {
                 "type": "done",
                 "answer": state.answer,
                 "tool_results": state.tool_results or None,
                 "usage": dict(_usage),
             }
+            self.memory.update_facts(user_input, state.answer)
+            self._persist()
             return
 
         # Max iterations reached: force a direct answer if we only did tool calls
         if not state.answer:
-            final = self.executor.run(messages, extra_system=context_prompt, force_direct=True)
+            final = None
+            for item_type, item_val in self.executor.run_stream(
+                messages, extra_system=context_prompt, force_direct=True
+            ):
+                if item_type == "delta":
+                    yield {"type": "text_delta", "text": item_val}
+                else:
+                    final = item_val
             state.answer = final.answer
             for k in _usage:
                 _usage[k] += final.usage.get(k, 0)
 
         self.memory.add_message("assistant", state.answer)
-        self.memory.update_facts(user_input, state.answer)
-        self._persist()
         yield {
             "type": "done",
             "answer": state.answer,
             "tool_results": state.tool_results or None,
             "usage": dict(_usage),
         }
+        self.memory.update_facts(user_input, state.answer)
+        self._persist()
 
     # ------------------------------------------------------------------
     # Internal

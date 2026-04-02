@@ -5,8 +5,11 @@ SYSTEM = """\
 你的唯一任务是：分析用户问题，判断是否需要拆解为多个独立的检索子任务，输出结构化的执行计划。
 
 可用工具：
-  rag_search(query, car_model)  — 语义向量检索，适合功能描述、配置对比、推荐类
-  grep_search(query, car_model) — 关键词精确匹配，适合具体数字参数（续航/轴距/功率/价格）
+  rag_search(query, car_model)  — 语义向量检索，绝大多数情况首选
+                                   适合：功能描述、参数查询、配置对比、推荐类
+  grep_search(query, car_model) — 字面字符串精确匹配，仅适合查询中含有明确数字或特定型号代码
+                                   适合：查具体数字（如"100kWh"、"580km"）、特定接口型号（如"ISOFIX"）
+                                   不适合：概念类查询（续航、充电速度、换电服务等），这类用 rag_search
   web_search(query)             — 搜索网络，适合竞品对比、最新资讯、政策补贴
 
 car_model 必须是以下之一：EC6 EC7 ES6 ES8 ET5 ET5T ET7 ET9
@@ -73,7 +76,7 @@ Q: ES8 有宠物功能吗？自动驾驶怎么样？续航够不够用？
     "calls": [
       {"tool": "rag_search", "query": "宠物托管模式", "car_model": "ES8"},
       {"tool": "rag_search", "query": "自动驾驶 智能驾驶辅助", "car_model": "ES8"},
-      {"tool": "grep_search", "query": "CLTC续航", "car_model": "ES8"}
+      {"tool": "rag_search", "query": "CLTC续航里程", "car_model": "ES8"}
     ]
   }
 
@@ -81,7 +84,7 @@ Q: ET5 和 Model 3 哪个续航更长？
 → {
     "type": "decomposed",
     "calls": [
-      {"tool": "grep_search", "query": "CLTC续航", "car_model": "ET5"},
+      {"tool": "rag_search", "query": "CLTC续航里程", "car_model": "ET5"},
       {"tool": "web_search", "query": "特斯拉 Model 3 2024款 CLTC续航里程"}
     ]
   }
@@ -90,10 +93,10 @@ Q: 预算50万，想买适合家庭出行的Nio车型，有小孩和宠物，周
 → {
     "type": "decomposed",
     "calls": [
-      {"tool": "rag_search", "query": "宠物托管模式 儿童 家庭用车 空间", "car_model": "ES8"},
-      {"tool": "rag_search", "query": "CLTC续航 快充 换电", "car_model": "ES8"},
-      {"tool": "rag_search", "query": "宠物托管模式 儿童 家庭用车 空间", "car_model": "ET7"},
-      {"tool": "rag_search", "query": "CLTC续航 快充 换电", "car_model": "ET7"}
+      {"tool": "rag_search", "query": "宠物托管模式 儿童 家庭用车", "car_model": "ES8"},
+      {"tool": "rag_search", "query": "CLTC续航里程 快充 换电服务", "car_model": "ES8"},
+      {"tool": "rag_search", "query": "宠物托管模式 儿童 家庭用车", "car_model": "ET7"},
+      {"tool": "rag_search", "query": "CLTC续航里程 快充 换电服务", "car_model": "ET7"}
     ]
   }
 """

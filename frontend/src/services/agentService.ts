@@ -153,6 +153,13 @@ export const processChat = async (
           break;
         }
 
+        case "text_delta":
+          updateAssistant((msg) => ({
+            ...msg,
+            content: (msg.content || "") + (ev.text || ""),
+          }));
+          break;
+
         case "done": {
           const trace: Trace = {
             original_query: lastMessage.content,
@@ -162,7 +169,8 @@ export const processChat = async (
           };
           updateAssistant((msg) => ({
             ...msg,
-            content: ev.answer || "",
+            // keep already-streamed content; fall back to ev.answer if streaming didn't fire
+            content: msg.content || ev.answer || "",
             trace,
           }));
           break;

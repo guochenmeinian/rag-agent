@@ -144,7 +144,10 @@ async def chat_stream(
                     "original_query": q,
                     "refined_query": refined_ev["query"] if refined_ev else q,
                     "elapsed": time.time() - t0,
-                    "events": json.loads(json.dumps(collected, cls=_Encoder)),
+                    "events": json.loads(json.dumps(
+                    [e for e in collected if e["type"] != "text_delta"],
+                    cls=_Encoder,
+                )),
                 }
                 workflow.memory.attach_trace_to_last_assistant(trace)
                 workflow._persist()

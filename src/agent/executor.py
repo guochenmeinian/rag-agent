@@ -1,4 +1,5 @@
 import json
+from typing import Generator
 
 from openai import OpenAI
 
@@ -45,6 +46,103 @@ class AgentExecutor:
         # else: no tools at all → omit both, LLM answers directly
         response = self._client.chat.completions.create(**create_kwargs)
         return self._parse(response)
+
+    def run_stream(
+        self,
+        messages: list[dict],
+        extra_system: str = "",
+        force_direct: bool = False,
+    ) -> Generator[tuple[str, str | ExecutorResponse], None, None]:
+        """Streaming variant of run().
+
+        Yields:
+            ("delta", token_str)  — one per content token, for direct answers only
+            ("response", ExecutorResponse)  — exactly once, at the end
+        """
+        sys_content = f"{prompt.SYSTEM}\n\n{extra_system}" if extra_system else prompt.SYSTEM
+        create_kwargs: dict = dict(
+            model=self._model,
+            max_tokens=4096,
+            temperature=0.3,
+            stream=True,
+            stream_options={"include_usage": True},
+            messages=[{"role": "system", "content": sys_content}] + messages,
+        )
+        if self._tool_schemas and not force_direct:
+            create_kwargs["tools"] = self._tool_schemas
+            create_kwargs["parallel_tool_calls"] = True
+        elif self._tool_schemas and force_direct:
+            create_kwargs["tools"] = self._tool_schemas
+            create_kwargs["tool_choice"] = "none"
+
+        content_parts: list[str] = []
+        tool_calls_acc: dict[int, dict] = {}  # index → {id, name, arguments}
+        usage: dict[str, int] = {}
+
+        stream = self._client.chat.completions.create(**create_kwargs)
+        for chunk in stream:
+            # Final usage-only chunk has no choices
+            if not chunk.choices:
+                if getattr(chunk, "usage", None):
+                    usage = {
+                        "prompt_tokens": chunk.usage.prompt_tokens,
+                        "completion_tokens": chunk.usage.completion_tokens,
+                        "total_tokens": chunk.usage.total_tokens,
+                    }
+                continue
+
+            delta = chunk.choices[0].delta
+
+            if delta.content:
+                content_parts.append(delta.content)
+                yield ("delta", delta.content)
+
+            if delta.tool_calls:
+                for tc in delta.tool_calls:
+                    i = tc.index
+                    if i not in tool_calls_acc:
+                        tool_calls_acc[i] = {"id": "", "name": "", "arguments": ""}
+                    if tc.id:
+                        tool_calls_acc[i]["id"] = tc.id
+                    if tc.function:
+                        if tc.function.name:
+                            tool_calls_acc[i]["name"] += tc.function.name
+                        if tc.function.arguments:
+                            tool_calls_acc[i]["arguments"] += tc.function.arguments
+
+        full_content = "".join(content_parts)
+
+        if tool_calls_acc:
+            blocks = [
+                ToolUseBlock(
+                    id=data["id"],
+                    name=data["name"],
+                    input=json.loads(data["arguments"]) if data["arguments"] else {},
+                )
+                for _, data in sorted(tool_calls_acc.items())
+            ]
+            raw = {
+                "role": "assistant",
+                "content": full_content or None,
+                "tool_calls": [
+                    {
+                        "id": data["id"],
+                        "type": "function",
+                        "function": {"name": data["name"], "arguments": data["arguments"]},
+                    }
+                    for _, data in sorted(tool_calls_acc.items())
+                ],
+            }
+            yield ("response", ExecutorResponse(
+                type="tool_call", raw_content=raw, tool_use_blocks=blocks, usage=usage,
+            ))
+        else:
+            yield ("response", ExecutorResponse(
+                type="direct",
+                answer=full_content,
+                raw_content={"role": "assistant", "content": full_content},
+                usage=usage,
+            ))
 
     def _parse(self, response) -> ExecutorResponse:
         msg = response.choices[0].message
