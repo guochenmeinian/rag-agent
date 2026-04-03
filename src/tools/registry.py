@@ -7,6 +7,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError as
 from .base import BaseTool
 from .result import ToolResult
 
+# Global cap on concurrent tool executions to prevent unbounded thread creation.
+_MAX_PARALLEL_TOOLS = 6
+
 # ── Structured tool call format ────────────────────────────────────────────────
 # Every call dict flowing through the system has the shape:
 #   {
@@ -62,7 +65,7 @@ class ToolRegistry:
 
         results: list[dict | None] = [None] * len(calls)
 
-        with ThreadPoolExecutor(max_workers=len(calls)) as pool:
+        with ThreadPoolExecutor(max_workers=min(len(calls), _MAX_PARALLEL_TOOLS)) as pool:
             future_to_idx = {
                 pool.submit(self._run_with_resilience, call): i
                 for i, call in enumerate(calls)

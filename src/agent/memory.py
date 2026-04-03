@@ -1,14 +1,18 @@
 """Conversation memory: facts + global user info + recent messages."""
 
 import json
+import math
 import os
 import re
+import tempfile
 from collections import deque
 from dataclasses import dataclass, field
 
 import config
 from prompts.memory import FACT_EXTRACT_SYSTEM
 from .qwen_client import get_qwen_client
+
+_MAX_UI_MESSAGES = 200
 
 
 @dataclass
@@ -81,6 +85,9 @@ class ConversationMemory:
         """Add a message to the sliding window (no LLM call here)."""
         self.recent_messages.append({"role": role, "content": content})
         self.ui_messages.append({"role": role, "content": content})
+        # Prevent unbounded growth — keep most recent messages
+        if len(self.ui_messages) > _MAX_UI_MESSAGES:
+            self.ui_messages = self.ui_messages[-_MAX_UI_MESSAGES:]
 
     def attach_trace_to_last_assistant(self, trace: dict):
         """Attach trace data to the most recent assistant ui_message."""
@@ -207,8 +214,19 @@ class ConversationMemory:
             "recent_messages": list(self.recent_messages),
             "ui_messages": self.ui_messages,
         }
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        # Atomic write: write to temp file then rename to prevent half-written JSON
+        dir_name = os.path.dirname(path)
+        fd, tmp_path = tempfile.mkstemp(dir=dir_name, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            os.replace(tmp_path, path)
+        except BaseException:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
 
     @classmethod
     def load(cls, path: str) -> "ConversationMemory":
@@ -216,8 +234,11 @@ class ConversationMemory:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
         except (json.JSONDecodeError, OSError):
+            # Isolate corrupted file instead of deleting (preserves user data for recovery)
             try:
-                os.remove(path)
+                corrupt_path = path + ".corrupt"
+                if os.path.exists(path) and not os.path.exists(corrupt_path):
+                    os.rename(path, corrupt_path)
             except OSError:
                 pass
             return cls()
@@ -247,6 +268,7 @@ class ConversationMemory:
 
         for msg in data.get("recent_messages", []):
             mem.recent_messages.append(msg)
-        mem.ui_messages = data.get("ui_messages", [])
+        ui = data.get("ui_messages", [])
+        mem.ui_messages = ui[-_MAX_UI_MESSAGES:] if len(ui) > _MAX_UI_MESSAGES else ui
 
         return mem

@@ -113,14 +113,13 @@ class AgentExecutor:
         full_content = "".join(content_parts)
 
         if tool_calls_acc:
-            blocks = [
-                ToolUseBlock(
-                    id=data["id"],
-                    name=data["name"],
-                    input=json.loads(data["arguments"]) if data["arguments"] else {},
-                )
-                for _, data in sorted(tool_calls_acc.items())
-            ]
+            blocks = []
+            for _, data in sorted(tool_calls_acc.items()):
+                try:
+                    parsed_args = json.loads(data["arguments"]) if data["arguments"] else {}
+                except json.JSONDecodeError:
+                    parsed_args = {"_raw": data["arguments"], "_parse_error": True}
+                blocks.append(ToolUseBlock(id=data["id"], name=data["name"], input=parsed_args))
             raw = {
                 "role": "assistant",
                 "content": full_content or None,
@@ -155,14 +154,13 @@ class AgentExecutor:
             }
 
         if msg.tool_calls:
-            blocks = [
-                ToolUseBlock(
-                    id=tc.id,
-                    name=tc.function.name,
-                    input=json.loads(tc.function.arguments),
-                )
-                for tc in msg.tool_calls
-            ]
+            blocks = []
+            for tc in msg.tool_calls:
+                try:
+                    parsed = json.loads(tc.function.arguments)
+                except json.JSONDecodeError:
+                    parsed = {}
+                blocks.append(ToolUseBlock(id=tc.id, name=tc.function.name, input=parsed))
             raw = {
                 "role": "assistant",
                 "content": msg.content,

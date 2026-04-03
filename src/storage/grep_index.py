@@ -24,8 +24,15 @@ class GrepIndex:
         self.db_path = db_path
         self._ensure_schema()
 
+    def _connect(self) -> sqlite3.Connection:
+        """Create a connection with WAL mode and busy timeout."""
+        conn = sqlite3.connect(self.db_path, timeout=10)
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA busy_timeout=5000")
+        return conn
+
     def _ensure_schema(self):
-        conn = sqlite3.connect(self.db_path)
+        conn = self._connect()
         try:
             conn.execute("CREATE TABLE IF NOT EXISTS _grep_schema (version INTEGER)")
             cur = conn.execute("SELECT version FROM _grep_schema LIMIT 1")
@@ -51,7 +58,7 @@ class GrepIndex:
 
     def has_chunks(self, col_name: str) -> bool:
         """检查该 col 是否已有数据"""
-        conn = sqlite3.connect(self.db_path)
+        conn = self._connect()
         try:
             cur = conn.execute(
                 f"SELECT 1 FROM {self.TABLE} WHERE col_name = ? LIMIT 1",
@@ -65,7 +72,7 @@ class GrepIndex:
         """
         插入该车型的 chunks。会先删除该 col 的旧数据再插入。
         """
-        conn = sqlite3.connect(self.db_path)
+        conn = self._connect()
         try:
             conn.execute(
                 f"DELETE FROM {self.TABLE} WHERE col_name = ?",
@@ -107,7 +114,7 @@ class GrepIndex:
 
         match_expr = " OR ".join(terms)
 
-        conn = sqlite3.connect(self.db_path)
+        conn = self._connect()
         try:
             # FTS5: col_name 过滤 + MATCH
             cur = conn.execute(

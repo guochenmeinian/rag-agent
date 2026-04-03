@@ -25,6 +25,8 @@ Ingest Manager - 文件指纹检测 + Parse 结果缓存
 import hashlib
 import json
 import os
+import tempfile
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
@@ -50,7 +52,7 @@ class IngestManager:
     3. Manifest 管理 - 记录已 ingest 的文件和版本
     """
     
-    def __init__(self, 
+    def __init__(self,
                  manifest_path: str = None,
                  cache_dir: str = None):
         """
@@ -59,11 +61,12 @@ class IngestManager:
             cache_dir: parse 缓存目录，默认在项目根目录的 .parse_cache/
         """
         project_root = Path(__file__).resolve().parents[2]
-        
+
         self.manifest_path = manifest_path or str(project_root / ".ingest_manifest.json")
         self.cache_dir = Path(cache_dir or str(project_root / ".parse_cache"))
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        
+        self._lock = threading.RLock()
+
         self._manifest = self._load_manifest()
     
     # =========================================================================
@@ -81,9 +84,20 @@ class IngestManager:
         return {}
     
     def _save_manifest(self):
-        """保存 manifest 文件"""
-        with open(self.manifest_path, "w", encoding="utf-8") as f:
-            json.dump(self._manifest, f, indent=2, ensure_ascii=False)
+        """保存 manifest 文件（原子写入 + 线程安全）"""
+        with self._lock:
+            dir_name = os.path.dirname(self.manifest_path) or "."
+            fd, tmp_path = tempfile.mkstemp(dir=dir_name, suffix=".tmp")
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
+                    json.dump(self._manifest, f, indent=2, ensure_ascii=False)
+                os.replace(tmp_path, self.manifest_path)
+            except BaseException:
+                try:
+                    os.unlink(tmp_path)
+                except OSError:
+                    pass
+                raise
     
     def _file_hash(self, filepath: str) -> str:
         """计算文件的 MD5 指纹"""
@@ -122,8 +136,10 @@ class IngestManager:
                 reason="no PDF files provided",
             )
 
-        # 获取上次 ingest 时的文件指纹
-        cached_files = self._manifest.get(col_name, {}).get("files", {})
+        # 获取上次 ingest 时的文件指纹（线程安全快照）
+        with self._lock:
+            cached_files = dict(self._manifest.get(col_name, {}).get("files", {}))
+            cached_flags_snapshot = dict(self._manifest.get(col_name, {}).get("pipeline_flags", {}))
 
         # 比较文件指纹
         changed_files = []
@@ -147,8 +163,7 @@ class IngestManager:
         # 检查 pipeline 配置是否变化（如 contextual_retrieval 开关）
         pipeline_changed = False
         if pipeline_flags:
-            cached_flags = self._manifest.get(col_name, {}).get("pipeline_flags", {})
-            if cached_flags != pipeline_flags:
+            if cached_flags_snapshot != pipeline_flags:
                 pipeline_changed = True
 
         # 决定是否跳过
@@ -193,11 +208,12 @@ class IngestManager:
             if os.path.exists(filepath):
                 files[os.path.basename(filepath)] = self._file_hash(filepath)
 
-        self._manifest[col_name] = {
-            "files": files,
-            "pipeline_flags": pipeline_flags or {},
-            "last_ingested": self._get_timestamp(),
-        }
+        with self._lock:
+            self._manifest[col_name] = {
+                "files": files,
+                "pipeline_flags": pipeline_flags or {},
+                "last_ingested": self._get_timestamp(),
+            }
         self._save_manifest()
     
     @staticmethod

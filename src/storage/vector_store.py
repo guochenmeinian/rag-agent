@@ -7,6 +7,10 @@ from pymilvus import (
     Collection,
 )
 
+# 全局连接追踪：避免对同一 URI 重复创建 gRPC channel
+_connected_uris: set[str] = set()
+
+
 class MilvusVectorStore():
 
     def __init__(self, dense_dim, uri="./milvus.db", col_name="hybrid_demo"):
@@ -16,9 +20,18 @@ class MilvusVectorStore():
 
         self._connect(self.uri)
         self.col = self._init_collection()
-    
+
     def _connect(self, uri):
-        connections.connect(uri=uri)
+        if uri not in _connected_uris:
+            connections.connect(uri=uri)
+            _connected_uris.add(uri)
+
+    def release(self):
+        """Release the collection from memory."""
+        try:
+            self.col.release()
+        except Exception:
+            pass
     
     def _build_schema(self):
         fields = [
@@ -43,8 +56,9 @@ class MilvusVectorStore():
     def _init_collection(self):
         if utility.has_collection(self.col_name):
             col = Collection(self.col_name)
-            col.load()
+            # 先检查 entity 数量再决定是否 load，避免空 collection 白白占内存
             if col.num_entities > 0:
+                col.load()
                 self.already_exists = True
                 return col
             col.drop()

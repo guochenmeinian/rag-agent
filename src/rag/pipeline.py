@@ -178,7 +178,7 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
         raise ValueError(f"No PDF files found in {data_dir}" +
                          (f" matching '{file_filter}'" if file_filter else ""))
 
-    # 检查 collection 状态
+    # 检查 collection 状态（probe 仅用于检测，skip 路径外立即 release 释放内存）
     probe = MilvusVectorStore(uri=uri, col_name=col_name, dense_dim=_PROBE_DIM)
     collection_exists = probe.already_exists
     collection_count = probe.col.num_entities if collection_exists else 0
@@ -260,10 +260,13 @@ def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, f
     emb = embed_texts(small_chunks, embedder)
     dense_dim = emb["dense"][0].shape[0]
 
-    # 5. 如果 collection 已存在但需要重建，先删除
+    # 5. 如果 collection 已存在但需要重建，先释放再删除
     if collection_exists:
         print(f"[ingest] {col_name}: dropping existing collection")
+        probe.release()
         probe.col.drop()
+    else:
+        probe.release()
 
     # 6. 重新创建并插入（同时存 small chunk 和 parent chunk）
     store = MilvusVectorStore(uri=uri, col_name=col_name, dense_dim=dense_dim)

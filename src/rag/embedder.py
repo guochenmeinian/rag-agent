@@ -1,6 +1,7 @@
 # download bge model
 import os
 import platform
+import threading
 from pathlib import Path
 from modelscope import snapshot_download
 from pymilvus import model
@@ -28,7 +29,19 @@ def _get_model_cache_dir() -> Path:
     return cache_dir
 
 
+_embedder_instance = None
+_embedder_lock = threading.Lock()
+
+
 def load_bge_m3_embedder():
+    """Load BGE-M3 embedder (singleton — loaded once, shared across all RAGContexts)."""
+    global _embedder_instance
+    if _embedder_instance is not None:
+        return _embedder_instance
+    with _embedder_lock:
+        if _embedder_instance is not None:
+            return _embedder_instance
+
     model_cache_dir = _get_model_cache_dir()
     local_model_dir = model_cache_dir / "BAAI" / "bge-m3"
 
@@ -39,11 +52,12 @@ def load_bge_m3_embedder():
         cache_dir=str(model_cache_dir), revision='master')
 
     # BGEM3EmbeddingFunction: https://milvus.io/api-reference/pymilvus/v2.4.x/EmbeddingModels/BGEM3EmbeddingFunction/BGEM3EmbeddingFunction.md
-    return model.hybrid.BGEM3EmbeddingFunction(
+    _embedder_instance = model.hybrid.BGEM3EmbeddingFunction(
         model_dir,
         use_fp16=False,
         device=_get_device()
     )
+    return _embedder_instance
 
 
 _reranker_instance: FlagReranker | None = None
