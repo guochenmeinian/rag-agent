@@ -10,7 +10,7 @@ usage() {
   cat <<'EOF'
 Usage:
   ./run.sh setup   # create .venv and install pinned deps
-  ./run.sh serve   # start FastAPI server at http://localhost:8000
+  ./run.sh serve   # start Milvus (if needed) + FastAPI server at http://localhost:8000
   ./run.sh test    # run src/tests/test_generator.py (full RAG E2E)
   ./run.sh test-milvus  # run src/tests/test_milvus.py
   ./run.sh doctor  # re-sign binary libs on macOS
@@ -117,8 +117,47 @@ run_test_milvus() {
   "$PYTHON_BIN" "$ROOT_DIR/src/tests/test_milvus.py"
 }
 
+ensure_milvus() {
+  # Skip if using Milvus-lite (local .db file)
+  local uri="${MILVUS_URI:-http://localhost:19530}"
+  if [[ "$uri" == *.db ]]; then
+    return 0
+  fi
+
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "ERROR: Docker not found. Install Docker or set MILVUS_URI=./milvus.db for lite mode."
+    exit 1
+  fi
+
+  if ! curl -sf http://localhost:9091/healthz >/dev/null 2>&1; then
+    echo "[milvus] Starting Milvus container..."
+    docker compose -f "$ROOT_DIR/docker-compose.yml" up -d
+    echo "[milvus] Waiting for healthy status..."
+    local retries=0
+    while ! curl -sf http://localhost:9091/healthz >/dev/null 2>&1; do
+      retries=$((retries + 1))
+      if [[ $retries -ge 30 ]]; then
+        echo "ERROR: Milvus failed to start within 60s. Check: docker compose logs milvus"
+        exit 1
+      fi
+      sleep 2
+    done
+    echo "[milvus] Ready."
+  fi
+}
+
 run_serve() {
   set_common_env
+  ensure_milvus
+  # Kill stale uvicorn if port 8000 is occupied
+  local stale_pid
+  stale_pid="$(lsof -ti:8000 2>/dev/null || true)"
+  if [[ -n "$stale_pid" ]]; then
+    echo "[serve] Killing stale process on port 8000 (pid $stale_pid)..."
+    kill $stale_pid 2>/dev/null || true
+    sleep 1
+    kill -9 $stale_pid 2>/dev/null || true
+  fi
   # --loop asyncio: nest_asyncio 不兼容 uvloop，用标准 asyncio
   "$VENV_DIR/bin/uvicorn" api:app --reload --port 8000 --app-dir "$ROOT_DIR/src" --loop asyncio
 }
