@@ -327,7 +327,7 @@ def main():
     missing = [m for m in _MODEL_SCAN_ORDER if m not in contexts]
     if missing:
         print(f"  ⚠ 以下 collection 加载失败，涉及的 case 将返回空结果: {missing}")
-        print(f"  （原因通常是 milvus.db 被 API server 占用，关闭 server 后重跑可修复）")
+        print(f"  （请确认 Milvus 服务已启动且数据已 ingest）")
 
     # Pre-embed all queries
     print("\n[2/3] 预嵌入查询（每条查询只 embed 一次）…")

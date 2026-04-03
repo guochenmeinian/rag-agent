@@ -158,7 +158,7 @@ class AgentWorkflow:
                 # Execute all planned calls in parallel
                 tool_results = self.registry.run_parallel(registry_calls)
 
-                # If ALL results failed (e.g. Milvus "Already borrowed" burst), skip
+                # If ALL results failed, skip
                 # injection — let the Executor loop decide tools from scratch instead of
                 # reasoning over empty / error-only context.
                 successful = [r for r in tool_results if r["result"].success]

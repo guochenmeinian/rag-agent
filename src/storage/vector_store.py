@@ -13,7 +13,7 @@ _connected_uris: set[str] = set()
 
 class MilvusVectorStore():
 
-    def __init__(self, dense_dim, uri="./milvus.db", col_name="hybrid_demo"):
+    def __init__(self, dense_dim, uri="http://localhost:19530", col_name="hybrid_demo"):
         self.dense_dim = dense_dim
         self.uri = uri
         self.col_name = col_name
@@ -50,7 +50,7 @@ class MilvusVectorStore():
     def _build_index(self, col):
         sparse_index = {"index_type": "SPARSE_INVERTED_INDEX", "metric_type": "IP"}
         col.create_index("sparse_vector", sparse_index)
-        dense_index = {"index_type": "AUTOINDEX", "metric_type": "IP"}
+        dense_index = {"index_type": "HNSW", "metric_type": "IP", "params": {"M": 16, "efConstruction": 256}}
         col.create_index("dense_vector", dense_index)
     
     def _init_collection(self):
@@ -64,7 +64,7 @@ class MilvusVectorStore():
             col.drop()
 
         self.already_exists = False
-        col = Collection(self.col_name, self._build_schema(), consistency_level="Strong")
+        col = Collection(self.col_name, self._build_schema(), consistency_level="Bounded")
         self._build_index(col)
         col.load()
         return col
@@ -89,8 +89,9 @@ class MilvusVectorStore():
         schema_field_names = {f.name for f in self.col.schema.fields}
         has_metadata = "source_file" in schema_field_names
 
-        for i in range(0, len(chunks), 50):
-            end = min(i + 50, len(chunks))
+        _BATCH = 1000
+        for i in range(0, len(chunks), _BATCH):
+            end = min(i + _BATCH, len(chunks))
             sparse_batch = [self._sparse_row(sparse_embeddings, row_idx) for row_idx in range(i, end)]
             if has_metadata:
                 self.col.insert(

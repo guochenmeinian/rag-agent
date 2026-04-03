@@ -146,7 +146,7 @@ def get_ingest_manager() -> IngestManager:
     return _ingest_managers[uri_tag]
 
 
-def ingest(data_dir="data", uri="./milvus.db", col_name="hybrid", force=False, file_filter=None, grep_path=None):
+def ingest(data_dir="data", uri="http://localhost:19530", col_name="hybrid", force=False, file_filter=None, grep_path=None):
     """
     Ingest PDF 文档到向量数据库
 

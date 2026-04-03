@@ -29,7 +29,7 @@ def _hit_to_tuple(hit, fields: list[str]) -> tuple[str, str, float, str, str]:
 
 def dense_search(col, query_dense_embedding, limit=5):
     fields = _output_fields(col)
-    search_params = {"metric_type": "IP", "params": {}}
+    search_params = {"metric_type": "IP", "params": {"ef": 128}}
     res = col.search(
         [query_dense_embedding],
         anns_field="dense_vector",
@@ -42,7 +42,7 @@ def dense_search(col, query_dense_embedding, limit=5):
 
 def sparse_search(col, query_sparse_embedding, limit=5):
     fields = _output_fields(col)
-    search_params = {"metric_type": "IP", "params": {}}
+    search_params = {"metric_type": "IP", "params": {"ef": 128}}
     res = col.search(
         [query_sparse_embedding],
         anns_field="sparse_vector",
@@ -55,7 +55,7 @@ def sparse_search(col, query_sparse_embedding, limit=5):
 
 def hybrid_search(col, query_dense_embedding, query_sparse_embedding, sparse_weight=1.0, dense_weight=0.7, limit=5):
     fields = _output_fields(col)
-    dense_search_params = {"metric_type": "IP", "params": {}}
+    dense_search_params = {"metric_type": "IP", "params": {"ef": 128}}
     dense_req = AnnSearchRequest(
         [query_dense_embedding], "dense_vector", dense_search_params, limit=limit
     )
