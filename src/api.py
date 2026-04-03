@@ -84,20 +84,28 @@ async def lifespan(app: FastAPI):
     _rag_contexts = _load_rag_contexts()
     _registry = _build_registry(_rag_contexts)
     yield
-    # Shutdown: release all loaded collections to free memory
-    for model, ctx in _rag_contexts.items():
+    # Shutdown: release collections with a hard timeout to avoid hanging on Ctrl+C
+    import concurrent.futures
+    def _shutdown_milvus():
+        for model, ctx in _rag_contexts.items():
+            try:
+                ctx.store.release()
+                print(f"[shutdown] {model} collection released")
+            except Exception:
+                pass
+        from pymilvus import connections
+        from storage.vector_store import _connected_uris
         try:
-            ctx.store.release()
-            print(f"[shutdown] {model} collection released")
+            connections.disconnect("default")
+            _connected_uris.clear()
         except Exception:
             pass
-    from pymilvus import connections
-    from storage.vector_store import _connected_uris
-    try:
-        connections.disconnect("default")
-        _connected_uris.clear()
-    except Exception:
-        pass
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        try:
+            pool.submit(_shutdown_milvus).result(timeout=5)
+        except concurrent.futures.TimeoutError:
+            print("[shutdown] Milvus cleanup timed out, forcing exit")
 
 
 app = FastAPI(title="NIO AI Assistant", lifespan=lifespan)
