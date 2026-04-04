@@ -50,6 +50,25 @@ def reciprocal_rank(ranked_ids: list[str], relevant_ids: set[str]) -> float:
     return 0.0
 
 
+def recall_at_k(ranked_ids: list[str], relevant_ids: set[str], k: int) -> float:
+    """Fraction of relevant chunks found in top-k results."""
+    if not relevant_ids:
+        return 0.0
+    found = sum(1 for cid in ranked_ids[:k] if cid in relevant_ids)
+    return found / len(relevant_ids)
+
+
+def ndcg_at_k(ranked_ids: list[str], relevant_ids: set[str], k: int) -> float:
+    """Normalized Discounted Cumulative Gain at k."""
+    import math
+    dcg = sum(
+        (1.0 / math.log2(i + 2)) for i, cid in enumerate(ranked_ids[:k])
+        if cid in relevant_ids
+    )
+    ideal = sum(1.0 / math.log2(i + 2) for i in range(min(len(relevant_ids), k)))
+    return dcg / ideal if ideal > 0 else 0.0
+
+
 # ─────────────────────────────────────────────────────────────
 # Mode B helpers
 # ─────────────────────────────────────────────────────────────
@@ -109,13 +128,15 @@ def eval_retrieval_case(
     relevant = set(gt.get("relevant_chunk_ids", []))
     if relevant:
         hits = {f"hit@{k}": hit_at_k(ranked_ids, relevant, k) for k in eval_at_k}
+        recalls = {f"recall@{k}": round(recall_at_k(ranked_ids, relevant, k), 4) for k in eval_at_k}
+        ndcgs = {f"ndcg@{k}": round(ndcg_at_k(ranked_ids, relevant, k), 4) for k in eval_at_k}
         mrr  = reciprocal_rank(ranked_ids, relevant)
         return {
             "id":    case["id"],
             "input": case["input"],
             "skip":  False,
             "mode":  "chunk_id",
-            "metrics": {**hits, "mrr": round(mrr, 4)},
+            "metrics": {**hits, **recalls, **ndcgs, "mrr": round(mrr, 4)},
             "detail": {
                 "ranked_top5": ranked_ids[:5],
                 "relevant":    list(relevant),
@@ -177,9 +198,11 @@ def aggregate_retrieval(results: list[dict]) -> dict:
         for r in mode_a:
             all_k.update(int(k.split("@")[1]) for k in r["metrics"] if k.startswith("hit@"))
         for k in sorted(all_k):
-            key = f"hit@{k}"
-            vals = [r["metrics"].get(key, 0) for r in mode_a]
-            agg[key] = round(sum(vals) / len(vals), 3)
+            for prefix in ["hit", "recall", "ndcg"]:
+                key = f"{prefix}@{k}"
+                vals = [r["metrics"].get(key, 0) for r in mode_a if key in r.get("metrics", {})]
+                if vals:
+                    agg[key] = round(sum(vals) / len(vals), 3)
         mrr_vals = [r["metrics"]["mrr"] for r in mode_a]
         agg["mrr"] = round(sum(mrr_vals) / len(mrr_vals), 4)
         agg["n_chunk_id"] = len(mode_a)

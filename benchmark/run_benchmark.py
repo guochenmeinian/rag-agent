@@ -348,6 +348,7 @@ def print_summary(summary: dict):
         ],
         "retrieval": [
             ("hit@1", None), ("hit@3", None), ("hit@5", None), ("mrr", "n_chunk_id"),
+            ("recall@5", None), ("ndcg@5", None),
             ("relevance@5", "n_llm_judge"), ("facts_coverage_avg", None),
             ("no_hit_ok", "no_hit_n"),
         ],
@@ -403,7 +404,7 @@ def print_case_row(r: dict):
 # CLI
 # ─────────────────────────────────────────────────────────────
 
-DISABLEABLE = ["rewriter", "rag", "web", "memory"]
+DISABLEABLE = ["rewriter", "rag", "web", "memory", "planner"]
 
 
 def parse_args() -> argparse.Namespace:
